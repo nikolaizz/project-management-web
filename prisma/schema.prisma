@@ -1,0 +1,124 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ============ ENUM ============
+
+enum KategoriProject {
+  FS
+  CR_FORM
+  AIR_FORM
+  IC_FORM
+  SC_FORM
+}
+
+enum JenisProject {
+  NEW
+  ADDENDUM
+}
+
+enum ProjectStatus {
+  DRAFT
+  INISIASI
+  ON_PROGRESS
+  PENDING
+  ON_HOLD
+  SELESAI
+}
+
+enum Role {
+  ADMIN
+  PROJECT_MANAGER
+  VIEWER
+}
+
+// ============ MASTER DATA (isi dropdown) ============
+
+model ProjectManager {
+  id       Int       @id @default(autoincrement())
+  nama     String    @unique
+  projects Project[]
+}
+
+model BusinessPartner {
+  id       Int       @id @default(autoincrement())
+  nama     String    @unique
+  projects Project[]
+}
+
+model Unit {
+  id       Int       @id @default(autoincrement())
+  nama     String    @unique
+  projects Project[]
+}
+
+// ============ USER ============
+
+model User {
+  id           Int      @id @default(autoincrement())
+  nama         String
+  email        String   @unique
+  passwordHash String
+  role         Role     @default(PROJECT_MANAGER)
+  createdAt    DateTime @default(now())
+}
+
+// ============ PROJECT ============
+
+model Project {
+  id            Int             @id @default(autoincrement())
+  kategori      KategoriProject
+  jenis         JenisProject
+  kodeProject   String?         @unique
+  nama          String
+  deskripsi     String
+  pmId          Int
+  pm            ProjectManager  @relation(fields: [pmId], references: [id])
+  bpId          Int
+  bp            BusinessPartner @relation(fields: [bpId], references: [id])
+  unitId        Int
+  unitPengusul  Unit            @relation(fields: [unitId], references: [id])
+  ownerPic      String
+  tanggalProject DateTime       @db.Date
+  targetGoLive  DateTime?       @db.Date
+  status        ProjectStatus   @default(INISIASI)
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime        @updatedAt
+
+  documents     Document[]
+  updates       ProjectUpdate[]
+
+  @@index([status])
+  @@index([nama])
+}
+
+// Dokumen pendukung (upload)
+model Document {
+  id         Int      @id @default(autoincrement())
+  projectId  Int
+  project    Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  namaFile   String
+  pathFile   String
+  ukuran     Int
+  tipe       String
+  uploadedAt DateTime @default(now())
+}
+
+// Riwayat update (tabel History)
+model ProjectUpdate {
+  id           Int           @id @default(autoincrement())
+  projectId    Int
+  project      Project       @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  tanggalInput DateTime      @default(now())
+  status       ProjectStatus
+  aktivitas    String        // Aktivitas / Progress / Outcome
+  kendala      String?       // Kendala / Issue
+  nextAction   String
+
+  @@index([projectId, tanggalInput])
+}
