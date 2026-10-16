@@ -1,7 +1,8 @@
 import prisma from "../src/lib/prisma.js";
 
 async function main() {
-  // Bersihkan data lama (anak dulu, baru induk)
+  // Bersihkan data agar seed bisa dijalankan ulang; hapus tabel anak sebelum induknya
+  // karena data anak memiliki relasi foreign key ke project dan data master.
   await prisma.document.deleteMany();
   await prisma.projectUpdate.deleteMany();
   await prisma.project.deleteMany();
@@ -10,6 +11,7 @@ async function main() {
   await prisma.unit.deleteMany();
   await prisma.user.deleteMany();
 
+  // Buat satu user contoh. Hash ini hanya data dummy untuk pengembangan.
   await prisma.user.create({
     data: {
       nama: "Riswan Saputra",
@@ -19,7 +21,7 @@ async function main() {
     },
   });
 
-  // Master data untuk dropdown
+  // Buat data master yang akan direferensikan oleh contoh project di bawah.
   const [budi, dewi] = await Promise.all([
     prisma.projectManager.create({ data: { nama: "Budi Santoso" } }),
     prisma.projectManager.create({ data: { nama: "Dewi Lestari" } }),
@@ -33,7 +35,7 @@ async function main() {
     prisma.unit.create({ data: { nama: "ITS" } }),
   ]);
 
-  // Project dummy
+  // Buat contoh project beserta referensi PM, BP, dan unit dari data master di atas.
   const hcms = await prisma.project.create({
     data: {
       kategori: "FS",
@@ -102,7 +104,7 @@ async function main() {
     },
   });
 
-  // Riwayat update untuk project pertama
+  // Tambahkan dua catatan riwayat untuk menunjukkan perkembangan project pertama.
   await prisma.projectUpdate.createMany({
     data: [
       {
@@ -127,6 +129,7 @@ async function main() {
   console.log("Seed selesai");
 }
 
+// Jalankan seed; jika gagal, tampilkan error dan akhiri proses dengan status gagal.
 main()
   .catch((e) => {
     console.error(e);

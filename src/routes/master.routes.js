@@ -8,6 +8,7 @@ import {
 
 const router = Router();
 
+// Endpoint untuk data referensi yang biasanya digunakan sebagai pilihan form.
 router.get("/pm", getProjectManagers);
 router.get("/bp", getBusinessPartners);
 router.get("/units", getUnits);

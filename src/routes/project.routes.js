@@ -10,9 +10,12 @@ import { createProjectSchema } from "../validators/project.validator.js";
 
 const router = Router();
 
+// Daftar project dan pemeriksaan kode ditempatkan sebelum route parameter /:id.
 router.get("/", getProjects);
 router.get("/check-code", checkProjectCode); // HARUS di atas "/:id"
+// Route /:id menangkap satu segmen URL sebagai ID project.
 router.get("/:id", getProjectById);
+// Validasi body request dijalankan sebelum controller menyimpan project.
 router.post("/", validate(createProjectSchema), createProject);
 
 export default router;

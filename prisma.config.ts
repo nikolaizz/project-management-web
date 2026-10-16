@@ -1,6 +1,7 @@
 import "dotenv/config";
 import { defineConfig, env } from "prisma/config";
 
+// Pengaturan Prisma: lokasi schema, migrasi, perintah seed, dan URL database.
 export default defineConfig({
   schema: "prisma/schema.prisma",
   migrations: {

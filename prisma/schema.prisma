@@ -1,13 +1,15 @@
 generator client {
+  // Prisma Client hasil generate disimpan pada folder generated.
   provider = "prisma-client"
   output   = "../generated/prisma"
 }
 
 datasource db {
+  // URL koneksi database dibaca dari konfigurasi Prisma, bukan ditulis di schema ini.
   provider = "postgresql"
 }
 
-// ============ ENUM ============
+// Pilihan tetap yang dipakai untuk kategori, jenis, status project, dan peran user.
 
 enum KategoriProject {
   FS
@@ -37,7 +39,7 @@ enum Role {
   VIEWER
 }
 
-// ============ MASTER DATA (isi dropdown) ============
+// Data referensi untuk mengisi dropdown dan relasinya ke project.
 
 model ProjectManager {
   id       Int       @id @default(autoincrement())
@@ -57,7 +59,7 @@ model Unit {
   projects Project[]
 }
 
-// ============ USER ============
+// Akun pengguna aplikasi; email menjadi identitas unik untuk login.
 
 model User {
   id           Int      @id @default(autoincrement())
@@ -68,8 +70,7 @@ model User {
   createdAt    DateTime @default(now())
 }
 
-// ============ PROJECT ============
-
+// Data utama project dan relasinya ke data master, dokumen, serta riwayat update.
 model Project {
   id            Int             @id @default(autoincrement())
   kategori      KategoriProject
@@ -97,7 +98,7 @@ model Project {
   @@index([nama])
 }
 
-// Dokumen pendukung (upload)
+// Metadata file yang diunggah; file terkait ikut terhapus jika project dihapus.
 model Document {
   id         Int      @id @default(autoincrement())
   projectId  Int
@@ -109,7 +110,7 @@ model Document {
   uploadedAt DateTime @default(now())
 }
 
-// Riwayat update (tabel History)
+// Catatan perkembangan project yang tersimpan sebagai riwayat terpisah.
 model ProjectUpdate {
   id           Int           @id @default(autoincrement())
   projectId    Int

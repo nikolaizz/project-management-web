@@ -1,7 +1,7 @@
 import prisma from "../lib/prisma.js";
 import { STATUS, KATEGORI } from "../constants/enums.js";
 
-// Relasi yang selalu disertakan di response
+// Relasi data master yang ikut dikirim bersama project, tanpa mengambil kolom lain.
 const projectInclude = {
   pm: { select: { id: true, nama: true } },
   bp: { select: { id: true, nama: true } },
@@ -11,10 +11,12 @@ const projectInclude = {
 // ---------- GET /projects ----------
 export async function getProjects(req, res, next) {
   try {
+    // Ambil filter dan pagination dari query URL; batasi jumlah hasil maksimal 100.
     const page = Math.max(parseInt(req.query.page) || 1, 1);
     const limit = Math.min(parseInt(req.query.limit) || 10, 100);
     const { search, status, kategori, unitId } = req.query;
 
+    // Tolak filter yang tidak termasuk pilihan resmi sebelum menjalankan query database.
     if (status && !STATUS.includes(status)) {
       return res.status(400).json({
         success: false,
@@ -28,6 +30,7 @@ export async function getProjects(req, res, next) {
       });
     }
 
+    // Bangun kondisi pencarian hanya dari filter yang benar-benar dikirim pemanggil.
     const where = {};
     if (status) where.status = status;
     if (kategori) where.kategori = kategori;
@@ -39,11 +42,13 @@ export async function getProjects(req, res, next) {
       ];
     }
 
+    // Jalankan query daftar dan hitung total secara bersamaan agar pagination akurat.
     const [data, total] = await Promise.all([
       prisma.project.findMany({
         where,
         include: {
           ...projectInclude,
+          // Daftar hanya menyertakan update terbaru dan jumlah dokumen/update.
           updates: { orderBy: { tanggalInput: "desc" }, take: 1 },
           _count: { select: { documents: true, updates: true } },
         },
@@ -54,12 +59,14 @@ export async function getProjects(req, res, next) {
       prisma.project.count({ where }),
     ]);
 
+    // Sertakan informasi pagination agar klien tahu jumlah halaman yang tersedia.
     res.json({
       success: true,
       data,
       pagination: { page, limit, total, totalPages: Math.ceil(total / limit) },
     });
   } catch (err) {
+    // Biarkan middleware error mengubah error database menjadi respons HTTP.
     next(err);
   }
 }
@@ -67,6 +74,7 @@ export async function getProjects(req, res, next) {
 // ---------- GET /projects/check-code?kode=HCMS-001 ----------
 export async function checkProjectCode(req, res, next) {
   try {
+    // Rapikan kode dari query sebelum mencari kecocokan persis di database.
     const kode = (req.query.kode || "").trim();
     if (!kode) {
       return res
@@ -91,6 +99,7 @@ export async function checkProjectCode(req, res, next) {
 // ---------- GET /projects/:id ----------
 export async function getProjectById(req, res, next) {
   try {
+    // Parameter URL berupa teks, jadi ubah menjadi angka dan validasi hasilnya.
     const id = parseInt(req.params.id);
     if (Number.isNaN(id)) {
       return res.status(400).json({ success: false, message: "ID project tidak valid" });
@@ -100,6 +109,7 @@ export async function getProjectById(req, res, next) {
       where: { id },
       include: {
         ...projectInclude,
+        // Pada tampilan detail, ambil seluruh dokumen dan riwayat update terbaru dahulu.
         documents: { orderBy: { uploadedAt: "desc" } },
         updates: { orderBy: { tanggalInput: "desc" } },
       },
@@ -118,6 +128,7 @@ export async function getProjectById(req, res, next) {
 // ---------- POST /projects ----------
 export async function createProject(req, res, next) {
   try {
+    // Body sudah diperiksa dan dibersihkan oleh middleware validate sebelum masuk ke sini.
     const d = req.body; // sudah divalidasi oleh middleware validate()
 
     // Cek kode unik supaya pesan errornya ramah
@@ -133,6 +144,7 @@ export async function createProject(req, res, next) {
       }
     }
 
+    // Ubah tanggal teks dari request menjadi Date sebelum disimpan oleh Prisma.
     const project = await prisma.project.create({
       data: {
         kategori: d.kategori,
@@ -151,6 +163,7 @@ export async function createProject(req, res, next) {
       include: projectInclude,
     });
 
+    // Status 201 menandakan resource baru berhasil dibuat.
     res.status(201).json({
       success: true,
       message: "Project berhasil dibuat",

@@ -1,3 +1,5 @@
+// Nilai yang diperbolehkan untuk kategori project, jenis project, dan statusnya.
+// Nilai-nilai ini dipakai ulang oleh validasi request dan endpoint data master.
 export const KATEGORI = ["FS", "CR_FORM", "AIR_FORM", "IC_FORM", "SC_FORM"];
 export const JENIS = ["NEW", "ADDENDUM"];
 export const STATUS = [

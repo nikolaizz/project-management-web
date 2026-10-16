@@ -1,3 +1,4 @@
+// Dipanggil ketika tidak ada route yang cocok dengan method dan URL request.
 export function notFound(req, res) {
   res.status(404).json({
     success: false,
@@ -23,6 +24,7 @@ export function errorHandler(err, req, res, next) {
     });
   }
 
+  // Catat error yang belum memiliki penanganan khusus, lalu kirim respons umum.
   console.error(err);
   res.status(500).json({ success: false, message: "Terjadi kesalahan server" });
 }

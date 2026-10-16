@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { KATEGORI, JENIS, STATUS } from "../constants/enums.js";
 
+// Membuat aturan untuk ID numerik positif; menerima angka maupun teks angka dari form.
 const id = (label) =>
   z.coerce
     .number(`${label} wajib dipilih`)
@@ -9,6 +10,7 @@ const id = (label) =>
 
 export const createProjectSchema = z
   .object({
+    // Enum memastikan nilai cocok dengan daftar pilihan yang diizinkan.
     kategori: z.enum(KATEGORI, `Kategori harus salah satu dari: ${KATEGORI.join(", ")}`),
     jenis: z.enum(JENIS, `Jenis project harus salah satu dari: ${JENIS.join(", ")}`),
 
@@ -24,6 +26,7 @@ export const createProjectSchema = z
 
     ownerPic: z.string().trim().min(1, "Owner / PIC wajib diisi"),
 
+    // Tanggal harus berbentuk YYYY-MM-DD; targetGoLive boleh tidak diisi.
     tanggalProject: z.iso.date("Tanggal project harus berformat YYYY-MM-DD"),
     targetGoLive: z.iso.date("Target go live harus berformat YYYY-MM-DD").nullish(),
 
