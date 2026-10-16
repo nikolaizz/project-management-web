@@ -6,12 +6,11 @@ export function notFound(req, res) {
 }
 
 export function errorHandler(err, req, res, next) {
-  // JSON rusak
   if (err.type === "entity.parse.failed") {
     return res.status(400).json({ success: false, message: "Format JSON tidak valid" });
   }
 
-  // Error upload (Multer)
+  // Error upload
   if (err.code === "LIMIT_FILE_SIZE") {
     return res.status(400).json({ success: false, message: "Ukuran file maksimal 10 MB" });
   }
@@ -23,6 +22,9 @@ export function errorHandler(err, req, res, next) {
   }
   if (err.code === "INVALID_FILE_TYPE") {
     return res.status(400).json({ success: false, message: err.message });
+  }
+  if (err.name === "MulterError") {
+    return res.status(400).json({ success: false, message: `Upload gagal: ${err.message}` });
   }
 
   // Error Prisma

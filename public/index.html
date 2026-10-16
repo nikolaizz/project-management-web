@@ -1,0 +1,492 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Project Hub - Upload Project</title>
+<style>
+:root{--navy:#10285c;--blue:#1b5fd6;--blue-soft:#e8f0fd;--bg:#f3f5fa;--card:#fff;--line:#d9dfec;--text:#18233d;--muted:#5d6b88;--ok:#157347;--ok-bg:#e4f4ea;--bad:#b3261e;--bad-bg:#fdeceb;--warn:#8a5a00;--warn-bg:#fff3d6}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{margin:0;background:var(--bg);color:var(--text);font:15px/1.5 "Segoe UI",system-ui,-apple-system,Roboto,sans-serif}
+:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
+.top{background:var(--navy);color:#fff;display:flex;justify-content:space-between;align-items:center;padding:12px 24px;gap:12px;flex-wrap:wrap}
+.brand strong{font-size:17px;margin-right:12px}
+.brand span{color:#b9c6e6;font-size:13px}
+.pill{font-size:12px;padding:3px 10px;border-radius:999px;background:rgba(255,255,255,.18)}
+.pill.ok{background:#1f8a4c}
+.pill.down{background:#b3261e}
+.layout{display:grid;grid-template-columns:230px minmax(0,1fr);gap:20px;padding:20px 24px;max-width:1500px;margin:0 auto;align-items:start}
+.sidebar{position:sticky;top:20px;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px}
+.side-title{margin:4px 10px 10px;color:var(--muted);font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.06em}
+.side-nav{display:grid;gap:6px}
+.side-link{display:flex;flex-direction:column;align-items:flex-start;gap:2px;width:100%;padding:10px 12px;border-color:transparent;text-align:left}
+.side-link span{color:var(--muted);font-size:12px}
+.side-link.active{background:var(--blue-soft);border-color:var(--blue);color:var(--navy);font-weight:600}
+.side-link.active span{color:var(--muted);font-weight:400}
+.content{min-width:0}
+.page[hidden]{display:none}
+@media(max-width:760px){.layout{grid-template-columns:minmax(0,1fr);padding:14px}.sidebar{position:static}.side-nav{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:420px){.side-nav{grid-template-columns:minmax(0,1fr)}}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:20px}
+h1{font-size:20px;margin:0 0 14px}
+h2{font-size:17px;margin:0 0 12px}
+.head{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+.head h2{margin:0}
+.steps{list-style:none;display:flex;gap:6px;padding:0;margin:0 0 20px;flex-wrap:wrap}
+.steps li{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--muted);padding:4px 10px 4px 4px;border-radius:999px}
+.steps li span{width:24px;height:24px;border-radius:50%;display:grid;place-items:center;background:#e5e9f3;color:var(--muted);font-weight:600;font-size:12px}
+.steps li.cur{color:var(--navy);font-weight:600}
+.steps li.cur span{background:var(--blue);color:#fff}
+.steps li.past span{background:var(--ok);color:#fff}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:14px 16px}
+@media(max-width:620px){.grid{grid-template-columns:1fr}}
+.full{grid-column:1/-1}
+label{display:block;font-weight:600;font-size:13px;margin-bottom:4px}
+input,select,textarea{width:100%;font:inherit;padding:8px 10px;border:1px solid var(--line);border-radius:8px;background:#fff;color:var(--text)}
+textarea{min-height:84px;resize:vertical}
+.invalid{border-color:var(--bad)}
+.err{color:var(--bad);font-size:12.5px;margin-top:3px}
+.hint{font-size:12.5px;margin-top:4px;color:var(--muted)}
+.ok-t{color:var(--ok)}
+.bad-t{color:var(--bad)}
+.row{display:flex;gap:8px}
+.row input{flex:1}
+button{font:inherit;padding:8px 14px;border-radius:8px;border:1px solid var(--line);background:#fff;color:var(--text);cursor:pointer}
+button:hover:not(:disabled){border-color:var(--blue)}
+button:disabled{opacity:.5;cursor:not-allowed}
+button.primary{background:var(--blue);border-color:var(--blue);color:#fff}
+button.danger{color:var(--bad)}
+button.small{padding:3px 9px;font-size:12.5px}
+.choices{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media(max-width:620px){.choices{grid-template-columns:1fr}}
+.choice{text-align:left;padding:16px;border:1.5px solid var(--line);border-radius:10px;display:flex;flex-direction:column;gap:4px;background:#fff}
+.choice span{color:var(--muted);font-size:13px}
+.choice.on{border-color:var(--blue);background:var(--blue-soft)}
+.drop{display:flex;flex-direction:column;align-items:center;gap:4px;padding:28px 16px;border:2px dashed var(--line);border-radius:10px;text-align:center;cursor:pointer;background:#fafbfe;font-weight:600}
+.drop small{font-weight:400;color:var(--muted)}
+.drop.over{border-color:var(--blue);background:var(--blue-soft)}
+.files{list-style:none;padding:0;margin:12px 0 0;display:grid;gap:6px}
+.files li{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:6px 10px;border:1px solid var(--line);border-radius:8px;font-size:13.5px}
+.files .nm{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+dl.rev{display:grid;grid-template-columns:140px 1fr;gap:6px 14px;margin:0}
+dl.rev dt{color:var(--muted)}
+dl.rev dd{margin:0;overflow-wrap:anywhere}
+.alert{margin-top:14px;padding:10px 12px;border-radius:8px;font-size:14px}
+.alert.error{background:var(--bad-bg);color:var(--bad)}
+.alert.warn{background:var(--warn-bg);color:var(--warn)}
+.alert.ok{background:var(--ok-bg);color:var(--ok)}
+.nav{display:flex;justify-content:space-between;margin-top:20px}
+.tablewrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:13.5px}
+th,td{text-align:left;padding:8px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+th{color:var(--muted);font-weight:600;white-space:nowrap}
+.badge{display:inline-block;padding:2px 9px;border-radius:999px;font-size:12px;font-weight:600;white-space:nowrap}
+.b-ON_PROGRESS{background:#e1ecff;color:#17479e}
+.b-SELESAI{background:var(--ok-bg);color:var(--ok)}
+.b-PENDING,.b-ON_HOLD{background:var(--warn-bg);color:var(--warn)}
+.b-INISIASI,.b-DRAFT{background:#e9ebf2;color:#444c63}
+tr.docs td{background:#f7f9fd}
+.empty{color:var(--muted);padding:12px 0}
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="brand"><strong>Project Hub</strong><span>Manajemen project</span></div>
+  <span id="apiStatus" class="pill">Memeriksa server...</span>
+</header>
+
+<main class="layout">
+  <aside class="sidebar" aria-label="Menu utama">
+    <p class="side-title">Menu utama</p>
+    <nav class="side-nav" aria-label="Navigasi project">
+      <button type="button" class="side-link active" data-page="uploadPage" aria-current="page">
+        Upload project
+        <span>Tambah project baru</span>
+      </button>
+      <button type="button" class="side-link" data-page="projectsPage">
+        Daftar project
+        <span>Lihat project tersimpan</span>
+      </button>
+    </nav>
+  </aside>
+
+  <div class="content">
+    <section class="page" id="uploadPage" aria-labelledby="wizTitle">
+      <div class="card">
+        <h1 id="wizTitle">Upload project</h1>
+        <ol class="steps" id="steps"></ol>
+        <div id="panel"></div>
+        <div id="alert" role="alert"></div>
+        <div class="nav" id="nav">
+          <button type="button" id="btnBack">Sebelumnya</button>
+          <button type="button" id="btnNext" class="primary">Selanjutnya</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="page" id="projectsPage" aria-labelledby="listTitle" hidden>
+      <div class="card">
+        <div class="head">
+          <h1 id="listTitle">Daftar project</h1>
+          <button type="button" id="btnRefresh">Muat ulang</button>
+        </div>
+        <div id="projects" class="tablewrap"><p class="empty">Memuat...</p></div>
+      </div>
+    </section>
+  </div>
+</main>
+
+<script>
+const API = location.protocol === "file:" ? "http://localhost:3000" : "";
+const MAX_SIZE = 10 * 1024 * 1024;
+const MAX_FILES = 10;
+const ALLOWED = [".pdf", ".doc", ".docx", ".xls", ".xlsx", ".jpg", ".jpeg", ".png"];
+const STEPS = ["Jenis project", "Informasi project", "Dokumen", "Review"];
+const STATUS_LABEL = { DRAFT: "Draft", INISIASI: "Inisiasi", ON_PROGRESS: "On progress", PENDING: "Pending", ON_HOLD: "On hold", SELESAI: "Selesai" };
+const KATEGORI_LABEL = { FS: "FS", CR_FORM: "CR Form", AIR_FORM: "AIR Form", IC_FORM: "IC Form", SC_FORM: "SC Form" };
+const JENIS_LABEL = { NEW: "Project baru", ADDENDUM: "Addendum" };
+
+const $ = (s, r = document) => r.querySelector(s);
+const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+const fmtSize = (n) => (n >= 1048576 ? (n / 1048576).toFixed(1) + " MB" : Math.max(1, Math.round(n / 1024)) + " KB");
+const today = () => new Date(Date.now() - new Date().getTimezoneOffset() * 60000).toISOString().slice(0, 10);
+
+function newForm() {
+  return { kategori: "", kodeProject: "", nama: "", deskripsi: "", pmId: "", bpId: "", unitId: "", ownerPic: "", tanggalProject: today(), targetGoLive: "", status: "INISIASI" };
+}
+const FIELDS = Object.keys(newForm());
+
+let master = { pm: [], bp: [], units: [], enums: { kategori: [], status: [] } };
+let busy = false;
+const state = { step: 0, jenis: null, form: newForm(), files: [], errors: {}, createdId: null, createdNama: "", done: false };
+
+// Tampilkan satu halaman menu dan tandai pilihan aktif pada sidebar.
+document.querySelector(".side-nav").addEventListener("click", (e) => {
+  const button = e.target.closest("[data-page]");
+  if (!button) return;
+
+  document.querySelectorAll(".side-link").forEach((link) => {
+    const active = link === button;
+    link.classList.toggle("active", active);
+    if (active) link.setAttribute("aria-current", "page");
+    else link.removeAttribute("aria-current");
+  });
+  document.querySelectorAll(".page").forEach((page) => {
+    page.hidden = page.id !== button.dataset.page;
+  });
+});
+
+async function api(path, opts) {
+  let res;
+  try {
+    res = await fetch(API + path, opts);
+  } catch {
+    throw { network: true, message: "Tidak bisa terhubung ke server. Pastikan backend berjalan (npm run dev)." };
+  }
+  let body = null;
+  try { body = await res.json(); } catch {}
+  if (!res.ok) throw { status: res.status, message: (body && body.message) || "Terjadi kesalahan", errors: (body && body.errors) || [] };
+  return body;
+}
+
+function setAlert(type, msg) { $("#alert").innerHTML = `<div class="alert ${type}">${esc(msg)}</div>`; }
+function clearAlert() { $("#alert").innerHTML = ""; }
+function setPill(cls, text) { const p = $("#apiStatus"); p.className = "pill " + cls; p.textContent = text; }
+
+const nameOf = (list, id) => (list.find((x) => String(x.id) === String(id)) || {}).nama || "-";
+const options = (list, ph) => `<option value="">${ph}</option>` + list.map((x) => `<option value="${x.id}">${esc(x.nama)}</option>`).join("");
+function fld(name, label, control, cls = "") {
+  return `<div class="${cls}"><label for="f-${name}">${label}</label>${control}<div class="err" data-err="${name}"></div></div>`;
+}
+
+function stepJenis() {
+  const c = (v, title, desc) => `<button type="button" class="choice ${state.jenis === v ? "on" : ""}" data-jenis="${v}"><strong>${title}</strong><span>${desc}</span></button>`;
+  return `<h2>Pilih jenis project</h2><div class="choices">
+    ${c("NEW", "Project baru", "Belum punya kode project. Kode boleh dikosongkan.")}
+    ${c("ADDENDUM", "Addendum (project existing)", "Sudah punya kode project. Kode wajib diisi.")}
+  </div>`;
+}
+
+function stepInfo() {
+  const kat = `<select id="f-kategori" data-f="kategori"><option value="">Pilih kategori</option>${master.enums.kategori.map((k) => `<option value="${k}">${esc(KATEGORI_LABEL[k] || k)}</option>`).join("")}</select>`;
+  const status = `<select id="f-status" data-f="status">${master.enums.status.map((s) => `<option value="${s}">${esc(STATUS_LABEL[s] || s)}</option>`).join("")}</select>`;
+  const hint = state.jenis === "ADDENDUM" ? "Wajib diisi untuk Addendum." : "Boleh dikosongkan untuk project baru.";
+  const kode = `<div class="row"><input id="f-kodeProject" data-f="kodeProject" autocomplete="off"><button type="button" id="btnCheck">Cek kode</button></div><div class="hint" id="codeResult">${hint}</div>`;
+  return `<h2>Informasi project</h2><div class="grid">
+    ${fld("kategori", "Kategori", kat)}
+    ${fld("kodeProject", "Kode project", kode)}
+    ${fld("nama", "Nama project", `<input id="f-nama" data-f="nama">`, "full")}
+    ${fld("deskripsi", "Deskripsi", `<textarea id="f-deskripsi" data-f="deskripsi"></textarea>`, "full")}
+    ${fld("pmId", "Project manager", `<select id="f-pmId" data-f="pmId">${options(master.pm, "Pilih PM")}</select>`)}
+    ${fld("bpId", "Business partner", `<select id="f-bpId" data-f="bpId">${options(master.bp, "Pilih BP")}</select>`)}
+    ${fld("unitId", "Unit pengusul", `<select id="f-unitId" data-f="unitId">${options(master.units, "Pilih unit")}</select>`)}
+    ${fld("ownerPic", "Owner / PIC", `<input id="f-ownerPic" data-f="ownerPic">`)}
+    ${fld("tanggalProject", "Tanggal project", `<input id="f-tanggalProject" data-f="tanggalProject" type="date">`)}
+    ${fld("targetGoLive", "Target go live", `<input id="f-targetGoLive" data-f="targetGoLive" type="date">`)}
+    ${fld("status", "Status awal", status)}
+  </div>`;
+}
+
+function stepDocs() {
+  const list = state.files.map((f, i) => `<li><span class="nm">${esc(f.name)} <small>(${fmtSize(f.size)})</small></span><button type="button" class="small danger" data-rm="${i}">Hapus</button></li>`).join("");
+  return `<h2>Dokumen pendukung <small style="font-weight:400;color:var(--muted)">(opsional)</small></h2>
+    <label class="drop" id="drop"><input type="file" id="fileInput" multiple accept="${ALLOWED.join(",")}" hidden>
+      Klik atau seret file ke sini
+      <small>PDF, DOC, DOCX, XLS, XLSX, JPG, PNG. Maksimal 10 MB per file, 10 file.</small>
+    </label>
+    <ul class="files">${list}</ul>`;
+}
+
+function stepReview() {
+  const f = state.form;
+  const rows = [
+    ["Jenis", JENIS_LABEL[state.jenis]], ["Kategori", KATEGORI_LABEL[f.kategori] || f.kategori],
+    ["Kode project", f.kodeProject.trim() || "-"], ["Nama", f.nama], ["Deskripsi", f.deskripsi],
+    ["PM", nameOf(master.pm, f.pmId)], ["BP", nameOf(master.bp, f.bpId)], ["Unit pengusul", nameOf(master.units, f.unitId)],
+    ["Owner / PIC", f.ownerPic], ["Tanggal project", f.tanggalProject], ["Target go live", f.targetGoLive || "-"],
+    ["Status awal", STATUS_LABEL[f.status] || f.status],
+    ["Dokumen", state.files.length ? state.files.map((x) => x.name).join(", ") : "Tidak ada"],
+  ];
+  return `<h2>Review data</h2><dl class="rev">${rows.map(([k, v]) => `<dt>${k}</dt><dd>${esc(v)}</dd>`).join("")}</dl>`;
+}
+
+function successHtml() {
+  const n = state.files.length;
+  return `<div class="alert ok"><strong>Project tersimpan.</strong> ID ${state.createdId}: ${esc(state.createdNama)}${n ? `, ${n} dokumen terunggah` : ""}.</div>
+    <div style="margin-top:16px"><button type="button" class="primary" id="btnAgain">Tambah project lain</button></div>`;
+}
+
+function renderSteps() {
+  $("#steps").innerHTML = STEPS.map((s, i) => {
+    const cls = state.done || i < state.step ? "past" : i === state.step ? "cur" : "";
+    return `<li class="${cls}"><span>${i + 1}</span>${s}</li>`;
+  }).join("");
+}
+
+function updateNav() {
+  const last = state.step === 3;
+  $("#nav").hidden = state.done;
+  $("#btnBack").disabled = busy || state.step === 0 || (!!state.createdId && state.step <= 2);
+  $("#btnNext").disabled = busy;
+  $("#btnNext").textContent = busy ? "Menyimpan..." : last ? (state.createdId ? "Coba unggah ulang dokumen" : "Simpan & kirim") : "Selanjutnya";
+}
+
+function render() {
+  renderSteps();
+  const p = $("#panel");
+  p.innerHTML = state.done ? successHtml() : [stepJenis, stepInfo, stepDocs, stepReview][state.step]();
+  p.querySelectorAll("[data-f]").forEach((el) => { el.value = state.form[el.dataset.f]; });
+  p.querySelectorAll("[data-err]").forEach((el) => {
+    const m = state.errors[el.dataset.err];
+    el.textContent = m || "";
+    const inp = p.querySelector(`[data-f="${el.dataset.err}"]`);
+    if (inp) inp.classList.toggle("invalid", !!m);
+  });
+  updateNav();
+}
+
+function validateInfo() {
+  const f = state.form, e = {};
+  if (!f.kategori) e.kategori = "Pilih kategori";
+  if (state.jenis === "ADDENDUM" && !f.kodeProject.trim()) e.kodeProject = "Kode project wajib diisi untuk Addendum";
+  if (!f.nama.trim()) e.nama = "Nama project wajib diisi";
+  if (!f.deskripsi.trim()) e.deskripsi = "Deskripsi wajib diisi";
+  if (!f.pmId) e.pmId = "Pilih PM";
+  if (!f.bpId) e.bpId = "Pilih BP";
+  if (!f.unitId) e.unitId = "Pilih unit pengusul";
+  if (!f.ownerPic.trim()) e.ownerPic = "Owner / PIC wajib diisi";
+  if (!f.tanggalProject) e.tanggalProject = "Tanggal project wajib diisi";
+  state.errors = e;
+  return Object.keys(e).length === 0;
+}
+
+function payload() {
+  const f = state.form;
+  return {
+    kategori: f.kategori, jenis: state.jenis, kodeProject: f.kodeProject.trim(), nama: f.nama.trim(),
+    deskripsi: f.deskripsi.trim(), pmId: f.pmId, bpId: f.bpId, unitId: f.unitId, ownerPic: f.ownerPic.trim(),
+    tanggalProject: f.tanggalProject, targetGoLive: f.targetGoLive || null, status: f.status,
+  };
+}
+
+async function checkCode() {
+  const out = $("#codeResult");
+  const kode = state.form.kodeProject.trim();
+  if (!kode) { out.className = "hint bad-t"; out.textContent = "Isi kode project dulu."; return; }
+  try {
+    const r = await api("/projects/check-code?kode=" + encodeURIComponent(kode));
+    if (r.data.exists) { out.className = "hint bad-t"; out.textContent = `Kode sudah terdaftar pada project "${r.data.project.nama}".`; }
+    else { out.className = "hint ok-t"; out.textContent = "Kode belum dipakai, aman digunakan."; }
+  } catch (e) { out.className = "hint bad-t"; out.textContent = e.message; }
+}
+
+function addFiles(list) {
+  const bad = [];
+  for (const f of list) {
+    const ext = (f.name.match(/\.[^.]+$/) || [""])[0].toLowerCase();
+    if (!ALLOWED.includes(ext)) { bad.push(`${f.name}: tipe file tidak diizinkan`); continue; }
+    if (f.size > MAX_SIZE) { bad.push(`${f.name}: lebih dari 10 MB`); continue; }
+    if (state.files.some((x) => x.name === f.name && x.size === f.size)) continue;
+    if (state.files.length >= MAX_FILES) { bad.push(`${f.name}: maksimal ${MAX_FILES} file`); continue; }
+    state.files.push(f);
+  }
+  render();
+  if (bad.length) setAlert("warn", "Sebagian file ditolak. " + bad.join("; "));
+}
+
+async function submit() {
+  busy = true; updateNav(); clearAlert();
+  try {
+    if (!state.createdId) {
+      const res = await api("/projects", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload()) });
+      state.createdId = res.data.id;
+      state.createdNama = res.data.nama;
+    }
+    if (state.files.length) {
+      const fd = new FormData();
+      state.files.forEach((f) => fd.append("files", f));
+      await api(`/projects/${state.createdId}/documents`, { method: "POST", body: fd });
+    }
+    state.done = true;
+    busy = false;
+    render();
+    loadProjects();
+  } catch (e) {
+    busy = false;
+    handleSubmitError(e);
+    updateNav();
+  }
+}
+
+function handleSubmitError(e) {
+  if (state.createdId) {
+    setAlert("warn", `Project sudah tersimpan (ID ${state.createdId}), tetapi dokumen gagal diunggah: ${e.message}. Kembali ke langkah Dokumen untuk memperbaiki file, lalu coba unggah ulang.`);
+    loadProjects();
+    return;
+  }
+  if (e.status === 400 && e.errors && e.errors.length) {
+    const errs = {}, other = [];
+    for (const x of e.errors) { if (FIELDS.includes(x.field)) errs[x.field] = x.message; else other.push(x.message); }
+    state.errors = errs; state.step = 1; render();
+    const first = $("#panel .invalid"); if (first) first.focus();
+    setAlert("error", other.length ? other.join("; ") : "Server menolak data. Perbaiki isian yang ditandai.");
+    return;
+  }
+  if (e.status === 409) { state.errors = { kodeProject: e.message }; state.step = 1; render(); setAlert("error", e.message); return; }
+  setAlert("error", e.message);
+}
+
+function resetAll() {
+  Object.assign(state, { step: 0, jenis: null, form: newForm(), files: [], errors: {}, createdId: null, createdNama: "", done: false });
+  clearAlert(); render();
+}
+
+$("#btnNext").onclick = () => {
+  clearAlert();
+  if (state.step === 0) {
+    if (!state.jenis) return setAlert("error", "Pilih jenis project dulu.");
+    state.step = 1; render();
+  } else if (state.step === 1) {
+    if (!validateInfo()) { render(); const first = $("#panel .invalid"); if (first) first.focus(); return setAlert("error", "Lengkapi isian yang ditandai."); }
+    state.step = 2; render();
+  } else if (state.step === 2) {
+    state.step = 3; render();
+  } else submit();
+};
+$("#btnBack").onclick = () => { clearAlert(); state.step -= 1; render(); };
+
+const panel = $("#panel");
+panel.addEventListener("input", (e) => {
+  const n = e.target.dataset.f;
+  if (!n) return;
+  state.form[n] = e.target.value;
+  if (state.errors[n]) {
+    delete state.errors[n];
+    e.target.classList.remove("invalid");
+    const el = $(`[data-err="${n}"]`); if (el) el.textContent = "";
+  }
+});
+panel.addEventListener("click", (e) => {
+  const j = e.target.closest("[data-jenis]");
+  if (j) { state.jenis = j.dataset.jenis; clearAlert(); render(); return; }
+  if (e.target.closest("#btnCheck")) { checkCode(); return; }
+  const rm = e.target.closest("[data-rm]");
+  if (rm) { state.files.splice(Number(rm.dataset.rm), 1); render(); return; }
+  if (e.target.closest("#btnAgain")) resetAll();
+});
+panel.addEventListener("change", (e) => {
+  if (e.target.id === "fileInput") { addFiles([...e.target.files]); e.target.value = ""; }
+});
+panel.addEventListener("dragover", (e) => { const d = e.target.closest("#drop"); if (d) { e.preventDefault(); d.classList.add("over"); } });
+panel.addEventListener("dragleave", (e) => { const d = e.target.closest("#drop"); if (d) d.classList.remove("over"); });
+panel.addEventListener("drop", (e) => { const d = e.target.closest("#drop"); if (d) { e.preventDefault(); d.classList.remove("over"); addFiles([...e.dataTransfer.files]); } });
+
+function docsHtml(list) {
+  if (!list.length) return `<span class="hint">Belum ada dokumen.</span>`;
+  return `<ul class="files">${list.map((d) => `<li><span class="nm"><a href="${API}/documents/${d.id}/download">${esc(d.namaFile)}</a> <small>(${fmtSize(d.ukuran)})</small></span><button type="button" class="small danger" data-deldoc="${d.id}">Hapus</button></li>`).join("")}</ul>`;
+}
+
+function renderProjects(list, total) {
+  const box = $("#projects");
+  if (!list.length) { box.innerHTML = `<p class="empty">Belum ada project.</p>`; return; }
+  box.innerHTML = `<table><thead><tr><th>Kode</th><th>Nama</th><th>Kategori</th><th>Jenis</th><th>Status</th><th>PM</th><th>Dokumen</th><th></th></tr></thead><tbody>${list.map((p) => `<tr>
+    <td>${esc(p.kodeProject || "-")}</td><td>${esc(p.nama)}</td><td>${esc(KATEGORI_LABEL[p.kategori] || p.kategori)}</td>
+    <td>${esc(JENIS_LABEL[p.jenis] || p.jenis)}</td><td><span class="badge b-${esc(p.status)}">${esc(STATUS_LABEL[p.status] || p.status)}</span></td>
+    <td>${esc(p.pm ? p.pm.nama : "-")}</td><td><button type="button" class="small" data-docs="${p.id}">${p._count ? p._count.documents : 0} file</button></td>
+    <td><button type="button" class="small danger" data-delp="${p.id}">Hapus</button></td></tr>`).join("")}</tbody></table>
+    <p class="hint">Menampilkan ${list.length} dari ${total} project.</p>`;
+}
+
+async function loadProjects() {
+  try {
+    const r = await api("/projects?limit=20");
+    renderProjects(r.data, r.pagination.total);
+  } catch (e) { $("#projects").innerHTML = `<p class="empty">${esc(e.message)}</p>`; }
+}
+
+$("#btnRefresh").onclick = loadProjects;
+$("#projects").addEventListener("click", async (e) => {
+  try {
+    const d = e.target.closest("[data-docs]");
+    if (d) {
+      const row = d.closest("tr"), next = row.nextElementSibling;
+      if (next && next.classList.contains("docs")) { next.remove(); return; }
+      const r = await api(`/projects/${d.dataset.docs}/documents`);
+      const tr = document.createElement("tr");
+      tr.className = "docs"; tr.innerHTML = `<td colspan="8">${docsHtml(r.data)}</td>`;
+      row.after(tr);
+      return;
+    }
+    const dp = e.target.closest("[data-delp]");
+    if (dp) {
+      if (!confirm("Hapus project ini beserta dokumennya? Tindakan ini permanen.")) return;
+      await api(`/projects/${dp.dataset.delp}`, { method: "DELETE" });
+      loadProjects(); return;
+    }
+    const dd = e.target.closest("[data-deldoc]");
+    if (dd) {
+      if (!confirm("Hapus dokumen ini?")) return;
+      await api(`/documents/${dd.dataset.deldoc}`, { method: "DELETE" });
+      loadProjects();
+    }
+  } catch (err) { setAlert("error", err.message); }
+});
+
+async function init() {
+  try {
+    const [pm, bp, units, enums] = await Promise.all([api("/master/pm"), api("/master/bp"), api("/master/units"), api("/master/enums")]);
+    master = { pm: pm.data, bp: bp.data, units: units.data, enums: { kategori: enums.data.kategori, status: enums.data.status } };
+    setPill("ok", "Server terhubung");
+    if (!pm.data.length || !bp.data.length || !units.data.length) setAlert("warn", "Data master (PM / BP / Unit) masih kosong. Jalankan: npx prisma db seed");
+  } catch (e) {
+    setPill("down", "Server tidak terjangkau");
+    setAlert("error", e.message);
+  }
+  render();
+  loadProjects();
+}
+init();
+</script>
+</body>
+</html>
