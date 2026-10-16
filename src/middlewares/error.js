@@ -1,4 +1,3 @@
-// Dipanggil ketika tidak ada route yang cocok dengan method dan URL request.
 export function notFound(req, res) {
   res.status(404).json({
     success: false,
@@ -6,17 +5,30 @@ export function notFound(req, res) {
   });
 }
 
-// Express mengenali error handler dari jumlah parameternya (harus 4)
 export function errorHandler(err, req, res, next) {
-  // Body JSON rusak (misal koma berlebih)
+  // JSON rusak
   if (err.type === "entity.parse.failed") {
     return res.status(400).json({ success: false, message: "Format JSON tidak valid" });
   }
-  // Prisma: data unik bentrok
+
+  // Error upload (Multer)
+  if (err.code === "LIMIT_FILE_SIZE") {
+    return res.status(400).json({ success: false, message: "Ukuran file maksimal 10 MB" });
+  }
+  if (err.code === "LIMIT_FILE_COUNT" || err.code === "LIMIT_UNEXPECTED_FILE") {
+    return res.status(400).json({
+      success: false,
+      message: "Gunakan field bernama 'files' dan maksimal 10 file per upload",
+    });
+  }
+  if (err.code === "INVALID_FILE_TYPE") {
+    return res.status(400).json({ success: false, message: err.message });
+  }
+
+  // Error Prisma
   if (err.code === "P2002") {
     return res.status(409).json({ success: false, message: "Data duplikat" });
   }
-  // Prisma: foreign key tidak ada (misal pmId salah)
   if (err.code === "P2003") {
     return res.status(400).json({
       success: false,
@@ -24,7 +36,6 @@ export function errorHandler(err, req, res, next) {
     });
   }
 
-  // Catat error yang belum memiliki penanganan khusus, lalu kirim respons umum.
   console.error(err);
   res.status(500).json({ success: false, message: "Terjadi kesalahan server" });
 }

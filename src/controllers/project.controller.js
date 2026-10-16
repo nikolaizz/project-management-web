@@ -1,5 +1,6 @@
 import prisma from "../lib/prisma.js";
 import { STATUS, KATEGORI } from "../constants/enums.js";
+import { removeFiles } from "../lib/files.js";
 
 // Relasi data master yang ikut dikirim bersama project, tanpa mengambil kolom lain.
 const projectInclude = {
@@ -149,7 +150,7 @@ export async function createProject(req, res, next) {
       data: {
         kategori: d.kategori,
         jenis: d.jenis,
-        kodeProject: d.kodeProject,
+        kodeProject: d.kodeProject || null, // "" / null / kosong dinormalisasi menjadi null
         nama: d.nama,
         deskripsi: d.deskripsi,
         pmId: d.pmId,
@@ -169,6 +170,95 @@ export async function createProject(req, res, next) {
       message: "Project berhasil dibuat",
       data: project,
     });
+  } catch (err) {
+    next(err);
+  }
+}
+
+// ---------- PUT /projects/:id ----------
+export async function updateProject(req, res, next) {
+  try {
+    const id = Number(req.params.id);
+    if (!Number.isInteger(id)) {
+      return res.status(400).json({ success: false, message: "ID project tidak valid" });
+    }
+
+    const d = req.body; // sudah divalidasi (semua field opsional)
+    if (Object.keys(d).length === 0) {
+      return res.status(400).json({ success: false, message: "Tidak ada data yang diubah" });
+    }
+
+    const existing = await prisma.project.findUnique({ where: { id } });
+    if (!existing) {
+      return res.status(404).json({ success: false, message: "Project tidak ditemukan" });
+    }
+
+    // Hitung nilai akhir untuk aturan bisnis
+    const jenis = d.jenis ?? existing.jenis;
+    const kode = "kodeProject" in d ? d.kodeProject || null : existing.kodeProject;
+
+    if (jenis === "ADDENDUM" && !kode) {
+      return res.status(400).json({
+        success: false,
+        message: "Validasi gagal",
+        errors: [{ field: "kodeProject", message: "Kode project wajib diisi untuk jenis Addendum" }],
+      });
+    }
+
+    // Kode harus unik (selain milik project ini sendiri)
+    if (kode && kode !== existing.kodeProject) {
+      const dup = await prisma.project.findUnique({ where: { kodeProject: kode } });
+      if (dup) {
+        return res.status(409).json({
+          success: false,
+          message: `Kode project ${kode} sudah digunakan`,
+        });
+      }
+    }
+
+    // Hanya ubah field yang memang dikirim
+    const data = {};
+    for (const key of ["kategori", "jenis", "nama", "deskripsi", "pmId", "bpId", "unitId", "ownerPic"]) {
+      if (key in d) data[key] = d[key];
+    }
+    if ("kodeProject" in d) data.kodeProject = kode;
+    if ("tanggalProject" in d) data.tanggalProject = new Date(d.tanggalProject);
+    if ("targetGoLive" in d) data.targetGoLive = d.targetGoLive ? new Date(d.targetGoLive) : null;
+
+    const project = await prisma.project.update({
+      where: { id },
+      data,
+      include: projectInclude,
+    });
+
+    res.json({ success: true, message: "Project berhasil diperbarui", data: project });
+  } catch (err) {
+    next(err);
+  }
+}
+
+// ---------- DELETE /projects/:id ----------
+export async function deleteProject(req, res, next) {
+  try {
+    const id = Number(req.params.id);
+    if (!Number.isInteger(id)) {
+      return res.status(400).json({ success: false, message: "ID project tidak valid" });
+    }
+
+    const project = await prisma.project.findUnique({
+      where: { id },
+      include: { documents: { select: { pathFile: true } } },
+    });
+    if (!project) {
+      return res.status(404).json({ success: false, message: "Project tidak ditemukan" });
+    }
+
+    // Baris dokumen dan update ikut terhapus otomatis (onDelete: Cascade di schema)
+    await prisma.project.delete({ where: { id } });
+    // File fisiknya kita hapus manual
+    await removeFiles(project.documents.map((doc) => doc.pathFile));
+
+    res.json({ success: true, message: "Project berhasil dihapus" });
   } catch (err) {
     next(err);
   }

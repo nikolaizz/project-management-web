@@ -4,6 +4,7 @@ import cors from "cors";
 import projectRoutes from "./routes/project.routes.js";
 import masterRoutes from "./routes/master.routes.js";
 import { notFound, errorHandler } from "./middlewares/error.js";
+import documentRoutes from "./routes/document.routes.js";
 
 // Membuat aplikasi Express yang akan menerima request HTTP.
 const app = express();
@@ -31,3 +32,7 @@ const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`Server jalan di http://localhost:${PORT}`);
 });
+
+app.use("/projects", projectRoutes); 
+app.use("/documents", documentRoutes);
+app.use("/master", masterRoutes);
