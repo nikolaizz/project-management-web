@@ -20,27 +20,17 @@ export type BusinessPartnerModel = runtime.Types.Result.DefaultSelection<Prisma.
 
 export type AggregateBusinessPartner = {
   _count: BusinessPartnerCountAggregateOutputType | null
-  _avg: BusinessPartnerAvgAggregateOutputType | null
-  _sum: BusinessPartnerSumAggregateOutputType | null
   _min: BusinessPartnerMinAggregateOutputType | null
   _max: BusinessPartnerMaxAggregateOutputType | null
 }
 
-export type BusinessPartnerAvgAggregateOutputType = {
-  id: number | null
-}
-
-export type BusinessPartnerSumAggregateOutputType = {
-  id: number | null
-}
-
 export type BusinessPartnerMinAggregateOutputType = {
-  id: number | null
+  id: string | null
   nama: string | null
 }
 
 export type BusinessPartnerMaxAggregateOutputType = {
-  id: number | null
+  id: string | null
   nama: string | null
 }
 
@@ -50,14 +40,6 @@ export type BusinessPartnerCountAggregateOutputType = {
   _all: number
 }
 
-
-export type BusinessPartnerAvgAggregateInputType = {
-  id?: true
-}
-
-export type BusinessPartnerSumAggregateInputType = {
-  id?: true
-}
 
 export type BusinessPartnerMinAggregateInputType = {
   id?: true
@@ -113,18 +95,6 @@ export type BusinessPartnerAggregateArgs<ExtArgs extends runtime.Types.Extension
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
    * 
-   * Select which fields to average
-  **/
-  _avg?: BusinessPartnerAvgAggregateInputType
-  /**
-   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
-   * 
-   * Select which fields to sum
-  **/
-  _sum?: BusinessPartnerSumAggregateInputType
-  /**
-   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
-   * 
    * Select which fields to find the minimum value
   **/
   _min?: BusinessPartnerMinAggregateInputType
@@ -155,18 +125,14 @@ export type BusinessPartnerGroupByArgs<ExtArgs extends runtime.Types.Extensions.
   take?: number
   skip?: number
   _count?: BusinessPartnerCountAggregateInputType | true
-  _avg?: BusinessPartnerAvgAggregateInputType
-  _sum?: BusinessPartnerSumAggregateInputType
   _min?: BusinessPartnerMinAggregateInputType
   _max?: BusinessPartnerMaxAggregateInputType
 }
 
 export type BusinessPartnerGroupByOutputType = {
-  id: number
+  id: string
   nama: string
   _count: BusinessPartnerCountAggregateOutputType | null
-  _avg: BusinessPartnerAvgAggregateOutputType | null
-  _sum: BusinessPartnerSumAggregateOutputType | null
   _min: BusinessPartnerMinAggregateOutputType | null
   _max: BusinessPartnerMaxAggregateOutputType | null
 }
@@ -190,7 +156,7 @@ export type BusinessPartnerWhereInput = {
   AND?: Prisma.BusinessPartnerWhereInput | Prisma.BusinessPartnerWhereInput[]
   OR?: Prisma.BusinessPartnerWhereInput[]
   NOT?: Prisma.BusinessPartnerWhereInput | Prisma.BusinessPartnerWhereInput[]
-  id?: Prisma.IntFilter<"BusinessPartner"> | number
+  id?: Prisma.StringFilter<"BusinessPartner"> | string
   nama?: Prisma.StringFilter<"BusinessPartner"> | string
   projects?: Prisma.ProjectListRelationFilter
 }
@@ -202,7 +168,7 @@ export type BusinessPartnerOrderByWithRelationInput = {
 }
 
 export type BusinessPartnerWhereUniqueInput = Prisma.AtLeast<{
-  id?: number
+  id?: string
   nama?: string
   AND?: Prisma.BusinessPartnerWhereInput | Prisma.BusinessPartnerWhereInput[]
   OR?: Prisma.BusinessPartnerWhereInput[]
@@ -214,63 +180,60 @@ export type BusinessPartnerOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
   nama?: Prisma.SortOrder
   _count?: Prisma.BusinessPartnerCountOrderByAggregateInput
-  _avg?: Prisma.BusinessPartnerAvgOrderByAggregateInput
   _max?: Prisma.BusinessPartnerMaxOrderByAggregateInput
   _min?: Prisma.BusinessPartnerMinOrderByAggregateInput
-  _sum?: Prisma.BusinessPartnerSumOrderByAggregateInput
 }
 
 export type BusinessPartnerScalarWhereWithAggregatesInput = {
   AND?: Prisma.BusinessPartnerScalarWhereWithAggregatesInput | Prisma.BusinessPartnerScalarWhereWithAggregatesInput[]
   OR?: Prisma.BusinessPartnerScalarWhereWithAggregatesInput[]
   NOT?: Prisma.BusinessPartnerScalarWhereWithAggregatesInput | Prisma.BusinessPartnerScalarWhereWithAggregatesInput[]
-  id?: Prisma.IntWithAggregatesFilter<"BusinessPartner"> | number
+  id?: Prisma.StringWithAggregatesFilter<"BusinessPartner"> | string
   nama?: Prisma.StringWithAggregatesFilter<"BusinessPartner"> | string
 }
 
 export type BusinessPartnerCreateInput = {
+  id: string
   nama: string
   projects?: Prisma.ProjectCreateNestedManyWithoutBpInput
 }
 
 export type BusinessPartnerUncheckedCreateInput = {
-  id?: number
+  id: string
   nama: string
   projects?: Prisma.ProjectUncheckedCreateNestedManyWithoutBpInput
 }
 
 export type BusinessPartnerUpdateInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
   nama?: Prisma.StringFieldUpdateOperationsInput | string
   projects?: Prisma.ProjectUpdateManyWithoutBpNestedInput
 }
 
 export type BusinessPartnerUncheckedUpdateInput = {
-  id?: Prisma.IntFieldUpdateOperationsInput | number
+  id?: Prisma.StringFieldUpdateOperationsInput | string
   nama?: Prisma.StringFieldUpdateOperationsInput | string
   projects?: Prisma.ProjectUncheckedUpdateManyWithoutBpNestedInput
 }
 
 export type BusinessPartnerCreateManyInput = {
-  id?: number
+  id: string
   nama: string
 }
 
 export type BusinessPartnerUpdateManyMutationInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
   nama?: Prisma.StringFieldUpdateOperationsInput | string
 }
 
 export type BusinessPartnerUncheckedUpdateManyInput = {
-  id?: Prisma.IntFieldUpdateOperationsInput | number
+  id?: Prisma.StringFieldUpdateOperationsInput | string
   nama?: Prisma.StringFieldUpdateOperationsInput | string
 }
 
 export type BusinessPartnerCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
   nama?: Prisma.SortOrder
-}
-
-export type BusinessPartnerAvgOrderByAggregateInput = {
-  id?: Prisma.SortOrder
 }
 
 export type BusinessPartnerMaxOrderByAggregateInput = {
@@ -281,10 +244,6 @@ export type BusinessPartnerMaxOrderByAggregateInput = {
 export type BusinessPartnerMinOrderByAggregateInput = {
   id?: Prisma.SortOrder
   nama?: Prisma.SortOrder
-}
-
-export type BusinessPartnerSumOrderByAggregateInput = {
-  id?: Prisma.SortOrder
 }
 
 export type BusinessPartnerScalarRelationFilter = {
@@ -307,11 +266,12 @@ export type BusinessPartnerUpdateOneRequiredWithoutProjectsNestedInput = {
 }
 
 export type BusinessPartnerCreateWithoutProjectsInput = {
+  id: string
   nama: string
 }
 
 export type BusinessPartnerUncheckedCreateWithoutProjectsInput = {
-  id?: number
+  id: string
   nama: string
 }
 
@@ -332,11 +292,12 @@ export type BusinessPartnerUpdateToOneWithWhereWithoutProjectsInput = {
 }
 
 export type BusinessPartnerUpdateWithoutProjectsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
   nama?: Prisma.StringFieldUpdateOperationsInput | string
 }
 
 export type BusinessPartnerUncheckedUpdateWithoutProjectsInput = {
-  id?: Prisma.IntFieldUpdateOperationsInput | number
+  id?: Prisma.StringFieldUpdateOperationsInput | string
   nama?: Prisma.StringFieldUpdateOperationsInput | string
 }
 
@@ -407,7 +368,7 @@ export type $BusinessPartnerPayload<ExtArgs extends runtime.Types.Extensions.Int
     projects: Prisma.$ProjectPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
-    id: number
+    id: string
     nama: string
   }, ExtArgs["result"]["businessPartner"]>
   composites: {}
@@ -833,7 +794,7 @@ export interface Prisma__BusinessPartnerClient<T, Null = never, ExtArgs extends 
  * Fields of the BusinessPartner model
  */
 export interface BusinessPartnerFieldRefs {
-  readonly id: Prisma.FieldRef<"BusinessPartner", 'Int'>
+  readonly id: Prisma.FieldRef<"BusinessPartner", 'String'>
   readonly nama: Prisma.FieldRef<"BusinessPartner", 'String'>
 }
     

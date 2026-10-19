@@ -20,27 +20,17 @@ export type ProjectManagerModel = runtime.Types.Result.DefaultSelection<Prisma.$
 
 export type AggregateProjectManager = {
   _count: ProjectManagerCountAggregateOutputType | null
-  _avg: ProjectManagerAvgAggregateOutputType | null
-  _sum: ProjectManagerSumAggregateOutputType | null
   _min: ProjectManagerMinAggregateOutputType | null
   _max: ProjectManagerMaxAggregateOutputType | null
 }
 
-export type ProjectManagerAvgAggregateOutputType = {
-  id: number | null
-}
-
-export type ProjectManagerSumAggregateOutputType = {
-  id: number | null
-}
-
 export type ProjectManagerMinAggregateOutputType = {
-  id: number | null
+  id: string | null
   nama: string | null
 }
 
 export type ProjectManagerMaxAggregateOutputType = {
-  id: number | null
+  id: string | null
   nama: string | null
 }
 
@@ -50,14 +40,6 @@ export type ProjectManagerCountAggregateOutputType = {
   _all: number
 }
 
-
-export type ProjectManagerAvgAggregateInputType = {
-  id?: true
-}
-
-export type ProjectManagerSumAggregateInputType = {
-  id?: true
-}
 
 export type ProjectManagerMinAggregateInputType = {
   id?: true
@@ -113,18 +95,6 @@ export type ProjectManagerAggregateArgs<ExtArgs extends runtime.Types.Extensions
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
    * 
-   * Select which fields to average
-  **/
-  _avg?: ProjectManagerAvgAggregateInputType
-  /**
-   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
-   * 
-   * Select which fields to sum
-  **/
-  _sum?: ProjectManagerSumAggregateInputType
-  /**
-   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
-   * 
    * Select which fields to find the minimum value
   **/
   _min?: ProjectManagerMinAggregateInputType
@@ -155,18 +125,14 @@ export type ProjectManagerGroupByArgs<ExtArgs extends runtime.Types.Extensions.I
   take?: number
   skip?: number
   _count?: ProjectManagerCountAggregateInputType | true
-  _avg?: ProjectManagerAvgAggregateInputType
-  _sum?: ProjectManagerSumAggregateInputType
   _min?: ProjectManagerMinAggregateInputType
   _max?: ProjectManagerMaxAggregateInputType
 }
 
 export type ProjectManagerGroupByOutputType = {
-  id: number
+  id: string
   nama: string
   _count: ProjectManagerCountAggregateOutputType | null
-  _avg: ProjectManagerAvgAggregateOutputType | null
-  _sum: ProjectManagerSumAggregateOutputType | null
   _min: ProjectManagerMinAggregateOutputType | null
   _max: ProjectManagerMaxAggregateOutputType | null
 }
@@ -190,7 +156,7 @@ export type ProjectManagerWhereInput = {
   AND?: Prisma.ProjectManagerWhereInput | Prisma.ProjectManagerWhereInput[]
   OR?: Prisma.ProjectManagerWhereInput[]
   NOT?: Prisma.ProjectManagerWhereInput | Prisma.ProjectManagerWhereInput[]
-  id?: Prisma.IntFilter<"ProjectManager"> | number
+  id?: Prisma.StringFilter<"ProjectManager"> | string
   nama?: Prisma.StringFilter<"ProjectManager"> | string
   projects?: Prisma.ProjectListRelationFilter
 }
@@ -202,7 +168,7 @@ export type ProjectManagerOrderByWithRelationInput = {
 }
 
 export type ProjectManagerWhereUniqueInput = Prisma.AtLeast<{
-  id?: number
+  id?: string
   nama?: string
   AND?: Prisma.ProjectManagerWhereInput | Prisma.ProjectManagerWhereInput[]
   OR?: Prisma.ProjectManagerWhereInput[]
@@ -214,63 +180,60 @@ export type ProjectManagerOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
   nama?: Prisma.SortOrder
   _count?: Prisma.ProjectManagerCountOrderByAggregateInput
-  _avg?: Prisma.ProjectManagerAvgOrderByAggregateInput
   _max?: Prisma.ProjectManagerMaxOrderByAggregateInput
   _min?: Prisma.ProjectManagerMinOrderByAggregateInput
-  _sum?: Prisma.ProjectManagerSumOrderByAggregateInput
 }
 
 export type ProjectManagerScalarWhereWithAggregatesInput = {
   AND?: Prisma.ProjectManagerScalarWhereWithAggregatesInput | Prisma.ProjectManagerScalarWhereWithAggregatesInput[]
   OR?: Prisma.ProjectManagerScalarWhereWithAggregatesInput[]
   NOT?: Prisma.ProjectManagerScalarWhereWithAggregatesInput | Prisma.ProjectManagerScalarWhereWithAggregatesInput[]
-  id?: Prisma.IntWithAggregatesFilter<"ProjectManager"> | number
+  id?: Prisma.StringWithAggregatesFilter<"ProjectManager"> | string
   nama?: Prisma.StringWithAggregatesFilter<"ProjectManager"> | string
 }
 
 export type ProjectManagerCreateInput = {
+  id: string
   nama: string
   projects?: Prisma.ProjectCreateNestedManyWithoutPmInput
 }
 
 export type ProjectManagerUncheckedCreateInput = {
-  id?: number
+  id: string
   nama: string
   projects?: Prisma.ProjectUncheckedCreateNestedManyWithoutPmInput
 }
 
 export type ProjectManagerUpdateInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
   nama?: Prisma.StringFieldUpdateOperationsInput | string
   projects?: Prisma.ProjectUpdateManyWithoutPmNestedInput
 }
 
 export type ProjectManagerUncheckedUpdateInput = {
-  id?: Prisma.IntFieldUpdateOperationsInput | number
+  id?: Prisma.StringFieldUpdateOperationsInput | string
   nama?: Prisma.StringFieldUpdateOperationsInput | string
   projects?: Prisma.ProjectUncheckedUpdateManyWithoutPmNestedInput
 }
 
 export type ProjectManagerCreateManyInput = {
-  id?: number
+  id: string
   nama: string
 }
 
 export type ProjectManagerUpdateManyMutationInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
   nama?: Prisma.StringFieldUpdateOperationsInput | string
 }
 
 export type ProjectManagerUncheckedUpdateManyInput = {
-  id?: Prisma.IntFieldUpdateOperationsInput | number
+  id?: Prisma.StringFieldUpdateOperationsInput | string
   nama?: Prisma.StringFieldUpdateOperationsInput | string
 }
 
 export type ProjectManagerCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
   nama?: Prisma.SortOrder
-}
-
-export type ProjectManagerAvgOrderByAggregateInput = {
-  id?: Prisma.SortOrder
 }
 
 export type ProjectManagerMaxOrderByAggregateInput = {
@@ -283,10 +246,6 @@ export type ProjectManagerMinOrderByAggregateInput = {
   nama?: Prisma.SortOrder
 }
 
-export type ProjectManagerSumOrderByAggregateInput = {
-  id?: Prisma.SortOrder
-}
-
 export type ProjectManagerScalarRelationFilter = {
   is?: Prisma.ProjectManagerWhereInput
   isNot?: Prisma.ProjectManagerWhereInput
@@ -294,14 +253,6 @@ export type ProjectManagerScalarRelationFilter = {
 
 export type StringFieldUpdateOperationsInput = {
   set?: string
-}
-
-export type IntFieldUpdateOperationsInput = {
-  set?: number
-  increment?: number
-  decrement?: number
-  multiply?: number
-  divide?: number
 }
 
 export type ProjectManagerCreateNestedOneWithoutProjectsInput = {
@@ -319,11 +270,12 @@ export type ProjectManagerUpdateOneRequiredWithoutProjectsNestedInput = {
 }
 
 export type ProjectManagerCreateWithoutProjectsInput = {
+  id: string
   nama: string
 }
 
 export type ProjectManagerUncheckedCreateWithoutProjectsInput = {
-  id?: number
+  id: string
   nama: string
 }
 
@@ -344,11 +296,12 @@ export type ProjectManagerUpdateToOneWithWhereWithoutProjectsInput = {
 }
 
 export type ProjectManagerUpdateWithoutProjectsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
   nama?: Prisma.StringFieldUpdateOperationsInput | string
 }
 
 export type ProjectManagerUncheckedUpdateWithoutProjectsInput = {
-  id?: Prisma.IntFieldUpdateOperationsInput | number
+  id?: Prisma.StringFieldUpdateOperationsInput | string
   nama?: Prisma.StringFieldUpdateOperationsInput | string
 }
 
@@ -419,7 +372,7 @@ export type $ProjectManagerPayload<ExtArgs extends runtime.Types.Extensions.Inte
     projects: Prisma.$ProjectPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
-    id: number
+    id: string
     nama: string
   }, ExtArgs["result"]["projectManager"]>
   composites: {}
@@ -845,7 +798,7 @@ export interface Prisma__ProjectManagerClient<T, Null = never, ExtArgs extends r
  * Fields of the ProjectManager model
  */
 export interface ProjectManagerFieldRefs {
-  readonly id: Prisma.FieldRef<"ProjectManager", 'Int'>
+  readonly id: Prisma.FieldRef<"ProjectManager", 'String'>
   readonly nama: Prisma.FieldRef<"ProjectManager", 'String'>
 }
     

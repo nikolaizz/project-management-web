@@ -292,6 +292,14 @@ export type UnitScalarRelationFilter = {
   isNot?: Prisma.UnitWhereInput
 }
 
+export type IntFieldUpdateOperationsInput = {
+  set?: number
+  increment?: number
+  decrement?: number
+  multiply?: number
+  divide?: number
+}
+
 export type UnitCreateNestedOneWithoutProjectsInput = {
   create?: Prisma.XOR<Prisma.UnitCreateWithoutProjectsInput, Prisma.UnitUncheckedCreateWithoutProjectsInput>
   connectOrCreate?: Prisma.UnitCreateOrConnectWithoutProjectsInput

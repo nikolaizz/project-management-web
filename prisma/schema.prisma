@@ -42,13 +42,13 @@ enum Role {
 // Data referensi untuk mengisi dropdown dan relasinya ke project.
 
 model ProjectManager {
-  id       Int       @id @default(autoincrement())
+  id       String    @id 
   nama     String    @unique
   projects Project[]
 }
 
 model BusinessPartner {
-  id       Int       @id @default(autoincrement())
+  id       String    @id 
   nama     String    @unique
   projects Project[]
 }
@@ -62,7 +62,7 @@ model Unit {
 // Akun pengguna aplikasi; email menjadi identitas unik untuk login.
 
 model User {
-  id           Int      @id @default(autoincrement())
+  id           String   @id
   nama         String
   email        String   @unique
   passwordHash String
@@ -78,9 +78,9 @@ model Project {
   kodeProject   String?         @unique
   nama          String
   deskripsi     String
-  pmId          Int
+  pmId          String
   pm            ProjectManager  @relation(fields: [pmId], references: [id])
-  bpId          Int
+  bpId          String
   bp            BusinessPartner @relation(fields: [bpId], references: [id])
   unitId        Int
   unitPengusul  Unit            @relation(fields: [unitId], references: [id])

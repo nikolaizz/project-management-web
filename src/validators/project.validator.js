@@ -7,6 +7,9 @@ const id = (label) =>
     .int()
     .positive(`${label} wajib dipilih`);
 
+const stringId = (label) =>
+  z.string().trim().min(1, `${label} wajib dipilih`);
+
 // Field yang dipakai bersama oleh create dan update
 const projectFields = {
   kategori: z.enum(KATEGORI, `Kategori harus salah satu dari: ${KATEGORI.join(", ")}`),
@@ -14,8 +17,8 @@ const projectFields = {
   kodeProject: z.string().trim().nullish(), // "" / null / kosong dinormalisasi di controller
   nama: z.string().trim().min(1, "Nama project wajib diisi"),
   deskripsi: z.string().trim().min(1, "Deskripsi project wajib diisi"),
-  pmId: id("PM"),
-  bpId: id("BP"),
+  pmId: stringId("PM"),
+  bpId: stringId("BP"),
   unitId: id("Unit pengusul"),
   ownerPic: z.string().trim().min(1, "Owner / PIC wajib diisi"),
   tanggalProject: z.iso.date("Tanggal project harus berformat YYYY-MM-DD"),

@@ -15,6 +15,7 @@ async function main() {
   await prisma.user.create({
     data: {
       nama: "Riswan Saputra",
+      id: "USER-001",
       email: "riswan@example.com",
       passwordHash: "dummy-nanti-diganti-hash",
       role: "PROJECT_MANAGER",
@@ -23,12 +24,12 @@ async function main() {
 
   // Buat data master yang akan direferensikan oleh contoh project di bawah.
   const [budi, dewi] = await Promise.all([
-    prisma.projectManager.create({ data: { nama: "Budi Santoso" } }),
-    prisma.projectManager.create({ data: { nama: "Dewi Lestari" } }),
+    prisma.projectManager.create({ data: { id: "PM-001", nama: "Budi Santoso" } }),
+    prisma.projectManager.create({ data: { id: "PM-002", nama: "Dewi Lestari" } }),
   ]);
   const [rizky, sari] = await Promise.all([
-    prisma.businessPartner.create({ data: { nama: "Rizky Aditya" } }),
-    prisma.businessPartner.create({ data: { nama: "Sari Wulandari" } }),
+    prisma.businessPartner.create({ data: { id: "BP-001", nama: "Rizky Aditya" } }),
+    prisma.businessPartner.create({ data: { id: "BP-002", nama: "Sari Wulandari" } }),
   ]);
   const [hcs, its] = await Promise.all([
     prisma.unit.create({ data: { nama: "HCS" } }),

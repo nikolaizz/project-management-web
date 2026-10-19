@@ -28,15 +28,11 @@ export type AggregateProject = {
 
 export type ProjectAvgAggregateOutputType = {
   id: number | null
-  pmId: number | null
-  bpId: number | null
   unitId: number | null
 }
 
 export type ProjectSumAggregateOutputType = {
   id: number | null
-  pmId: number | null
-  bpId: number | null
   unitId: number | null
 }
 
@@ -47,8 +43,8 @@ export type ProjectMinAggregateOutputType = {
   kodeProject: string | null
   nama: string | null
   deskripsi: string | null
-  pmId: number | null
-  bpId: number | null
+  pmId: string | null
+  bpId: string | null
   unitId: number | null
   ownerPic: string | null
   tanggalProject: Date | null
@@ -65,8 +61,8 @@ export type ProjectMaxAggregateOutputType = {
   kodeProject: string | null
   nama: string | null
   deskripsi: string | null
-  pmId: number | null
-  bpId: number | null
+  pmId: string | null
+  bpId: string | null
   unitId: number | null
   ownerPic: string | null
   tanggalProject: Date | null
@@ -98,15 +94,11 @@ export type ProjectCountAggregateOutputType = {
 
 export type ProjectAvgAggregateInputType = {
   id?: true
-  pmId?: true
-  bpId?: true
   unitId?: true
 }
 
 export type ProjectSumAggregateInputType = {
   id?: true
-  pmId?: true
-  bpId?: true
   unitId?: true
 }
 
@@ -258,8 +250,8 @@ export type ProjectGroupByOutputType = {
   kodeProject: string | null
   nama: string
   deskripsi: string
-  pmId: number
-  bpId: number
+  pmId: string
+  bpId: string
   unitId: number
   ownerPic: string
   tanggalProject: Date
@@ -299,8 +291,8 @@ export type ProjectWhereInput = {
   kodeProject?: Prisma.StringNullableFilter<"Project"> | string | null
   nama?: Prisma.StringFilter<"Project"> | string
   deskripsi?: Prisma.StringFilter<"Project"> | string
-  pmId?: Prisma.IntFilter<"Project"> | number
-  bpId?: Prisma.IntFilter<"Project"> | number
+  pmId?: Prisma.StringFilter<"Project"> | string
+  bpId?: Prisma.StringFilter<"Project"> | string
   unitId?: Prisma.IntFilter<"Project"> | number
   ownerPic?: Prisma.StringFilter<"Project"> | string
   tanggalProject?: Prisma.DateTimeFilter<"Project"> | Date | string
@@ -348,8 +340,8 @@ export type ProjectWhereUniqueInput = Prisma.AtLeast<{
   jenis?: Prisma.EnumJenisProjectFilter<"Project"> | $Enums.JenisProject
   nama?: Prisma.StringFilter<"Project"> | string
   deskripsi?: Prisma.StringFilter<"Project"> | string
-  pmId?: Prisma.IntFilter<"Project"> | number
-  bpId?: Prisma.IntFilter<"Project"> | number
+  pmId?: Prisma.StringFilter<"Project"> | string
+  bpId?: Prisma.StringFilter<"Project"> | string
   unitId?: Prisma.IntFilter<"Project"> | number
   ownerPic?: Prisma.StringFilter<"Project"> | string
   tanggalProject?: Prisma.DateTimeFilter<"Project"> | Date | string
@@ -397,8 +389,8 @@ export type ProjectScalarWhereWithAggregatesInput = {
   kodeProject?: Prisma.StringNullableWithAggregatesFilter<"Project"> | string | null
   nama?: Prisma.StringWithAggregatesFilter<"Project"> | string
   deskripsi?: Prisma.StringWithAggregatesFilter<"Project"> | string
-  pmId?: Prisma.IntWithAggregatesFilter<"Project"> | number
-  bpId?: Prisma.IntWithAggregatesFilter<"Project"> | number
+  pmId?: Prisma.StringWithAggregatesFilter<"Project"> | string
+  bpId?: Prisma.StringWithAggregatesFilter<"Project"> | string
   unitId?: Prisma.IntWithAggregatesFilter<"Project"> | number
   ownerPic?: Prisma.StringWithAggregatesFilter<"Project"> | string
   tanggalProject?: Prisma.DateTimeWithAggregatesFilter<"Project"> | Date | string
@@ -434,8 +426,8 @@ export type ProjectUncheckedCreateInput = {
   kodeProject?: string | null
   nama: string
   deskripsi: string
-  pmId: number
-  bpId: number
+  pmId: string
+  bpId: string
   unitId: number
   ownerPic: string
   tanggalProject: Date | string
@@ -473,8 +465,8 @@ export type ProjectUncheckedUpdateInput = {
   kodeProject?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   nama?: Prisma.StringFieldUpdateOperationsInput | string
   deskripsi?: Prisma.StringFieldUpdateOperationsInput | string
-  pmId?: Prisma.IntFieldUpdateOperationsInput | number
-  bpId?: Prisma.IntFieldUpdateOperationsInput | number
+  pmId?: Prisma.StringFieldUpdateOperationsInput | string
+  bpId?: Prisma.StringFieldUpdateOperationsInput | string
   unitId?: Prisma.IntFieldUpdateOperationsInput | number
   ownerPic?: Prisma.StringFieldUpdateOperationsInput | string
   tanggalProject?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -493,8 +485,8 @@ export type ProjectCreateManyInput = {
   kodeProject?: string | null
   nama: string
   deskripsi: string
-  pmId: number
-  bpId: number
+  pmId: string
+  bpId: string
   unitId: number
   ownerPic: string
   tanggalProject: Date | string
@@ -525,8 +517,8 @@ export type ProjectUncheckedUpdateManyInput = {
   kodeProject?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   nama?: Prisma.StringFieldUpdateOperationsInput | string
   deskripsi?: Prisma.StringFieldUpdateOperationsInput | string
-  pmId?: Prisma.IntFieldUpdateOperationsInput | number
-  bpId?: Prisma.IntFieldUpdateOperationsInput | number
+  pmId?: Prisma.StringFieldUpdateOperationsInput | string
+  bpId?: Prisma.StringFieldUpdateOperationsInput | string
   unitId?: Prisma.IntFieldUpdateOperationsInput | number
   ownerPic?: Prisma.StringFieldUpdateOperationsInput | string
   tanggalProject?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -566,8 +558,6 @@ export type ProjectCountOrderByAggregateInput = {
 
 export type ProjectAvgOrderByAggregateInput = {
   id?: Prisma.SortOrder
-  pmId?: Prisma.SortOrder
-  bpId?: Prisma.SortOrder
   unitId?: Prisma.SortOrder
 }
 
@@ -609,8 +599,6 @@ export type ProjectMinOrderByAggregateInput = {
 
 export type ProjectSumOrderByAggregateInput = {
   id?: Prisma.SortOrder
-  pmId?: Prisma.SortOrder
-  bpId?: Prisma.SortOrder
   unitId?: Prisma.SortOrder
 }
 
@@ -818,7 +806,7 @@ export type ProjectUncheckedCreateWithoutPmInput = {
   kodeProject?: string | null
   nama: string
   deskripsi: string
-  bpId: number
+  bpId: string
   unitId: number
   ownerPic: string
   tanggalProject: Date | string
@@ -866,8 +854,8 @@ export type ProjectScalarWhereInput = {
   kodeProject?: Prisma.StringNullableFilter<"Project"> | string | null
   nama?: Prisma.StringFilter<"Project"> | string
   deskripsi?: Prisma.StringFilter<"Project"> | string
-  pmId?: Prisma.IntFilter<"Project"> | number
-  bpId?: Prisma.IntFilter<"Project"> | number
+  pmId?: Prisma.StringFilter<"Project"> | string
+  bpId?: Prisma.StringFilter<"Project"> | string
   unitId?: Prisma.IntFilter<"Project"> | number
   ownerPic?: Prisma.StringFilter<"Project"> | string
   tanggalProject?: Prisma.DateTimeFilter<"Project"> | Date | string
@@ -902,7 +890,7 @@ export type ProjectUncheckedCreateWithoutBpInput = {
   kodeProject?: string | null
   nama: string
   deskripsi: string
-  pmId: number
+  pmId: string
   unitId: number
   ownerPic: string
   tanggalProject: Date | string
@@ -965,8 +953,8 @@ export type ProjectUncheckedCreateWithoutUnitPengusulInput = {
   kodeProject?: string | null
   nama: string
   deskripsi: string
-  pmId: number
-  bpId: number
+  pmId: string
+  bpId: string
   ownerPic: string
   tanggalProject: Date | string
   targetGoLive?: Date | string | null
@@ -1028,8 +1016,8 @@ export type ProjectUncheckedCreateWithoutDocumentsInput = {
   kodeProject?: string | null
   nama: string
   deskripsi: string
-  pmId: number
-  bpId: number
+  pmId: string
+  bpId: string
   unitId: number
   ownerPic: string
   tanggalProject: Date | string
@@ -1081,8 +1069,8 @@ export type ProjectUncheckedUpdateWithoutDocumentsInput = {
   kodeProject?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   nama?: Prisma.StringFieldUpdateOperationsInput | string
   deskripsi?: Prisma.StringFieldUpdateOperationsInput | string
-  pmId?: Prisma.IntFieldUpdateOperationsInput | number
-  bpId?: Prisma.IntFieldUpdateOperationsInput | number
+  pmId?: Prisma.StringFieldUpdateOperationsInput | string
+  bpId?: Prisma.StringFieldUpdateOperationsInput | string
   unitId?: Prisma.IntFieldUpdateOperationsInput | number
   ownerPic?: Prisma.StringFieldUpdateOperationsInput | string
   tanggalProject?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1118,8 +1106,8 @@ export type ProjectUncheckedCreateWithoutUpdatesInput = {
   kodeProject?: string | null
   nama: string
   deskripsi: string
-  pmId: number
-  bpId: number
+  pmId: string
+  bpId: string
   unitId: number
   ownerPic: string
   tanggalProject: Date | string
@@ -1171,8 +1159,8 @@ export type ProjectUncheckedUpdateWithoutUpdatesInput = {
   kodeProject?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   nama?: Prisma.StringFieldUpdateOperationsInput | string
   deskripsi?: Prisma.StringFieldUpdateOperationsInput | string
-  pmId?: Prisma.IntFieldUpdateOperationsInput | number
-  bpId?: Prisma.IntFieldUpdateOperationsInput | number
+  pmId?: Prisma.StringFieldUpdateOperationsInput | string
+  bpId?: Prisma.StringFieldUpdateOperationsInput | string
   unitId?: Prisma.IntFieldUpdateOperationsInput | number
   ownerPic?: Prisma.StringFieldUpdateOperationsInput | string
   tanggalProject?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1190,7 +1178,7 @@ export type ProjectCreateManyPmInput = {
   kodeProject?: string | null
   nama: string
   deskripsi: string
-  bpId: number
+  bpId: string
   unitId: number
   ownerPic: string
   tanggalProject: Date | string
@@ -1225,7 +1213,7 @@ export type ProjectUncheckedUpdateWithoutPmInput = {
   kodeProject?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   nama?: Prisma.StringFieldUpdateOperationsInput | string
   deskripsi?: Prisma.StringFieldUpdateOperationsInput | string
-  bpId?: Prisma.IntFieldUpdateOperationsInput | number
+  bpId?: Prisma.StringFieldUpdateOperationsInput | string
   unitId?: Prisma.IntFieldUpdateOperationsInput | number
   ownerPic?: Prisma.StringFieldUpdateOperationsInput | string
   tanggalProject?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1244,7 +1232,7 @@ export type ProjectUncheckedUpdateManyWithoutPmInput = {
   kodeProject?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   nama?: Prisma.StringFieldUpdateOperationsInput | string
   deskripsi?: Prisma.StringFieldUpdateOperationsInput | string
-  bpId?: Prisma.IntFieldUpdateOperationsInput | number
+  bpId?: Prisma.StringFieldUpdateOperationsInput | string
   unitId?: Prisma.IntFieldUpdateOperationsInput | number
   ownerPic?: Prisma.StringFieldUpdateOperationsInput | string
   tanggalProject?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1261,7 +1249,7 @@ export type ProjectCreateManyBpInput = {
   kodeProject?: string | null
   nama: string
   deskripsi: string
-  pmId: number
+  pmId: string
   unitId: number
   ownerPic: string
   tanggalProject: Date | string
@@ -1296,7 +1284,7 @@ export type ProjectUncheckedUpdateWithoutBpInput = {
   kodeProject?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   nama?: Prisma.StringFieldUpdateOperationsInput | string
   deskripsi?: Prisma.StringFieldUpdateOperationsInput | string
-  pmId?: Prisma.IntFieldUpdateOperationsInput | number
+  pmId?: Prisma.StringFieldUpdateOperationsInput | string
   unitId?: Prisma.IntFieldUpdateOperationsInput | number
   ownerPic?: Prisma.StringFieldUpdateOperationsInput | string
   tanggalProject?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1315,7 +1303,7 @@ export type ProjectUncheckedUpdateManyWithoutBpInput = {
   kodeProject?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   nama?: Prisma.StringFieldUpdateOperationsInput | string
   deskripsi?: Prisma.StringFieldUpdateOperationsInput | string
-  pmId?: Prisma.IntFieldUpdateOperationsInput | number
+  pmId?: Prisma.StringFieldUpdateOperationsInput | string
   unitId?: Prisma.IntFieldUpdateOperationsInput | number
   ownerPic?: Prisma.StringFieldUpdateOperationsInput | string
   tanggalProject?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1332,8 +1320,8 @@ export type ProjectCreateManyUnitPengusulInput = {
   kodeProject?: string | null
   nama: string
   deskripsi: string
-  pmId: number
-  bpId: number
+  pmId: string
+  bpId: string
   ownerPic: string
   tanggalProject: Date | string
   targetGoLive?: Date | string | null
@@ -1367,8 +1355,8 @@ export type ProjectUncheckedUpdateWithoutUnitPengusulInput = {
   kodeProject?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   nama?: Prisma.StringFieldUpdateOperationsInput | string
   deskripsi?: Prisma.StringFieldUpdateOperationsInput | string
-  pmId?: Prisma.IntFieldUpdateOperationsInput | number
-  bpId?: Prisma.IntFieldUpdateOperationsInput | number
+  pmId?: Prisma.StringFieldUpdateOperationsInput | string
+  bpId?: Prisma.StringFieldUpdateOperationsInput | string
   ownerPic?: Prisma.StringFieldUpdateOperationsInput | string
   tanggalProject?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   targetGoLive?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1386,8 +1374,8 @@ export type ProjectUncheckedUpdateManyWithoutUnitPengusulInput = {
   kodeProject?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   nama?: Prisma.StringFieldUpdateOperationsInput | string
   deskripsi?: Prisma.StringFieldUpdateOperationsInput | string
-  pmId?: Prisma.IntFieldUpdateOperationsInput | number
-  bpId?: Prisma.IntFieldUpdateOperationsInput | number
+  pmId?: Prisma.StringFieldUpdateOperationsInput | string
+  bpId?: Prisma.StringFieldUpdateOperationsInput | string
   ownerPic?: Prisma.StringFieldUpdateOperationsInput | string
   tanggalProject?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   targetGoLive?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1556,8 +1544,8 @@ export type $ProjectPayload<ExtArgs extends runtime.Types.Extensions.InternalArg
     kodeProject: string | null
     nama: string
     deskripsi: string
-    pmId: number
-    bpId: number
+    pmId: string
+    bpId: string
     unitId: number
     ownerPic: string
     tanggalProject: Date
@@ -1999,8 +1987,8 @@ export interface ProjectFieldRefs {
   readonly kodeProject: Prisma.FieldRef<"Project", 'String'>
   readonly nama: Prisma.FieldRef<"Project", 'String'>
   readonly deskripsi: Prisma.FieldRef<"Project", 'String'>
-  readonly pmId: Prisma.FieldRef<"Project", 'Int'>
-  readonly bpId: Prisma.FieldRef<"Project", 'Int'>
+  readonly pmId: Prisma.FieldRef<"Project", 'String'>
+  readonly bpId: Prisma.FieldRef<"Project", 'String'>
   readonly unitId: Prisma.FieldRef<"Project", 'Int'>
   readonly ownerPic: Prisma.FieldRef<"Project", 'String'>
   readonly tanggalProject: Prisma.FieldRef<"Project", 'DateTime'>
