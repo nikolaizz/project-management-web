@@ -37,6 +37,22 @@ export const createProjectSchema = z
     path: ["kodeProject"],
   });
 
-// PUT: semua opsional. Status sengaja TIDAK ada di sini,
-// karena perubahan status nanti lewat menu Update Project (tercatat di history).
-export const updateProjectSchema = z.object(projectFields).partial();
+// PUT: semua field opsional; perubahan status wajib disertai catatan riwayat.
+export const updateProjectSchema = z
+  .object({
+    ...projectFields,
+    status: z.enum(STATUS, "Status tidak valid").optional(),
+    aktivitas: z.string().trim().min(1, "Aktivitas wajib diisi").optional(),
+    kendala: z.string().trim().nullish(),
+    nextAction: z.string().trim().min(1, "Next action wajib diisi").optional(),
+  })
+  .partial()
+  .superRefine((data, ctx) => {
+    if (data.status === undefined) return;
+    if (!data.aktivitas) {
+      ctx.addIssue({ code: "custom", path: ["aktivitas"], message: "Aktivitas wajib diisi saat status diubah" });
+    }
+    if (!data.nextAction) {
+      ctx.addIssue({ code: "custom", path: ["nextAction"], message: "Next action wajib diisi saat status diubah" });
+    }
+  });

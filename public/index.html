@@ -79,6 +79,9 @@ dl.rev dd{margin:0;overflow-wrap:anywhere}
 .alert.ok{background:var(--ok-bg);color:var(--ok)}
 .nav{display:flex;justify-content:space-between;margin-top:20px}
 .tablewrap{overflow-x:auto}
+dialog{width:min(760px,calc(100% - 28px));max-height:90vh;overflow-y:auto;border:1px solid var(--line);border-radius:12px;padding:20px;color:var(--text)}
+dialog::backdrop{background:rgba(16,40,92,.45)}
+.dialog-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:18px}
 table{width:100%;border-collapse:collapse;font-size:13.5px}
 th,td{text-align:left;padding:8px 10px;border-bottom:1px solid var(--line);vertical-align:top}
 th{color:var(--muted);font-weight:600;white-space:nowrap}
@@ -88,6 +91,13 @@ th{color:var(--muted);font-weight:600;white-space:nowrap}
 .b-PENDING,.b-ON_HOLD{background:var(--warn-bg);color:var(--warn)}
 .b-INISIASI,.b-DRAFT{background:#e9ebf2;color:#444c63}
 tr.docs td{background:#f7f9fd}
+tr.project-detail td{background:#f7f9fd}
+.project-detail dl{display:grid;grid-template-columns:150px minmax(0,1fr);gap:6px 14px;margin:0}
+.project-detail dt{color:var(--muted)}
+.project-detail dd{margin:0;overflow-wrap:anywhere}
+.project-detail h3{font-size:14px;margin:14px 0 6px}
+.project-detail ul{margin:0;padding-left:20px}
+.project-detail .muted{color:var(--muted)}
 .empty{color:var(--muted);padding:12px 0}
 </style>
 </head>
@@ -132,11 +142,14 @@ tr.docs td{background:#f7f9fd}
           <h1 id="listTitle">Daftar project</h1>
           <button type="button" id="btnRefresh">Muat ulang</button>
         </div>
+        <div id="projectsMessage" aria-live="polite"></div>
         <div id="projects" class="tablewrap"><p class="empty">Memuat...</p></div>
       </div>
     </section>
   </div>
 </main>
+
+<dialog id="editProjectDialog" aria-labelledby="editProjectTitle"></dialog>
 
 <script>
 const API = location.protocol === "file:" ? "http://localhost:3000" : "";
@@ -428,15 +441,102 @@ function docsHtml(list) {
   return `<ul class="files">${list.map((d) => `<li><span class="nm"><a href="${API}/documents/${d.id}/download">${esc(d.namaFile)}</a> <small>(${fmtSize(d.ukuran)})</small></span><button type="button" class="small danger" data-deldoc="${d.id}">Hapus</button></li>`).join("")}</ul>`;
 }
 
+function renderProjectDetail(p) {
+  const date = (value) => value ? esc(String(value).slice(0, 10)) : "-";
+  const docs = p.documents.length
+    ? `<ul>${p.documents.map((d) => `<li><a href="${API}/documents/${d.id}/download">${esc(d.namaFile)}</a> <small>(${fmtSize(d.ukuran)})</small></li>`).join("")}</ul>`
+    : `<p class="hint">Belum ada dokumen.</p>`;
+  const updates = p.updates.length
+    ? `<ul>${p.updates.map((u) => `<li><strong>${date(u.tanggalInput)} — ${esc(STATUS_LABEL[u.status] || u.status)}</strong>: ${esc(u.aktivitas)}${u.kendala ? ` <span class="muted">Kendala: ${esc(u.kendala)}</span>` : ""}<br>Next action: ${esc(u.nextAction)}</li>`).join("")}</ul>`
+    : `<p class="hint">Belum ada riwayat update.</p>`;
+  return `<div class="project-detail"><dl>
+    <dt>Kategori</dt><dd>${esc(KATEGORI_LABEL[p.kategori] || p.kategori)}</dd>
+    <dt>Jenis</dt><dd>${esc(JENIS_LABEL[p.jenis] || p.jenis)}</dd>
+    <dt>Status</dt><dd>${esc(STATUS_LABEL[p.status] || p.status)}</dd>
+    <dt>Project manager</dt><dd>${esc(p.pm ? p.pm.nama : "-")}</dd>
+    <dt>Deskripsi</dt><dd>${esc(p.deskripsi)}</dd>
+    <dt>Business partner</dt><dd>${esc(p.bp ? p.bp.nama : "-")}</dd>
+    <dt>Unit pengusul</dt><dd>${esc(p.unitPengusul ? p.unitPengusul.nama : "-")}</dd>
+    <dt>Owner / PIC</dt><dd>${esc(p.ownerPic)}</dd>
+    <dt>Tanggal project</dt><dd>${date(p.tanggalProject)}</dd>
+    <dt>Target go live</dt><dd>${date(p.targetGoLive)}</dd>
+    <dt>Dibuat</dt><dd>${date(p.createdAt)}</dd>
+    <dt>Terakhir diperbarui</dt><dd>${date(p.updatedAt)}</dd>
+  </dl><h3>Dokumen</h3>${docs}<h3>Riwayat update</h3>${updates}</div>`;
+}
+
 function renderProjects(list, total) {
   const box = $("#projects");
   if (!list.length) { box.innerHTML = `<p class="empty">Belum ada project.</p>`; return; }
-  box.innerHTML = `<table><thead><tr><th>Kode</th><th>Nama</th><th>Kategori</th><th>Jenis</th><th>Status</th><th>PM</th><th>Dokumen</th><th></th></tr></thead><tbody>${list.map((p) => `<tr>
+  box.innerHTML = `<table><thead><tr><th>Kode</th><th>Nama</th><th>Kategori</th><th>Jenis</th><th>Status</th><th>PM</th><th>Unit pengusul</th><th>Dokumen</th><th>Aksi</th></tr></thead><tbody>${list.map((p) => `<tr>
     <td>${esc(p.kodeProject || "-")}</td><td>${esc(p.nama)}</td><td>${esc(KATEGORI_LABEL[p.kategori] || p.kategori)}</td>
     <td>${esc(JENIS_LABEL[p.jenis] || p.jenis)}</td><td><span class="badge b-${esc(p.status)}">${esc(STATUS_LABEL[p.status] || p.status)}</span></td>
-    <td>${esc(p.pm ? p.pm.nama : "-")}</td><td><button type="button" class="small" data-docs="${p.id}">${p._count ? p._count.documents : 0} file</button></td>
-    <td><button type="button" class="small danger" data-delp="${p.id}">Hapus</button></td></tr>`).join("")}</tbody></table>
+    <td>${esc(p.pm ? p.pm.nama : "-")}</td><td>${esc(p.unitPengusul ? p.unitPengusul.nama : "-")}</td>
+    <td><button type="button" class="small" data-docs="${p.id}">${p._count ? p._count.documents : 0} file</button></td>
+    <td><button type="button" class="small" data-edit="${p.id}">Edit</button>
+    <button type="button" class="small" data-detail="${p.id}" aria-expanded="false">Lihat detail</button>
+    <button type="button" class="small danger" data-delp="${p.id}">Hapus</button></td></tr>`).join("")}</tbody></table>
     <p class="hint">Menampilkan ${list.length} dari ${total} project.</p>`;
+}
+
+function editSelect(name, label, choices, selected, labels = {}) {
+  const optionsHtml = choices.map((value) => `<option value="${esc(value)}"${String(value) === String(selected) ? " selected" : ""}>${esc(labels[value] || value)}</option>`).join("");
+  return `<div><label for="edit-${name}">${label}</label><select id="edit-${name}" name="${name}" required>${optionsHtml}</select></div>`;
+}
+
+function editMasterSelect(name, label, choices, selected) {
+  const optionsHtml = choices.map((item) => `<option value="${esc(item.id)}"${String(item.id) === String(selected) ? " selected" : ""}>${esc(item.nama)}</option>`).join("");
+  return `<div><label for="edit-${name}">${label}</label><select id="edit-${name}" name="${name}" required>${optionsHtml}</select></div>`;
+}
+
+function renderEditForm(p) {
+  const date = (value) => value ? esc(String(value).slice(0, 10)) : "";
+  $("#editProjectDialog").innerHTML = `<form id="editProjectForm">
+    <div class="head"><h2 id="editProjectTitle">Edit project</h2><button type="button" data-close-edit aria-label="Tutup">Tutup</button></div>
+    <div class="grid">
+      ${editSelect("kategori", "Kategori", master.enums.kategori, p.kategori, KATEGORI_LABEL)}
+      <div><label for="edit-kodeProject">Kode project</label><input id="edit-kodeProject" name="kodeProject" value="${esc(p.kodeProject || "")}"></div>
+      ${editSelect("jenis", "Jenis project", Object.keys(JENIS_LABEL), p.jenis, JENIS_LABEL)}
+      ${editSelect("status", "Status", master.enums.status, p.status, STATUS_LABEL)}
+      ${editMasterSelect("pmId", "Project manager", master.pm, p.pmId)}
+      <div class="full"><label for="edit-nama">Nama project</label><input id="edit-nama" name="nama" value="${esc(p.nama)}" required></div>
+      <div class="full"><label for="edit-deskripsi">Deskripsi</label><textarea id="edit-deskripsi" name="deskripsi" required>${esc(p.deskripsi)}</textarea></div>
+      ${editMasterSelect("bpId", "Business partner", master.bp, p.bpId)}
+      ${editMasterSelect("unitId", "Unit pengusul", master.units, p.unitId)}
+      <div><label for="edit-ownerPic">Owner / PIC</label><input id="edit-ownerPic" name="ownerPic" value="${esc(p.ownerPic)}" required></div>
+      <div><label for="edit-tanggalProject">Tanggal project</label><input id="edit-tanggalProject" name="tanggalProject" type="date" value="${date(p.tanggalProject)}" required></div>
+      <div><label for="edit-targetGoLive">Target go live</label><input id="edit-targetGoLive" name="targetGoLive" type="date" value="${date(p.targetGoLive)}"></div>
+      <div id="statusUpdateFields" class="full" hidden>
+        <h3>Catatan perubahan status</h3>
+        <div class="grid">
+          <div class="full"><label for="edit-aktivitas">Aktivitas / progress / outcome</label><textarea id="edit-aktivitas" name="aktivitas"></textarea></div>
+          <div><label for="edit-kendala">Kendala / issue (opsional)</label><textarea id="edit-kendala" name="kendala"></textarea></div>
+          <div><label for="edit-nextAction">Next action</label><textarea id="edit-nextAction" name="nextAction"></textarea></div>
+        </div>
+      </div>
+    </div>
+    <p class="hint">Jika status berubah, isi aktivitas dan next action untuk mencatatnya di riwayat project.</p>
+    <div id="editProjectError" class="alert error" role="alert" hidden></div>
+    <div class="dialog-actions"><button type="button" data-close-edit>Batal</button><button type="submit" class="primary">Simpan perubahan</button></div>
+  </form>`;
+}
+
+function updateStatusFields() {
+  const form = $("#editProjectForm");
+  if (!form) return;
+  const changed = form.elements.status.value !== form.dataset.originalStatus;
+  $("#statusUpdateFields").hidden = !changed;
+  form.elements.aktivitas.required = changed;
+  form.elements.nextAction.required = changed;
+}
+
+async function openEditProject(id) {
+  const r = await api(`/projects/${id}`);
+  renderEditForm(r.data);
+  $("#editProjectForm").dataset.projectId = id;
+  $("#editProjectForm").dataset.originalStatus = r.data.status;
+  updateStatusFields();
+  $("#editProjectDialog").showModal();
 }
 
 async function loadProjects() {
@@ -447,15 +547,94 @@ async function loadProjects() {
 }
 
 $("#btnRefresh").onclick = loadProjects;
+$("#editProjectDialog").addEventListener("click", (e) => {
+  if (e.target.closest("[data-close-edit]")) $("#editProjectDialog").close();
+});
+$("#editProjectDialog").addEventListener("change", (e) => {
+  if (e.target.name === "status") updateStatusFields();
+});
+$("#editProjectDialog").addEventListener("submit", async (e) => {
+  if (e.target.id !== "editProjectForm") return;
+  e.preventDefault();
+  const form = e.target, submitButton = form.querySelector('button[type="submit"]');
+  const error = $("#editProjectError");
+  const data = new FormData(form);
+  const payload = {
+    kategori: data.get("kategori"),
+    jenis: data.get("jenis"),
+    kodeProject: String(data.get("kodeProject")).trim() || null,
+    nama: String(data.get("nama")).trim(),
+    deskripsi: String(data.get("deskripsi")).trim(),
+    pmId: data.get("pmId"),
+    bpId: data.get("bpId"),
+    unitId: Number(data.get("unitId")),
+    ownerPic: String(data.get("ownerPic")).trim(),
+    tanggalProject: data.get("tanggalProject"),
+    targetGoLive: data.get("targetGoLive") || null,
+  };
+  if (payload.status !== form.dataset.originalStatus) {
+    payload.aktivitas = String(data.get("aktivitas")).trim();
+    payload.kendala = String(data.get("kendala")).trim() || null;
+    payload.nextAction = String(data.get("nextAction")).trim();
+  } else {
+    delete payload.status;
+  }
+  submitButton.disabled = true;
+  submitButton.textContent = "Menyimpan...";
+  error.hidden = true;
+  try {
+    await api(`/projects/${form.dataset.projectId}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    });
+    $("#editProjectDialog").close();
+    $("#projectsMessage").innerHTML = `<div class="alert ok">Perubahan project berhasil disimpan.</div>`;
+    await loadProjects();
+  } catch (err) {
+    error.textContent = err.message;
+    error.hidden = false;
+  } finally {
+    submitButton.disabled = false;
+    submitButton.textContent = "Simpan perubahan";
+  }
+});
 $("#projects").addEventListener("click", async (e) => {
   try {
+    const edit = e.target.closest("[data-edit]");
+    if (edit) {
+      try {
+        await openEditProject(edit.dataset.edit);
+      } catch (err) {
+        $("#projectsMessage").innerHTML = `<div class="alert error">${esc(err.message)}</div>`;
+      }
+      return;
+    }
+    const detail = e.target.closest("[data-detail]");
+    if (detail) {
+      const row = detail.closest("tr"), next = row.nextElementSibling;
+      if (next && next.classList.contains("project-detail")) {
+        next.remove();
+        detail.setAttribute("aria-expanded", "false");
+        detail.textContent = "Lihat detail";
+        return;
+      }
+      const r = await api(`/projects/${detail.dataset.detail}`);
+      const tr = document.createElement("tr");
+      tr.className = "project-detail";
+      tr.innerHTML = `<td colspan="9">${renderProjectDetail(r.data)}</td>`;
+      row.after(tr);
+      detail.setAttribute("aria-expanded", "true");
+      detail.textContent = "Tutup detail";
+      return;
+    }
     const d = e.target.closest("[data-docs]");
     if (d) {
       const row = d.closest("tr"), next = row.nextElementSibling;
       if (next && next.classList.contains("docs")) { next.remove(); return; }
       const r = await api(`/projects/${d.dataset.docs}/documents`);
       const tr = document.createElement("tr");
-      tr.className = "docs"; tr.innerHTML = `<td colspan="8">${docsHtml(r.data)}</td>`;
+      tr.className = "docs"; tr.innerHTML = `<td colspan="9">${docsHtml(r.data)}</td>`;
       row.after(tr);
       return;
     }

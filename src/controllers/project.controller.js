@@ -224,11 +224,29 @@ export async function updateProject(req, res, next) {
     if ("kodeProject" in d) data.kodeProject = kode;
     if ("tanggalProject" in d) data.tanggalProject = new Date(d.tanggalProject);
     if ("targetGoLive" in d) data.targetGoLive = d.targetGoLive ? new Date(d.targetGoLive) : null;
+    if ("status" in d) data.status = d.status;
 
-    const project = await prisma.project.update({
-      where: { id },
-      data,
-      include: projectInclude,
+    const statusChanged = d.status !== undefined && d.status !== existing.status;
+    const project = await prisma.$transaction(async (tx) => {
+      const updated = await tx.project.update({
+        where: { id },
+        data,
+        include: projectInclude,
+      });
+
+      if (statusChanged) {
+        await tx.projectUpdate.create({
+          data: {
+            projectId: id,
+            status: d.status,
+            aktivitas: d.aktivitas,
+            kendala: d.kendala || null,
+            nextAction: d.nextAction,
+          },
+        });
+      }
+
+      return updated;
     });
 
     res.json({ success: true, message: "Project berhasil diperbarui", data: project });
