@@ -37,6 +37,7 @@ enum Role {
   ADMIN
   PROJECT_MANAGER
   VIEWER
+  BUSINESS_PARTNER
 }
 
 // Data referensi untuk mengisi dropdown dan relasinya ke project.
