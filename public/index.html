@@ -3,27 +3,27 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Project Hub - Upload Project</title>
+<title>Project Hub - Manajemen Project</title>
 <style>
 :root{--navy:#10285c;--blue:#1b5fd6;--blue-soft:#e8f0fd;--bg:#f3f5fa;--card:#fff;--line:#d9dfec;--text:#18233d;--muted:#5d6b88;--ok:#157347;--ok-bg:#e4f4ea;--bad:#b3261e;--bad-bg:#fdeceb;--warn:#8a5a00;--warn-bg:#fff3d6}
 *{box-sizing:border-box}
 [hidden]{display:none!important}
 body{margin:0;background:var(--bg);color:var(--text);font:15px/1.5 "Segoe UI",system-ui,-apple-system,Roboto,sans-serif}
 :focus-visible{outline:2px solid var(--blue);outline-offset:2px}
-.top{background:var(--navy);color:#fff;display:flex;justify-content:space-between;align-items:center;padding:12px 24px;gap:12px;flex-wrap:wrap}
+.top{background:#fff;color:var(--text);border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center;padding:12px 24px;gap:12px;flex-wrap:wrap}
 .brand strong{font-size:17px;margin-right:12px}
-.brand span{color:#b9c6e6;font-size:13px}
-.pill{font-size:12px;padding:3px 10px;border-radius:999px;background:rgba(255,255,255,.18)}
-.pill.ok{background:#1f8a4c}
-.pill.down{background:#b3261e}
+.brand span{color:var(--muted);font-size:13px}
+.pill{font-size:12px;padding:4px 10px;border-radius:999px;background:#e8f0fd;color:#194889}
+.pill.ok{background:var(--ok-bg);color:var(--ok)}
+.pill.down{background:var(--bad-bg);color:var(--bad)}
 .layout{display:grid;grid-template-columns:230px minmax(0,1fr);gap:20px;padding:20px 24px;max-width:1500px;margin:0 auto;align-items:start}
-.sidebar{position:sticky;top:20px;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px}
-.side-title{margin:4px 10px 10px;color:var(--muted);font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.06em}
+.sidebar{position:sticky;top:20px;background:#172848;color:#fff;border:1px solid #24375b;border-radius:12px;padding:12px}
+.side-title{margin:4px 10px 10px;color:#b8c6e0;font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.06em}
 .side-nav{display:grid;gap:6px}
-.side-link{display:flex;flex-direction:column;align-items:flex-start;gap:2px;width:100%;padding:10px 12px;border-color:transparent;text-align:left}
-.side-link span{color:var(--muted);font-size:12px}
-.side-link.active{background:var(--blue-soft);border-color:var(--blue);color:var(--navy);font-weight:600}
-.side-link.active span{color:var(--muted);font-weight:400}
+.side-link{display:flex;flex-direction:column;align-items:flex-start;gap:2px;width:100%;min-height:54px;padding:10px 12px;border-color:transparent;text-align:left;background:transparent;color:#f5f7fc}
+.side-link span{color:#b8c6e0;font-size:12px}
+.side-link.active{background:#2864d8;border-color:#5f8ef0;color:#fff;font-weight:600}
+.side-link.active span{color:#e7efff;font-weight:400}
 .content{min-width:0}
 .page[hidden]{display:none}
 @media(max-width:760px){.layout{grid-template-columns:minmax(0,1fr);padding:14px}.sidebar{position:static}.side-nav{grid-template-columns:repeat(2,minmax(0,1fr))}}
@@ -99,6 +99,68 @@ tr.project-detail td{background:#f7f9fd}
 .project-detail ul{margin:0;padding-left:20px}
 .project-detail .muted{color:var(--muted)}
 .empty{color:var(--muted);padding:12px 0}
+.update-heading{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;margin:2px 0 16px}
+.update-heading h1{margin:0 0 4px;font-size:clamp(22px,2.4vw,30px);letter-spacing:-.02em}
+.update-heading p{margin:0;color:var(--muted);max-width:680px}
+.eyebrow{font-size:11px;font-weight:700;letter-spacing:.1em;color:var(--blue);text-transform:uppercase;margin-bottom:5px!important}
+.update-mode{border:1px solid var(--line);background:#fff;color:var(--muted);padding:7px 10px;border-radius:7px;font-size:12px;white-space:nowrap}
+.update-layout{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(320px,.9fr);align-items:start;gap:16px}
+.update-main{display:grid;gap:14px;min-width:0}
+.update-layout .card{padding:18px}
+.date-note{color:var(--muted);font-size:13px}
+.date-note strong{display:block;color:var(--text);font-size:14px}
+.searchbox{position:relative}
+.project-results{display:grid;gap:6px;max-height:210px;overflow:auto;margin-top:8px}
+.project-result{display:flex;justify-content:space-between;align-items:center;gap:12px;text-align:left;padding:9px 11px;min-height:50px;border-radius:7px}
+.project-result strong,.project-result small{display:block}
+.project-result small{color:var(--muted);font-size:12px}
+.selected-projects{display:flex;flex-wrap:wrap;gap:7px;margin-top:12px}
+.project-chip{display:flex;align-items:center;gap:7px;border:1px solid #b8c9e7;background:#f2f6ff;border-radius:6px;padding:5px 8px;font-size:12.5px}
+.project-chip button{border:0;padding:0 3px;min-width:44px;min-height:44px;color:var(--muted);background:transparent}
+.project-chip button:hover:not(:disabled){background:#dce7fb;border-radius:4px}
+.update-form{border-top:1px solid var(--line);padding-top:15px;margin-top:15px}
+.update-form:first-child{border-top:0;padding-top:0;margin-top:0}
+.update-form-head{display:flex;justify-content:space-between;align-items:flex-start;gap:8px;margin-bottom:10px}
+.update-form-head h3{margin:0;font-size:15px}
+.project-meta{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px 12px;margin:10px 0 14px;padding:11px;background:#f5f7fb;border-radius:7px}
+.project-meta div{min-width:0}
+.project-meta dt{font-size:11px;color:var(--muted)}
+.project-meta dd{margin:2px 0 0;font-size:12.5px;overflow-wrap:anywhere}
+.update-fields{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.update-fields .wide{grid-column:1/-1}
+.update-fields textarea{min-height:75px}
+.update-fields input[type=file]{padding:7px}
+.update-file-list{list-style:none;margin:5px 0 0;padding:0;color:var(--muted);font-size:12px;display:grid;gap:4px}
+.update-file-list li{display:flex;align-items:center;justify-content:space-between;gap:8px;overflow-wrap:anywhere}
+.update-file-list button{padding:2px 7px;min-height:44px;color:var(--bad)}
+.update-form-head button{min-height:44px}
+.save-row{display:flex;justify-content:flex-end;align-items:center;gap:10px;flex-wrap:wrap}
+.save-row .hint{margin:0;flex:1}
+.whatsapp-card{position:sticky;top:18px;border-color:#cfd7e5!important}
+.preview-title{display:flex;align-items:center;gap:9px;margin-bottom:12px}
+.wa-mark{display:grid;place-items:center;width:30px;height:30px;border-radius:50%;background:#e3f5eb;color:#087a45;font-size:17px;font-weight:700}
+.preview-title h2{margin:0}
+.wa-paper{background:#f0eee8;border-radius:8px;padding:13px;min-height:260px}
+.wa-message{background:#fff;border:1px solid #e2e2dc;border-radius:7px;padding:14px;white-space:pre-wrap;overflow-wrap:anywhere;font:14px/1.55 "Segoe UI",system-ui,sans-serif;color:#202b40;min-height:200px}
+.wa-empty{color:var(--muted);font-size:13px}
+.wa-actions{display:grid;gap:9px;margin-top:12px}
+.button-wa{background:#087a45;color:#fff;border-color:#087a45;min-height:44px;font-weight:600}
+.button-wa:hover:not(:disabled){background:#056837;border-color:#056837}
+.copy-state{min-height:18px;color:var(--ok);font-size:12px}
+.latest-note{padding:10px 12px;border-radius:7px;background:#edf4ff;color:#274a83;font-size:12.5px;margin:13px 0 0}
+.update-layout input,.update-layout select,.update-layout textarea{border-color:#78859c}
+.update-layout button{border-color:#78859c}
+.update-layout button.primary{border-color:var(--blue)}
+.update-layout .button-wa{border-color:#087a45}
+.history-card{margin-top:16px}
+.history-card .tablewrap{margin-top:10px}
+.history-empty{color:var(--muted);font-size:13px;padding:4px 0}
+.status-select{display:flex;align-items:center;gap:8px}
+.status-select select{flex:1}
+.field-count{display:flex;justify-content:flex-end;color:var(--muted);font-size:11px;margin-top:2px}
+@media(max-width:980px){.update-layout{grid-template-columns:minmax(0,1fr)}.whatsapp-card{position:static}.wa-message{min-height:150px}}
+@media(max-width:620px){.update-heading{align-items:flex-start;flex-direction:column}.update-layout .card{padding:14px}.update-fields{grid-template-columns:minmax(0,1fr)}.update-fields .wide{grid-column:auto}.project-meta{grid-template-columns:minmax(0,1fr)}.save-row{align-items:stretch}.save-row button{width:100%}.side-nav{grid-template-columns:repeat(3,minmax(0,1fr))}.side-link{padding:9px 8px;font-size:13px}.side-link span{font-size:11px}}
+@media(max-width:420px){.side-nav{grid-template-columns:minmax(0,1fr)}.layout{padding:10px}.top{padding:10px 14px}.project-chip{max-width:100%;overflow-wrap:anywhere}}
 </style>
 </head>
 <body>
@@ -118,6 +180,10 @@ tr.project-detail td{background:#f7f9fd}
       <button type="button" class="side-link" data-page="projectsPage">
         Daftar project
         <span>Lihat project tersimpan</span>
+      </button>
+      <button type="button" class="side-link" data-page="updatePage">
+        Update project
+        <span>Rangkum progres harian</span>
       </button>
     </nav>
   </aside>
@@ -146,6 +212,55 @@ tr.project-detail td{background:#f7f9fd}
         <div id="projects" class="tablewrap"><p class="empty">Memuat...</p></div>
       </div>
     </section>
+
+    <section class="page" id="updatePage" aria-labelledby="updateTitle" hidden>
+      <div class="update-heading">
+        <div>
+          <p class="eyebrow">Daily update</p>
+          <h1 id="updateTitle">Rangkum progres project</h1>
+          <p>Pilih project, catat perkembangan terbaru, lalu salin rangkumannya ke WhatsApp.</p>
+        </div>
+        <span id="updateMode" class="update-mode" role="status">Memuat project...</span>
+      </div>
+      <div id="updateAlert" aria-live="polite"></div>
+      <div class="update-layout">
+        <div class="update-main">
+          <section class="card" aria-labelledby="pickProjectTitle">
+            <div class="head">
+              <h2 id="pickProjectTitle">Project yang diperbarui</h2>
+              <div class="date-note"><span>Tanggal input</span><strong id="updateDate"></strong></div>
+            </div>
+            <div class="searchbox">
+              <label for="projectSearch">Cari project berdasarkan nama atau kode</label>
+              <input id="projectSearch" type="search" autocomplete="off" placeholder="Ketik nama atau kode project">
+              <div id="projectResults" class="project-results" aria-live="polite"></div>
+            </div>
+            <div id="selectedProjects" class="selected-projects" aria-label="Project terpilih"></div>
+          </section>
+          <section class="card" aria-labelledby="entryTitle">
+            <div class="head"><h2 id="entryTitle">Catatan update</h2><span class="hint">Satu catatan untuk tiap project</span></div>
+            <div id="updateForms"><p class="history-empty">Pilih project untuk mulai mengisi update.</p></div>
+            <div class="save-row">
+              <span class="hint">Setiap update akan masuk ke riwayat project.</span>
+              <button type="button" id="saveUpdates" class="primary" disabled>Simpan update</button>
+            </div>
+          </section>
+        </div>
+        <aside class="card whatsapp-card" aria-labelledby="previewTitle">
+          <div class="preview-title"><span class="wa-mark" aria-hidden="true">W</span><h2 id="previewTitle">Preview WhatsApp</h2></div>
+          <div class="wa-paper"><div id="waPreview" class="wa-message" aria-live="polite"></div></div>
+          <p class="latest-note">Pesan hanya memuat update terbaru dari setiap project yang dipilih. Riwayat sebelumnya tetap tersimpan.</p>
+          <div class="wa-actions">
+            <button type="button" id="copyWhatsApp" class="button-wa">Salin ke WhatsApp</button>
+            <span id="copyState" class="copy-state" role="status"></span>
+          </div>
+        </aside>
+      </div>
+      <section class="card history-card" aria-labelledby="historyTitle">
+        <div class="head"><h2 id="historyTitle">Riwayat aktivitas dan update</h2><span class="hint">Terbaru ditampilkan lebih dulu</span></div>
+        <div id="updateHistory" class="tablewrap"><p class="history-empty">Pilih project untuk melihat riwayatnya.</p></div>
+      </section>
+    </section>
   </div>
 </main>
 
@@ -157,6 +272,7 @@ const MAX_SIZE = 10 * 1024 * 1024;
 const MAX_FILES = 10;
 const ALLOWED = [".pdf", ".doc", ".docx", ".xls", ".xlsx", ".jpg", ".jpeg", ".png"];
 const STEPS = ["Jenis project", "Informasi project", "Dokumen", "Review"];
+const PROJECT_STATUSES = ["DRAFT", "INISIASI", "ON_PROGRESS", "PENDING", "ON_HOLD", "SELESAI"];
 const STATUS_LABEL = { DRAFT: "Draft", INISIASI: "Inisiasi", ON_PROGRESS: "On progress", PENDING: "Pending", ON_HOLD: "On hold", SELESAI: "Selesai" };
 const KATEGORI_LABEL = { FS: "FS", CR_FORM: "CR Form", AIR_FORM: "AIR Form", IC_FORM: "IC Form", SC_FORM: "SC Form" };
 const JENIS_LABEL = { NEW: "Project baru", ADDENDUM: "Addendum" };
@@ -174,6 +290,7 @@ const FIELDS = Object.keys(newForm());
 let master = { pm: [], bp: [], units: [], enums: { kategori: [], status: [] } };
 let busy = false;
 const state = { step: 0, jenis: null, form: newForm(), files: [], errors: {}, createdId: null, createdNama: "", done: false };
+const updateState = { projects: [], selected: new Map(), histories: new Map(), demo: false, busy: false };
 
 // Tampilkan satu halaman menu dan tandai pilihan aktif pada sidebar.
 document.querySelector(".side-nav").addEventListener("click", (e) => {
@@ -466,7 +583,7 @@ function renderProjectDetail(p) {
     ? `<ul>${p.documents.map((d) => `<li><a href="${API}/documents/${d.id}/download">${esc(d.namaFile)}</a> <small>(${fmtSize(d.ukuran)})</small></li>`).join("")}</ul>`
     : `<p class="hint">Belum ada dokumen.</p>`;
   const updates = p.updates.length
-    ? `<ul>${p.updates.map((u) => `<li><strong>${date(u.tanggalInput)} — ${esc(STATUS_LABEL[u.status] || u.status)}</strong>: ${esc(u.aktivitas)}${u.kendala ? ` <span class="muted">Kendala: ${esc(u.kendala)}</span>` : ""}<br>Next action: ${esc(u.nextAction)}</li>`).join("")}</ul>`
+    ? `<ul>${p.updates.map((u) => `<li><strong>${date(u.tanggalInput)}, ${esc(STATUS_LABEL[u.status] || u.status)}</strong>: ${esc(u.aktivitas)}${u.kendala ? ` <span class="muted">Kendala: ${esc(u.kendala)}</span>` : ""}<br>Next action: ${esc(u.nextAction)}</li>`).join("")}</ul>`
     : `<p class="hint">Belum ada riwayat update.</p>`;
   return `<div class="project-detail"><dl>
     <dt>Kategori</dt><dd>${esc(KATEGORI_LABEL[p.kategori] || p.kategori)}</dd>
@@ -673,6 +790,322 @@ $("#projects").addEventListener("click", async (e) => {
   } catch (err) { setAlert("error", err.message); }
 });
 
+const demoProject = {
+  id: "demo-project",
+  kategori: "FS",
+  jenis: "NEW",
+  kodeProject: "CONTOH-001",
+  nama: "Contoh project untuk pratinjau",
+  deskripsi: "Data contoh ini hanya untuk melihat tampilan dan tidak disimpan.",
+  status: "ON_PROGRESS",
+  pm: { nama: "Contoh PM" },
+  bp: { nama: "Contoh BP" },
+  targetGoLive: "2026-12-15",
+  updates: [{
+    id: "demo-update",
+    tanggalInput: new Date().toISOString(),
+    status: "ON_PROGRESS",
+    aktivitas: "Review kebutuhan dengan tim terkait.",
+    kendala: "Menunggu konfirmasi data pendukung.",
+    nextAction: "Lanjutkan review setelah data diterima.",
+  }],
+};
+
+function setUpdateAlert(type, message) {
+  $("#updateAlert").innerHTML = message ? `<div class="alert ${type}" role="status">${esc(message)}</div>` : "";
+}
+
+function updateDateLabel(value) {
+  if (!value) return "-";
+  const date = new Date(value);
+  return Number.isNaN(date.getTime()) ? "-" : date.toLocaleDateString("id-ID", { day: "numeric", month: "short", year: "numeric" });
+}
+
+function addUpdateProject(project) {
+  if (updateState.selected.has(String(project.id))) return;
+  const sample = updateState.demo ? project.updates?.[0] : null;
+  updateState.selected.set(String(project.id), {
+    project,
+    status: sample?.status || project.status || "INISIASI",
+    aktivitas: sample?.aktivitas || "",
+    kendala: sample?.kendala || "",
+    nextAction: sample?.nextAction || "",
+    files: [],
+    savedUpdateId: null,
+    uploaded: false,
+  });
+  renderUpdateProjects();
+  loadUpdateHistory(project);
+}
+
+function renderProjectResults() {
+  const query = $("#projectSearch").value.trim().toLocaleLowerCase("id-ID");
+  const matches = updateState.projects
+    .filter((project) => !updateState.selected.has(String(project.id)))
+    .filter((project) => !query || `${project.nama} ${project.kodeProject || ""}`.toLocaleLowerCase("id-ID").includes(query))
+    .slice(0, 6);
+
+  $("#projectResults").innerHTML = matches.length
+    ? matches.map((project) => `<button type="button" class="project-result" data-add-update-project="${esc(project.id)}">
+        <span><strong>${esc(project.nama)}</strong><small>${esc(project.kodeProject || "Tanpa kode")} · ${esc(KATEGORI_LABEL[project.kategori] || project.kategori)}</small></span>
+        <span aria-hidden="true">＋</span>
+      </button>`).join("")
+    : `<p class="history-empty">${updateState.projects.length ? "Tidak ada project yang cocok." : "Belum ada project untuk dipilih."}</p>`;
+}
+
+function renderUpdateForms() {
+  const selected = [...updateState.selected.values()];
+  if (!selected.length) {
+    $("#updateForms").innerHTML = `<p class="history-empty">Pilih project untuk mulai mengisi update.</p>`;
+    return;
+  }
+  const statuses = master.enums.status.length ? master.enums.status : PROJECT_STATUSES;
+  $("#updateForms").innerHTML = selected.map((entry) => {
+    const project = entry.project;
+    const disabled = updateState.busy || Boolean(entry.savedUpdateId);
+    const filesDisabled = updateState.busy || entry.uploaded;
+    return `<article class="update-form" data-update-id="${esc(project.id)}">
+      <div class="update-form-head">
+        <div><h3>${esc(project.nama)}</h3><span class="hint">${esc(project.kodeProject || "Tanpa kode")}${entry.savedUpdateId ? " · Tersimpan" : ""}</span></div>
+        <button type="button" class="small" data-remove-update-project="${esc(project.id)}" ${updateState.busy ? "disabled" : ""}>Hapus dari rangkuman</button>
+      </div>
+      <dl class="project-meta">
+        <div><dt>Kategori</dt><dd>${esc(KATEGORI_LABEL[project.kategori] || project.kategori || "-")}</dd></div>
+        <div><dt>Deskripsi project</dt><dd>${esc(project.deskripsi || "-")}</dd></div>
+        <div><dt>Project manager</dt><dd>${esc(project.pm?.nama || "-")}</dd></div>
+        <div><dt>Business partner</dt><dd>${esc(project.bp?.nama || "-")}</dd></div>
+        <div><dt>Target Go Live</dt><dd>${esc(updateDateLabel(project.targetGoLive))}</dd></div>
+      </dl>
+      <div class="update-fields">
+        <div><label for="status-${esc(project.id)}">Status project</label><select id="status-${esc(project.id)}" data-update-field="status" ${disabled ? "disabled" : ""}>${statuses.map((status) => `<option value="${esc(status)}" ${entry.status === status ? "selected" : ""}>${esc(STATUS_LABEL[status] || status)}</option>`).join("")}</select></div>
+        <div class="wide"><label for="activity-${esc(project.id)}">Aktivitas / progress / outcome</label><textarea id="activity-${esc(project.id)}" data-update-field="aktivitas" required ${disabled ? "disabled" : ""} placeholder="Apa yang dikerjakan atau hasil yang dicapai?">${esc(entry.aktivitas)}</textarea></div>
+        <div class="wide"><label for="issue-${esc(project.id)}">Kendala / issue <span class="hint">(opsional)</span></label><textarea id="issue-${esc(project.id)}" data-update-field="kendala" ${disabled ? "disabled" : ""} placeholder="Tuliskan kendala jika ada">${esc(entry.kendala)}</textarea></div>
+        <div class="wide"><label for="next-${esc(project.id)}">Next action</label><textarea id="next-${esc(project.id)}" data-update-field="nextAction" required ${disabled ? "disabled" : ""} placeholder="Apa langkah berikutnya?">${esc(entry.nextAction)}</textarea></div>
+        <div class="wide"><label for="files-${esc(project.id)}">Dokumen pendukung <span class="hint">(opsional, maks. 10 file, 10 MB per file)</span></label><input id="files-${esc(project.id)}" type="file" data-update-files multiple accept=".pdf,.doc,.docx,.xls,.xlsx,.jpg,.jpeg,.png" ${filesDisabled ? "disabled" : ""}><ul class="update-file-list">${entry.files.map((file, index) => `<li><span>${esc(file.name)} (${fmtSize(file.size)})</span><button type="button" data-remove-update-file="${index}" aria-label="Hapus ${esc(file.name)}">Hapus</button></li>`).join("")}</ul></div>
+      </div>
+    </article>`;
+  }).join("");
+}
+
+function renderSelectedProjects() {
+  $("#selectedProjects").innerHTML = [...updateState.selected.values()].map(({ project }) => `<span class="project-chip">${esc(project.nama)}<button type="button" data-remove-update-project="${esc(project.id)}" aria-label="Hapus ${esc(project.nama)} dari rangkuman">×</button></span>`).join("");
+}
+
+function whatsappText() {
+  const selected = [...updateState.selected.values()];
+  if (!selected.length) return "Pilih project untuk melihat preview pesan.";
+  const lines = [`*Daily Update - ${new Date().toLocaleDateString("id-ID", { day: "numeric", month: "long", year: "numeric" })}*`, ""];
+  selected.forEach((entry, index) => {
+    lines.push(`${index + 1}. *${entry.project.nama}*`);
+    lines.push(`• Status: ${STATUS_LABEL[entry.status] || entry.status}`);
+    lines.push(`• Aktivitas / Progress: ${entry.aktivitas.trim() || "[Isi aktivitas / progress]"}`);
+    if (entry.kendala.trim()) lines.push(`• Kendala / Issue: ${entry.kendala.trim()}`);
+    lines.push(`• Next Action: ${entry.nextAction.trim() || "[Isi next action]"}`);
+    lines.push("");
+  });
+  return lines.join("\n").trim();
+}
+
+function renderUpdatePreview() {
+  const selected = [...updateState.selected.values()];
+  $("#waPreview").textContent = whatsappText();
+  $("#copyState").textContent = "";
+  const ready = selected.length > 0 && selected.every((entry) => entry.aktivitas.trim() && entry.nextAction.trim());
+  $("#copyWhatsApp").disabled = !ready;
+  $("#saveUpdates").disabled = updateState.demo || updateState.busy || !selected.length;
+}
+
+function renderUpdateHistory() {
+  const selected = [...updateState.selected.values()];
+  const rows = selected.flatMap(({ project }) => (updateState.histories.get(String(project.id)) || []).map((update) => ({ project, update })));
+  const loading = selected.some(({ project }) => !updateState.histories.has(String(project.id)));
+  rows.sort((a, b) => new Date(b.update.tanggalInput) - new Date(a.update.tanggalInput));
+  $("#updateHistory").innerHTML = rows.length ? `<table><thead><tr><th>Tanggal input</th><th>Project</th><th>Status project</th><th>Aktivitas / progress</th><th>Kendala / issue</th><th>Next action</th><th>Dokumen</th></tr></thead><tbody>${rows.slice(0, 30).map(({ project, update }) => `<tr>
+    <td>${esc(updateDateLabel(update.tanggalInput))}</td><td>${esc(project.nama)}</td>
+    <td><span class="badge b-${esc(update.status)}">${esc(STATUS_LABEL[update.status] || update.status)}</span></td>
+    <td>${esc(update.aktivitas)}</td><td>${esc(update.kendala || "-")}</td><td>${esc(update.nextAction)}</td>
+    <td>${(update.documents || []).map((doc) => `<a href="${API}/update-documents/${doc.id}/download">${esc(doc.namaFile)}</a>`).join("<br>") || "-"}</td>
+  </tr>`).join("")}</tbody></table>` : `<p class="history-empty">${loading ? "Memuat riwayat update..." : selected.length ? "Belum ada riwayat untuk project yang dipilih." : "Pilih project untuk melihat riwayatnya."}</p>`;
+}
+
+function renderUpdateProjects() {
+  renderProjectResults();
+  renderSelectedProjects();
+  renderUpdateForms();
+  renderUpdatePreview();
+  renderUpdateHistory();
+}
+
+async function loadUpdateHistory(project) {
+  const id = String(project.id);
+  if (updateState.demo) {
+    updateState.histories.set(id, project.updates || []);
+    renderUpdateHistory();
+    return;
+  }
+  try {
+    const result = await api(`/projects/${project.id}/updates`);
+    if (updateState.selected.has(id)) {
+      const saved = updateState.selected.get(id).savedUpdate;
+      if (saved && !result.data.some((update) => update.id === saved.id)) result.data.unshift(saved);
+      updateState.histories.set(id, result.data);
+    }
+  } catch (error) {
+    if (updateState.selected.has(id)) {
+      const saved = updateState.selected.get(id).savedUpdate;
+      updateState.histories.set(id, saved ? [saved] : []);
+    }
+    setUpdateAlert("warn", `Riwayat ${project.nama} belum dapat dimuat: ${error.message}`);
+  }
+  renderUpdateHistory();
+}
+
+async function loadUpdateProjects() {
+  $("#updateDate").textContent = new Date().toLocaleDateString("id-ID", { day: "numeric", month: "long", year: "numeric" });
+  try {
+    const result = await api("/projects?limit=100");
+    updateState.projects = result.data;
+    if (result.data.length) {
+      updateState.demo = false;
+      $("#updateMode").textContent = "Terhubung ke data project";
+    } else {
+      updateState.demo = true;
+      updateState.projects = [demoProject];
+      $("#updateMode").textContent = "Contoh tampilan, belum ada project";
+      setUpdateAlert("warn", "Belum ada project tersimpan. Data contoh hanya untuk pratinjau dan tidak dapat disimpan.");
+      addUpdateProject(demoProject);
+    }
+  } catch (error) {
+    updateState.demo = true;
+    updateState.projects = [demoProject];
+    $("#updateMode").textContent = "Contoh tampilan, data tidak tersimpan";
+    setUpdateAlert("warn", `Backend belum menyediakan data project (${error.message}). Form contoh ini hanya untuk pratinjau.`);
+    addUpdateProject(demoProject);
+  }
+  renderUpdateProjects();
+}
+
+$("#projectSearch").addEventListener("input", renderProjectResults);
+$("#projectResults").addEventListener("click", (event) => {
+  const button = event.target.closest("[data-add-update-project]");
+  if (!button) return;
+  const project = updateState.projects.find((item) => String(item.id) === button.dataset.addUpdateProject);
+  if (project) addUpdateProject(project);
+});
+$("#selectedProjects").addEventListener("click", (event) => {
+  const button = event.target.closest("[data-remove-update-project]");
+  if (!button) return;
+  updateState.selected.delete(button.dataset.removeUpdateProject);
+  updateState.histories.delete(button.dataset.removeUpdateProject);
+  renderUpdateProjects();
+});
+$("#updateForms").addEventListener("click", (event) => {
+  const button = event.target.closest("[data-remove-update-project]");
+  if (button) {
+    updateState.selected.delete(button.dataset.removeUpdateProject);
+    updateState.histories.delete(button.dataset.removeUpdateProject);
+    renderUpdateProjects();
+    return;
+  }
+  const removeFile = event.target.closest("[data-remove-update-file]");
+  if (removeFile) {
+    const entry = updateState.selected.get(removeFile.closest("[data-update-id]").dataset.updateId);
+    entry.files.splice(Number(removeFile.dataset.removeUpdateFile), 1);
+    renderUpdateForms();
+  }
+});
+$("#updateForms").addEventListener("input", (event) => {
+  const field = event.target.dataset.updateField;
+  if (!field) return;
+  const entry = updateState.selected.get(event.target.closest("[data-update-id]").dataset.updateId);
+  if (!entry) return;
+  entry[field] = event.target.value;
+  renderUpdatePreview();
+});
+$("#updateForms").addEventListener("change", (event) => {
+  if (!event.target.matches("[data-update-files]")) return;
+  const entry = updateState.selected.get(event.target.closest("[data-update-id]").dataset.updateId);
+  if (!entry) return;
+  const rejected = [];
+  for (const file of event.target.files) {
+    const ext = (file.name.match(/\.[^.]+$/) || [""])[0].toLowerCase();
+    if (!ALLOWED.includes(ext)) { rejected.push(`${file.name}: tipe file tidak diizinkan`); continue; }
+    if (file.size > MAX_SIZE) { rejected.push(`${file.name}: lebih dari 10 MB`); continue; }
+    if (entry.files.some((existing) => existing.name === file.name && existing.size === file.size)) continue;
+    if (entry.files.length >= MAX_FILES) { rejected.push(`${file.name}: maksimal ${MAX_FILES} file`); continue; }
+    entry.files.push(file);
+  }
+  event.target.value = "";
+  if (rejected.length) setUpdateAlert("warn", rejected.join("; "));
+  renderUpdateForms();
+});
+
+$("#saveUpdates").addEventListener("click", async () => {
+  const entries = [...updateState.selected.values()];
+  if (updateState.demo || !entries.length) return;
+  const incomplete = entries.find((entry) => !entry.aktivitas.trim() || !entry.nextAction.trim());
+  if (incomplete) {
+    setUpdateAlert("error", `Lengkapi aktivitas dan next action untuk ${incomplete.project.nama}.`);
+    return;
+  }
+  updateState.busy = true;
+  setUpdateAlert("", "");
+  renderUpdateProjects();
+  try {
+    for (const entry of entries) {
+      if (!entry.savedUpdateId) {
+        const result = await api(`/projects/${entry.project.id}/updates`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ status: entry.status, aktivitas: entry.aktivitas, kendala: entry.kendala.trim() || null, nextAction: entry.nextAction }),
+        });
+        entry.savedUpdateId = result.data.id;
+        entry.project.status = entry.status;
+        entry.savedUpdate = result.data;
+      }
+      if (entry.files.length && !entry.uploaded) {
+        const form = new FormData();
+        entry.files.forEach((file) => form.append("files", file));
+        const uploaded = await api(`/projects/${entry.project.id}/updates/${entry.savedUpdateId}/documents`, { method: "POST", body: form });
+        entry.savedUpdate.documents = uploaded.data;
+        entry.files = [];
+        entry.uploaded = true;
+      }
+      if (!entry.files.length) entry.uploaded = true;
+      const history = updateState.histories.get(String(entry.project.id)) || [];
+      if (!history.some((update) => update.id === entry.savedUpdateId)) updateState.histories.set(String(entry.project.id), [entry.savedUpdate, ...history]);
+    }
+    setUpdateAlert("ok", "Update berhasil disimpan ke riwayat project.");
+    loadProjects();
+  } catch (error) {
+    setUpdateAlert("error", `Sebagian update mungkin sudah tersimpan. ${error.message} Coba simpan lagi untuk melanjutkan.`);
+  } finally {
+    updateState.busy = false;
+    renderUpdateProjects();
+  }
+});
+
+$("#copyWhatsApp").addEventListener("click", async () => {
+  const text = whatsappText();
+  try {
+    if (navigator.clipboard && window.isSecureContext) await navigator.clipboard.writeText(text);
+    else {
+      const field = document.createElement("textarea");
+      field.value = text;
+      field.style.position = "fixed";
+      field.style.opacity = "0";
+      document.body.append(field);
+      field.select();
+      const copied = document.execCommand("copy");
+      field.remove();
+      if (!copied) throw new Error("Clipboard tidak tersedia");
+    }
+    $("#copyState").textContent = "Tersalin. Pesan siap ditempel ke WhatsApp.";
+  } catch {
+    $("#copyState").textContent = "Gagal menyalin. Pilih dan salin teks preview secara manual.";
+  }
+});
+
 async function init() {
   try {
     const [pm, bp, units, enums] = await Promise.all([api("/master/pm"), api("/master/bp"), api("/master/units"), api("/master/enums")]);
@@ -685,6 +1118,7 @@ async function init() {
   }
   render();
   loadProjects();
+  await loadUpdateProjects();
 }
 init();
 </script>

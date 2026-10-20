@@ -237,6 +237,7 @@ export type ProjectUpdateWhereInput = {
   kendala?: Prisma.StringNullableFilter<"ProjectUpdate"> | string | null
   nextAction?: Prisma.StringFilter<"ProjectUpdate"> | string
   project?: Prisma.XOR<Prisma.ProjectScalarRelationFilter, Prisma.ProjectWhereInput>
+  documents?: Prisma.UpdateDocumentListRelationFilter
 }
 
 export type ProjectUpdateOrderByWithRelationInput = {
@@ -248,6 +249,7 @@ export type ProjectUpdateOrderByWithRelationInput = {
   kendala?: Prisma.SortOrderInput | Prisma.SortOrder
   nextAction?: Prisma.SortOrder
   project?: Prisma.ProjectOrderByWithRelationInput
+  documents?: Prisma.UpdateDocumentOrderByRelationAggregateInput
 }
 
 export type ProjectUpdateWhereUniqueInput = Prisma.AtLeast<{
@@ -262,6 +264,7 @@ export type ProjectUpdateWhereUniqueInput = Prisma.AtLeast<{
   kendala?: Prisma.StringNullableFilter<"ProjectUpdate"> | string | null
   nextAction?: Prisma.StringFilter<"ProjectUpdate"> | string
   project?: Prisma.XOR<Prisma.ProjectScalarRelationFilter, Prisma.ProjectWhereInput>
+  documents?: Prisma.UpdateDocumentListRelationFilter
 }, "id">
 
 export type ProjectUpdateOrderByWithAggregationInput = {
@@ -299,6 +302,7 @@ export type ProjectUpdateCreateInput = {
   kendala?: string | null
   nextAction: string
   project: Prisma.ProjectCreateNestedOneWithoutUpdatesInput
+  documents?: Prisma.UpdateDocumentCreateNestedManyWithoutUpdateInput
 }
 
 export type ProjectUpdateUncheckedCreateInput = {
@@ -309,6 +313,7 @@ export type ProjectUpdateUncheckedCreateInput = {
   aktivitas: string
   kendala?: string | null
   nextAction: string
+  documents?: Prisma.UpdateDocumentUncheckedCreateNestedManyWithoutUpdateInput
 }
 
 export type ProjectUpdateUpdateInput = {
@@ -318,6 +323,7 @@ export type ProjectUpdateUpdateInput = {
   kendala?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   nextAction?: Prisma.StringFieldUpdateOperationsInput | string
   project?: Prisma.ProjectUpdateOneRequiredWithoutUpdatesNestedInput
+  documents?: Prisma.UpdateDocumentUpdateManyWithoutUpdateNestedInput
 }
 
 export type ProjectUpdateUncheckedUpdateInput = {
@@ -328,6 +334,7 @@ export type ProjectUpdateUncheckedUpdateInput = {
   aktivitas?: Prisma.StringFieldUpdateOperationsInput | string
   kendala?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   nextAction?: Prisma.StringFieldUpdateOperationsInput | string
+  documents?: Prisma.UpdateDocumentUncheckedUpdateManyWithoutUpdateNestedInput
 }
 
 export type ProjectUpdateCreateManyInput = {
@@ -408,6 +415,11 @@ export type ProjectUpdateSumOrderByAggregateInput = {
   projectId?: Prisma.SortOrder
 }
 
+export type ProjectUpdateScalarRelationFilter = {
+  is?: Prisma.ProjectUpdateWhereInput
+  isNot?: Prisma.ProjectUpdateWhereInput
+}
+
 export type ProjectUpdateCreateNestedManyWithoutProjectInput = {
   create?: Prisma.XOR<Prisma.ProjectUpdateCreateWithoutProjectInput, Prisma.ProjectUpdateUncheckedCreateWithoutProjectInput> | Prisma.ProjectUpdateCreateWithoutProjectInput[] | Prisma.ProjectUpdateUncheckedCreateWithoutProjectInput[]
   connectOrCreate?: Prisma.ProjectUpdateCreateOrConnectWithoutProjectInput | Prisma.ProjectUpdateCreateOrConnectWithoutProjectInput[]
@@ -450,12 +462,27 @@ export type ProjectUpdateUncheckedUpdateManyWithoutProjectNestedInput = {
   deleteMany?: Prisma.ProjectUpdateScalarWhereInput | Prisma.ProjectUpdateScalarWhereInput[]
 }
 
+export type ProjectUpdateCreateNestedOneWithoutDocumentsInput = {
+  create?: Prisma.XOR<Prisma.ProjectUpdateCreateWithoutDocumentsInput, Prisma.ProjectUpdateUncheckedCreateWithoutDocumentsInput>
+  connectOrCreate?: Prisma.ProjectUpdateCreateOrConnectWithoutDocumentsInput
+  connect?: Prisma.ProjectUpdateWhereUniqueInput
+}
+
+export type ProjectUpdateUpdateOneRequiredWithoutDocumentsNestedInput = {
+  create?: Prisma.XOR<Prisma.ProjectUpdateCreateWithoutDocumentsInput, Prisma.ProjectUpdateUncheckedCreateWithoutDocumentsInput>
+  connectOrCreate?: Prisma.ProjectUpdateCreateOrConnectWithoutDocumentsInput
+  upsert?: Prisma.ProjectUpdateUpsertWithoutDocumentsInput
+  connect?: Prisma.ProjectUpdateWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.ProjectUpdateUpdateToOneWithWhereWithoutDocumentsInput, Prisma.ProjectUpdateUpdateWithoutDocumentsInput>, Prisma.ProjectUpdateUncheckedUpdateWithoutDocumentsInput>
+}
+
 export type ProjectUpdateCreateWithoutProjectInput = {
   tanggalInput?: Date | string
   status: $Enums.ProjectStatus
   aktivitas: string
   kendala?: string | null
   nextAction: string
+  documents?: Prisma.UpdateDocumentCreateNestedManyWithoutUpdateInput
 }
 
 export type ProjectUpdateUncheckedCreateWithoutProjectInput = {
@@ -465,6 +492,7 @@ export type ProjectUpdateUncheckedCreateWithoutProjectInput = {
   aktivitas: string
   kendala?: string | null
   nextAction: string
+  documents?: Prisma.UpdateDocumentUncheckedCreateNestedManyWithoutUpdateInput
 }
 
 export type ProjectUpdateCreateOrConnectWithoutProjectInput = {
@@ -506,6 +534,60 @@ export type ProjectUpdateScalarWhereInput = {
   nextAction?: Prisma.StringFilter<"ProjectUpdate"> | string
 }
 
+export type ProjectUpdateCreateWithoutDocumentsInput = {
+  tanggalInput?: Date | string
+  status: $Enums.ProjectStatus
+  aktivitas: string
+  kendala?: string | null
+  nextAction: string
+  project: Prisma.ProjectCreateNestedOneWithoutUpdatesInput
+}
+
+export type ProjectUpdateUncheckedCreateWithoutDocumentsInput = {
+  id?: number
+  projectId: number
+  tanggalInput?: Date | string
+  status: $Enums.ProjectStatus
+  aktivitas: string
+  kendala?: string | null
+  nextAction: string
+}
+
+export type ProjectUpdateCreateOrConnectWithoutDocumentsInput = {
+  where: Prisma.ProjectUpdateWhereUniqueInput
+  create: Prisma.XOR<Prisma.ProjectUpdateCreateWithoutDocumentsInput, Prisma.ProjectUpdateUncheckedCreateWithoutDocumentsInput>
+}
+
+export type ProjectUpdateUpsertWithoutDocumentsInput = {
+  update: Prisma.XOR<Prisma.ProjectUpdateUpdateWithoutDocumentsInput, Prisma.ProjectUpdateUncheckedUpdateWithoutDocumentsInput>
+  create: Prisma.XOR<Prisma.ProjectUpdateCreateWithoutDocumentsInput, Prisma.ProjectUpdateUncheckedCreateWithoutDocumentsInput>
+  where?: Prisma.ProjectUpdateWhereInput
+}
+
+export type ProjectUpdateUpdateToOneWithWhereWithoutDocumentsInput = {
+  where?: Prisma.ProjectUpdateWhereInput
+  data: Prisma.XOR<Prisma.ProjectUpdateUpdateWithoutDocumentsInput, Prisma.ProjectUpdateUncheckedUpdateWithoutDocumentsInput>
+}
+
+export type ProjectUpdateUpdateWithoutDocumentsInput = {
+  tanggalInput?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  status?: Prisma.EnumProjectStatusFieldUpdateOperationsInput | $Enums.ProjectStatus
+  aktivitas?: Prisma.StringFieldUpdateOperationsInput | string
+  kendala?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  nextAction?: Prisma.StringFieldUpdateOperationsInput | string
+  project?: Prisma.ProjectUpdateOneRequiredWithoutUpdatesNestedInput
+}
+
+export type ProjectUpdateUncheckedUpdateWithoutDocumentsInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  projectId?: Prisma.IntFieldUpdateOperationsInput | number
+  tanggalInput?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  status?: Prisma.EnumProjectStatusFieldUpdateOperationsInput | $Enums.ProjectStatus
+  aktivitas?: Prisma.StringFieldUpdateOperationsInput | string
+  kendala?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  nextAction?: Prisma.StringFieldUpdateOperationsInput | string
+}
+
 export type ProjectUpdateCreateManyProjectInput = {
   id?: number
   tanggalInput?: Date | string
@@ -521,6 +603,7 @@ export type ProjectUpdateUpdateWithoutProjectInput = {
   aktivitas?: Prisma.StringFieldUpdateOperationsInput | string
   kendala?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   nextAction?: Prisma.StringFieldUpdateOperationsInput | string
+  documents?: Prisma.UpdateDocumentUpdateManyWithoutUpdateNestedInput
 }
 
 export type ProjectUpdateUncheckedUpdateWithoutProjectInput = {
@@ -530,6 +613,7 @@ export type ProjectUpdateUncheckedUpdateWithoutProjectInput = {
   aktivitas?: Prisma.StringFieldUpdateOperationsInput | string
   kendala?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   nextAction?: Prisma.StringFieldUpdateOperationsInput | string
+  documents?: Prisma.UpdateDocumentUncheckedUpdateManyWithoutUpdateNestedInput
 }
 
 export type ProjectUpdateUncheckedUpdateManyWithoutProjectInput = {
@@ -542,6 +626,35 @@ export type ProjectUpdateUncheckedUpdateManyWithoutProjectInput = {
 }
 
 
+/**
+ * Count Type ProjectUpdateCountOutputType
+ */
+
+export type ProjectUpdateCountOutputType = {
+  documents: number
+}
+
+export type ProjectUpdateCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  documents?: boolean | ProjectUpdateCountOutputTypeCountDocumentsArgs
+}
+
+/**
+ * ProjectUpdateCountOutputType without action
+ */
+export type ProjectUpdateCountOutputTypeDefaultArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the ProjectUpdateCountOutputType
+   */
+  select?: Prisma.ProjectUpdateCountOutputTypeSelect<ExtArgs> | null
+}
+
+/**
+ * ProjectUpdateCountOutputType without action
+ */
+export type ProjectUpdateCountOutputTypeCountDocumentsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.UpdateDocumentWhereInput
+}
+
 
 export type ProjectUpdateSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -552,6 +665,8 @@ export type ProjectUpdateSelect<ExtArgs extends runtime.Types.Extensions.Interna
   kendala?: boolean
   nextAction?: boolean
   project?: boolean | Prisma.ProjectDefaultArgs<ExtArgs>
+  documents?: boolean | Prisma.ProjectUpdate$documentsArgs<ExtArgs>
+  _count?: boolean | Prisma.ProjectUpdateCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["projectUpdate"]>
 
 export type ProjectUpdateSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -589,6 +704,8 @@ export type ProjectUpdateSelectScalar = {
 export type ProjectUpdateOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "projectId" | "tanggalInput" | "status" | "aktivitas" | "kendala" | "nextAction", ExtArgs["result"]["projectUpdate"]>
 export type ProjectUpdateInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   project?: boolean | Prisma.ProjectDefaultArgs<ExtArgs>
+  documents?: boolean | Prisma.ProjectUpdate$documentsArgs<ExtArgs>
+  _count?: boolean | Prisma.ProjectUpdateCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type ProjectUpdateIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   project?: boolean | Prisma.ProjectDefaultArgs<ExtArgs>
@@ -601,6 +718,7 @@ export type $ProjectUpdatePayload<ExtArgs extends runtime.Types.Extensions.Inter
   name: "ProjectUpdate"
   objects: {
     project: Prisma.$ProjectPayload<ExtArgs>
+    documents: Prisma.$UpdateDocumentPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: number
@@ -1005,6 +1123,7 @@ readonly fields: ProjectUpdateFieldRefs;
 export interface Prisma__ProjectUpdateClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
   project<T extends Prisma.ProjectDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.ProjectDefaultArgs<ExtArgs>>): Prisma.Prisma__ProjectClient<runtime.Types.Result.GetResult<Prisma.$ProjectPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+  documents<T extends Prisma.ProjectUpdate$documentsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.ProjectUpdate$documentsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$UpdateDocumentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1439,6 +1558,30 @@ export type ProjectUpdateDeleteManyArgs<ExtArgs extends runtime.Types.Extensions
    * Limit how many ProjectUpdates to delete.
    */
   limit?: number
+}
+
+/**
+ * ProjectUpdate.documents
+ */
+export type ProjectUpdate$documentsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the UpdateDocument
+   */
+  select?: Prisma.UpdateDocumentSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the UpdateDocument
+   */
+  omit?: Prisma.UpdateDocumentOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.UpdateDocumentInclude<ExtArgs> | null
+  where?: Prisma.UpdateDocumentWhereInput
+  orderBy?: Prisma.UpdateDocumentOrderByWithRelationInput | Prisma.UpdateDocumentOrderByWithRelationInput[]
+  cursor?: Prisma.UpdateDocumentWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.UpdateDocumentScalarFieldEnum | Prisma.UpdateDocumentScalarFieldEnum[]
 }
 
 /**

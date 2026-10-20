@@ -57,7 +57,8 @@ export const ModelName = {
   User: 'User',
   Project: 'Project',
   Document: 'Document',
-  ProjectUpdate: 'ProjectUpdate'
+  ProjectUpdate: 'ProjectUpdate',
+  UpdateDocument: 'UpdateDocument'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -157,6 +158,19 @@ export const ProjectUpdateScalarFieldEnum = {
 } as const
 
 export type ProjectUpdateScalarFieldEnum = (typeof ProjectUpdateScalarFieldEnum)[keyof typeof ProjectUpdateScalarFieldEnum]
+
+
+export const UpdateDocumentScalarFieldEnum = {
+  id: 'id',
+  updateId: 'updateId',
+  namaFile: 'namaFile',
+  pathFile: 'pathFile',
+  ukuran: 'ukuran',
+  tipe: 'tipe',
+  uploadedAt: 'uploadedAt'
+} as const
+
+export type UpdateDocumentScalarFieldEnum = (typeof UpdateDocumentScalarFieldEnum)[keyof typeof UpdateDocumentScalarFieldEnum]
 
 
 export const SortOrder = {

@@ -403,7 +403,8 @@ export const ModelName = {
   User: 'User',
   Project: 'Project',
   Document: 'Document',
-  ProjectUpdate: 'ProjectUpdate'
+  ProjectUpdate: 'ProjectUpdate',
+  UpdateDocument: 'UpdateDocument'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -419,7 +420,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "projectManager" | "businessPartner" | "unit" | "user" | "project" | "document" | "projectUpdate"
+    modelProps: "projectManager" | "businessPartner" | "unit" | "user" | "project" | "document" | "projectUpdate" | "updateDocument"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -941,6 +942,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    UpdateDocument: {
+      payload: Prisma.$UpdateDocumentPayload<ExtArgs>
+      fields: Prisma.UpdateDocumentFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.UpdateDocumentFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UpdateDocumentPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.UpdateDocumentFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UpdateDocumentPayload>
+        }
+        findFirst: {
+          args: Prisma.UpdateDocumentFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UpdateDocumentPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.UpdateDocumentFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UpdateDocumentPayload>
+        }
+        findMany: {
+          args: Prisma.UpdateDocumentFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UpdateDocumentPayload>[]
+        }
+        create: {
+          args: Prisma.UpdateDocumentCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UpdateDocumentPayload>
+        }
+        createMany: {
+          args: Prisma.UpdateDocumentCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.UpdateDocumentCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UpdateDocumentPayload>[]
+        }
+        delete: {
+          args: Prisma.UpdateDocumentDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UpdateDocumentPayload>
+        }
+        update: {
+          args: Prisma.UpdateDocumentUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UpdateDocumentPayload>
+        }
+        deleteMany: {
+          args: Prisma.UpdateDocumentDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.UpdateDocumentUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.UpdateDocumentUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UpdateDocumentPayload>[]
+        }
+        upsert: {
+          args: Prisma.UpdateDocumentUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UpdateDocumentPayload>
+        }
+        aggregate: {
+          args: Prisma.UpdateDocumentAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateUpdateDocument>
+        }
+        groupBy: {
+          args: Prisma.UpdateDocumentGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.UpdateDocumentGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.UpdateDocumentCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.UpdateDocumentCountAggregateOutputType> | number
+        }
+      }
+    }
   }
 } & {
   other: {
@@ -1061,6 +1136,19 @@ export const ProjectUpdateScalarFieldEnum = {
 } as const
 
 export type ProjectUpdateScalarFieldEnum = (typeof ProjectUpdateScalarFieldEnum)[keyof typeof ProjectUpdateScalarFieldEnum]
+
+
+export const UpdateDocumentScalarFieldEnum = {
+  id: 'id',
+  updateId: 'updateId',
+  namaFile: 'namaFile',
+  pathFile: 'pathFile',
+  ukuran: 'ukuran',
+  tipe: 'tipe',
+  uploadedAt: 'uploadedAt'
+} as const
+
+export type UpdateDocumentScalarFieldEnum = (typeof UpdateDocumentScalarFieldEnum)[keyof typeof UpdateDocumentScalarFieldEnum]
 
 
 export const SortOrder = {
@@ -1362,6 +1450,7 @@ export type GlobalOmitConfig = {
   project?: Prisma.ProjectOmit
   document?: Prisma.DocumentOmit
   projectUpdate?: Prisma.ProjectUpdateOmit
+  updateDocument?: Prisma.UpdateDocumentOmit
 }
 
 /* Types for Logging */

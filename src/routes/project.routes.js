@@ -11,7 +11,14 @@ import { uploadDocuments, listDocuments } from "../controllers/document.controll
 import { validate } from "../middlewares/validate.js";
 import { ensureProject } from "../middlewares/ensureProject.js";
 import { uploadFiles } from "../middlewares/upload.js";
+import { ensureProjectUpdate } from "../middlewares/ensureProjectUpdate.js";
 import { createProjectSchema, updateProjectSchema } from "../validators/project.validator.js";
+import { createProjectUpdateSchema } from "../validators/project-update.validator.js";
+import {
+  createProjectUpdate,
+  listProjectUpdates,
+  uploadUpdateDocuments,
+} from "../controllers/project-update.controller.js";
 
 const router = Router();
 
@@ -22,6 +29,16 @@ router.post("/", validate(createProjectSchema), createProject);
 router.get("/:id", getProjectById);
 router.put("/:id", validate(updateProjectSchema), updateProject);
 router.delete("/:id", deleteProject);
+
+router.get("/:id/updates", ensureProject, listProjectUpdates);
+router.post("/:id/updates", ensureProject, validate(createProjectUpdateSchema), createProjectUpdate);
+router.post(
+  "/:id/updates/:updateId/documents",
+  ensureProject,
+  ensureProjectUpdate,
+  uploadFiles,
+  uploadUpdateDocuments
+);
 
 // Dokumen: cek project ada dulu, baru terima file
 router.get("/:id/documents", ensureProject, listDocuments);

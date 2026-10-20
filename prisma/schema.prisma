@@ -121,6 +121,21 @@ model ProjectUpdate {
   aktivitas    String        // Aktivitas / Progress / Outcome
   kendala      String?       // Kendala / Issue
   nextAction   String
+  documents    UpdateDocument[]
 
   @@index([projectId, tanggalInput])
+}
+
+// Dokumen yang dilampirkan pada satu catatan update.
+model UpdateDocument {
+  id         Int           @id @default(autoincrement())
+  updateId   Int
+  update     ProjectUpdate @relation(fields: [updateId], references: [id], onDelete: Cascade)
+  namaFile   String
+  pathFile   String
+  ukuran     Int
+  tipe       String
+  uploadedAt DateTime      @default(now())
+
+  @@index([updateId, uploadedAt])
 }

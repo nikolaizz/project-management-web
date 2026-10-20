@@ -112,7 +112,10 @@ export async function getProjectById(req, res, next) {
         ...projectInclude,
         // Pada tampilan detail, ambil seluruh dokumen dan riwayat update terbaru dahulu.
         documents: { orderBy: { uploadedAt: "desc" } },
-        updates: { orderBy: { tanggalInput: "desc" } },
+        updates: {
+          orderBy: { tanggalInput: "desc" },
+          include: { documents: { orderBy: { uploadedAt: "desc" } } },
+        },
       },
     });
 
@@ -265,7 +268,10 @@ export async function deleteProject(req, res, next) {
 
     const project = await prisma.project.findUnique({
       where: { id },
-      include: { documents: { select: { pathFile: true } } },
+      include: {
+        documents: { select: { pathFile: true } },
+        updates: { select: { documents: { select: { pathFile: true } } } },
+      },
     });
     if (!project) {
       return res.status(404).json({ success: false, message: "Project tidak ditemukan" });
@@ -274,7 +280,10 @@ export async function deleteProject(req, res, next) {
     // Baris dokumen dan update ikut terhapus otomatis (onDelete: Cascade di schema)
     await prisma.project.delete({ where: { id } });
     // File fisiknya kita hapus manual
-    await removeFiles(project.documents.map((doc) => doc.pathFile));
+    await removeFiles([
+      ...project.documents.map((doc) => doc.pathFile),
+      ...project.updates.flatMap((update) => update.documents.map((doc) => doc.pathFile)),
+    ]);
 
     res.json({ success: true, message: "Project berhasil dihapus" });
   } catch (err) {

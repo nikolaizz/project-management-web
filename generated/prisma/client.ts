@@ -76,3 +76,8 @@ export type Document = Prisma.DocumentModel
  * 
  */
 export type ProjectUpdate = Prisma.ProjectUpdateModel
+/**
+ * Model UpdateDocument
+ * 
+ */
+export type UpdateDocument = Prisma.UpdateDocumentModel
