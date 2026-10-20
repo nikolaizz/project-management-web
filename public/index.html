@@ -283,7 +283,7 @@ function updateNav() {
   $("#nav").hidden = state.done;
   $("#btnBack").disabled = busy || state.step === 0 || (!!state.createdId && state.step <= 2);
   $("#btnNext").disabled = busy;
-  $("#btnNext").textContent = busy ? "Menyimpan..." : last ? (state.createdId ? "Coba unggah ulang dokumen" : "Simpan & kirim") : "Selanjutnya";
+  $("#btnNext").textContent = busy ? (last ? "Menyimpan..." : "Memeriksa...") : last ? (state.createdId ? "Coba unggah ulang dokumen" : "Simpan & kirim") : "Selanjutnya";
 }
 
 function render() {
@@ -396,13 +396,32 @@ function resetAll() {
   clearAlert(); render();
 }
 
-$("#btnNext").onclick = () => {
+$("#btnNext").onclick = async () => {
+  if (busy) return;
   clearAlert();
   if (state.step === 0) {
     if (!state.jenis) return setAlert("error", "Pilih jenis project dulu.");
     state.step = 1; render();
   } else if (state.step === 1) {
-    if (!validateInfo()) { render(); const first = $("#panel .invalid"); if (first) first.focus(); return setAlert("error", "Lengkapi isian yang ditandai."); }
+    validateInfo();
+    // Cek ke server apakah kode sudah dipakai, supaya ditolak di langkah ini juga
+    const kode = state.form.kodeProject.trim();
+    if (kode && !state.errors.kodeProject) {
+      busy = true; updateNav();
+      try {
+        const r = await api("/projects/check-code?kode=" + encodeURIComponent(kode));
+        if (r.data.exists) state.errors.kodeProject = `Kode sudah terdaftar pada project "${r.data.project.nama}".`;
+      } catch (e) {
+        busy = false; render();
+        return setAlert("error", e.message);
+      }
+      busy = false;
+    }
+    if (Object.keys(state.errors).length) {
+      render();
+      const first = $("#panel .invalid"); if (first) first.focus();
+      return setAlert("error", "Lengkapi atau perbaiki isian yang ditandai.");
+    }
     state.step = 2; render();
   } else if (state.step === 2) {
     state.step = 3; render();
@@ -562,6 +581,7 @@ $("#editProjectDialog").addEventListener("submit", async (e) => {
   const payload = {
     kategori: data.get("kategori"),
     jenis: data.get("jenis"),
+    status: data.get("status"),
     kodeProject: String(data.get("kodeProject")).trim() || null,
     nama: String(data.get("nama")).trim(),
     deskripsi: String(data.get("deskripsi")).trim(),
