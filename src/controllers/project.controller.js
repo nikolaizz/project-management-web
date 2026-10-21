@@ -1,12 +1,14 @@
 import prisma from "../lib/prisma.js";
 import { STATUS, KATEGORI } from "../constants/enums.js";
 import { removeFiles } from "../lib/files.js";
+import { buildStages } from "../lib/stages.js";
 
 // Relasi data master yang ikut dikirim bersama project, tanpa mengambil kolom lain.
 const projectInclude = {
   pm: { select: { id: true, nama: true } },
   bp: { select: { id: true, nama: true } },
   unitPengusul: { select: { id: true, nama: true } },
+  stages: { orderBy: { tahap: "asc" } },
 };
 
 // ---------- GET /projects ----------
@@ -160,6 +162,9 @@ export async function createProject(req, res, next) {
         tanggalProject: new Date(d.tanggalProject),
         targetGoLive: d.targetGoLive ? new Date(d.targetGoLive) : null,
         status: d.status,
+        stages: {
+          create: buildStages(d.stages),
+        },
       },
       include: projectInclude,
     });
@@ -277,6 +282,50 @@ export async function deleteProject(req, res, next) {
     await removeFiles(project.documents.map((doc) => doc.pathFile));
 
     res.json({ success: true, message: "Project berhasil dihapus" });
+  } catch (err) {
+    next(err);
+  }
+}
+
+// ---------- PUT /projects/:id/stages ----------
+export async function updateStages(req, res, next) {
+  try {
+    const projectId = Number(req.params.id);
+    const { stages } = req.body; // sudah divalidasi
+
+    // Semua tahapan diperbarui, atau tidak sama sekali
+    await prisma.$transaction(
+      stages.map((s) => {
+        // Hanya ubah field yang memang dikirim
+        const data = {};
+        if (s.tanggalRencana !== undefined) {
+          data.tanggalRencana = s.tanggalRencana ? new Date(s.tanggalRencana) : null;
+        }
+        if (s.status !== undefined) data.status = s.status;
+        if (s.catatan !== undefined) data.catatan = s.catatan || null;
+
+        // upsert: ubah kalau barisnya ada, buat kalau belum
+        // (berguna untuk project lama yang dibuat sebelum fitur ini)
+        return prisma.projectStage.upsert({
+          where: { projectId_tahap: { projectId, tahap: s.tahap } },
+          update: data,
+          create: {
+            projectId,
+            tahap: s.tahap,
+            tanggalRencana: data.tanggalRencana ?? null,
+            status: data.status ?? "PLANNED",
+            catatan: data.catatan ?? null,
+          },
+        });
+      })
+    );
+
+    const result = await prisma.projectStage.findMany({
+      where: { projectId },
+      orderBy: { tahap: "asc" },
+    });
+
+    res.json({ success: true, message: "Tahapan berhasil diperbarui", data: result });
   } catch (err) {
     next(err);
   }

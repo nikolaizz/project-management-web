@@ -52,3 +52,8 @@ export type Document = Prisma.DocumentModel
  * 
  */
 export type ProjectUpdate = Prisma.ProjectUpdateModel
+/**
+ * Model ProjectStage
+ * 
+ */
+export type ProjectStage = Prisma.ProjectStageModel

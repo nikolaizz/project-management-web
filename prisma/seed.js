@@ -1,10 +1,12 @@
 import prisma from "../src/lib/prisma.js";
+import { buildStages } from "../src/lib/stages.js";
 
 async function main() {
   // Bersihkan data agar seed bisa dijalankan ulang; hapus tabel anak sebelum induknya
   // karena data anak memiliki relasi foreign key ke project dan data master.
   await prisma.document.deleteMany();
   await prisma.projectUpdate.deleteMany();
+  await prisma.projectStage.deleteMany();
   await prisma.project.deleteMany();
   await prisma.projectManager.deleteMany();
   await prisma.businessPartner.deleteMany();
@@ -51,6 +53,12 @@ async function main() {
       tanggalProject: new Date("2026-09-01"),
       targetGoLive: new Date("2026-12-20"),
       status: "ON_PROGRESS",
+      stages: {
+        create: buildStages([
+          { tahap: "PRA_KOMITE", tanggalRencana: new Date("2026-09-12"), status: "SELESAI" },
+          { tahap: "KOMITE_TI_B", tanggalRencana: new Date("2026-10-20"), status: "ON_PROGRESS", catatan: "Menunggu finalisasi dokumen." },
+        ]),
+      },
     },
   });
 
@@ -68,6 +76,9 @@ async function main() {
       tanggalProject: new Date("2026-10-05"),
       targetGoLive: new Date("2027-03-31"),
       status: "INISIASI",
+      stages: {
+        create: buildStages(), 
+      },
     },
   });
 
@@ -85,6 +96,7 @@ async function main() {
       tanggalProject: new Date("2026-07-15"),
       targetGoLive: new Date("2027-01-30"),
       status: "ON_HOLD",
+      stages: { create: buildStages() },
     },
   });
 
@@ -102,6 +114,7 @@ async function main() {
       tanggalProject: new Date("2026-08-10"),
       targetGoLive: new Date("2027-02-15"),
       status: "PENDING",
+      stages: { create: buildStages() },
     },
   });
 

@@ -6,12 +6,13 @@ import {
   createProject,
   updateProject,
   deleteProject,
+  updateStages
 } from "../controllers/project.controller.js";
 import { uploadDocuments, listDocuments } from "../controllers/document.controller.js";
 import { validate } from "../middlewares/validate.js";
 import { ensureProject } from "../middlewares/ensureProject.js";
 import { uploadFiles } from "../middlewares/upload.js";
-import { createProjectSchema, updateProjectSchema } from "../validators/project.validator.js";
+import { createProjectSchema, updateProjectSchema, updateStagesSchema} from "../validators/project.validator.js";
 
 const router = Router();
 
@@ -21,6 +22,7 @@ router.post("/", validate(createProjectSchema), createProject);
 
 router.get("/:id", getProjectById);
 router.put("/:id", validate(updateProjectSchema), updateProject);
+router.put("/:id/stages", ensureProject, validate(updateStagesSchema), updateStages);
 router.delete("/:id", deleteProject);
 
 // Dokumen: cek project ada dulu, baru terima file

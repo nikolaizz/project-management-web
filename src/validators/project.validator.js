@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { KATEGORI, JENIS, STATUS } from "../constants/enums.js";
+import { KATEGORI, JENIS, STATUS, TAHAP, STATUS_TAHAPAN} from "../constants/enums.js";
 
 const id = (label) =>
   z.coerce
@@ -25,11 +25,28 @@ const projectFields = {
   targetGoLive: z.iso.date("Target go live harus berformat YYYY-MM-DD").nullish(),
 };
 
+const stageSchema = z.object({
+  tahap: z.enum(TAHAP, `Tahapan harus salah satu dari: ${TAHAP.join(", ")}`),
+  tanggalRencana: z.iso.date("Tanggal rencana harus berformat YYYY-MM-DD").nullish(),
+  status: z
+    .enum(STATUS_TAHAPAN, `Status tahapan harus salah satu dari: ${STATUS_TAHAPAN.join(", ")}`)
+    .optional(),
+  catatan: z.string().trim().max(500, "Catatan maksimal 500 karakter").nullish(),
+});
+
+const stagesSchema = z
+  .array(stageSchema)
+  .max(3, "Maksimal 3 tahapan")
+  .refine((list) => new Set(list.map((s) => s.tahap)).size === list.length, {
+    message: "Tahapan tidak boleh duplikat",
+  });
+
 // POST: semua wajib (kecuali yang nullish), status default INISIASI
 export const createProjectSchema = z
   .object({
     ...projectFields,
     status: z.enum(STATUS, "Status tidak valid").default("INISIASI"),
+    stages: stagesSchema.optional(),
   })
   // ASUMSI SEMENTARA: Addendum wajib punya kode. Hapus kalau tidak wajib.
   .refine((d) => d.jenis !== "ADDENDUM" || d.kodeProject, {
@@ -56,3 +73,8 @@ export const updateProjectSchema = z
       ctx.addIssue({ code: "custom", path: ["nextAction"], message: "Next action wajib diisi saat status diubah" });
     }
   });
+  
+  // PUT /projects/:id/stages: kirim hanya tahapan yang berubah
+export const updateStagesSchema = z.object({
+  stages: stagesSchema.min(1, "Kirim minimal satu tahapan"),
+});

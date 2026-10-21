@@ -10,3 +10,5 @@ export const STATUS = [
   "ON_HOLD",
   "SELESAI",
 ];
+export const TAHAP = ["PRA_KOMITE", "KOMITE_TI_B", "KOMITE_TI_A"];
+export const STATUS_TAHAPAN = ["PLANNED", "ON_PROGRESS", "SELESAI"];

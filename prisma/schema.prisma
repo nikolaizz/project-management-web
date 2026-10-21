@@ -40,6 +40,18 @@ enum Role {
   BUSINESS_PARTNER
 }
 
+enum TahapKomite {
+  PRA_KOMITE
+  KOMITE_TI_B
+  KOMITE_TI_A
+}
+
+enum StatusTahapan {
+  PLANNED
+  ON_PROGRESS
+  SELESAI
+}
+
 // Data referensi untuk mengisi dropdown dan relasinya ke project.
 
 model ProjectManager {
@@ -94,6 +106,7 @@ model Project {
 
   documents     Document[]
   updates       ProjectUpdate[]
+  stages        ProjectStage[]
 
   @@index([status])
   @@index([nama])
@@ -123,4 +136,16 @@ model ProjectUpdate {
   nextAction   String
 
   @@index([projectId, tanggalInput])
+}
+
+model ProjectStage {
+  id             Int           @id @default(autoincrement())
+  projectId      Int
+  project        Project       @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  tahap          TahapKomite
+  tanggalRencana DateTime?     @db.Date
+  status         StatusTahapan @default(PLANNED)
+  catatan        String?
+
+  @@unique([projectId, tahap])
 }

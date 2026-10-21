@@ -230,6 +230,40 @@ export type EnumProjectStatusWithAggregatesFilter<$PrismaModel = never> = {
   _max?: Prisma.NestedEnumProjectStatusFilter<$PrismaModel>
 }
 
+export type EnumTahapKomiteFilter<$PrismaModel = never> = {
+  equals?: $Enums.TahapKomite | Prisma.EnumTahapKomiteFieldRefInput<$PrismaModel>
+  in?: $Enums.TahapKomite[] | Prisma.ListEnumTahapKomiteFieldRefInput<$PrismaModel>
+  notIn?: $Enums.TahapKomite[] | Prisma.ListEnumTahapKomiteFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumTahapKomiteFilter<$PrismaModel> | $Enums.TahapKomite
+}
+
+export type EnumStatusTahapanFilter<$PrismaModel = never> = {
+  equals?: $Enums.StatusTahapan | Prisma.EnumStatusTahapanFieldRefInput<$PrismaModel>
+  in?: $Enums.StatusTahapan[] | Prisma.ListEnumStatusTahapanFieldRefInput<$PrismaModel>
+  notIn?: $Enums.StatusTahapan[] | Prisma.ListEnumStatusTahapanFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumStatusTahapanFilter<$PrismaModel> | $Enums.StatusTahapan
+}
+
+export type EnumTahapKomiteWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.TahapKomite | Prisma.EnumTahapKomiteFieldRefInput<$PrismaModel>
+  in?: $Enums.TahapKomite[] | Prisma.ListEnumTahapKomiteFieldRefInput<$PrismaModel>
+  notIn?: $Enums.TahapKomite[] | Prisma.ListEnumTahapKomiteFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumTahapKomiteWithAggregatesFilter<$PrismaModel> | $Enums.TahapKomite
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumTahapKomiteFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumTahapKomiteFilter<$PrismaModel>
+}
+
+export type EnumStatusTahapanWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.StatusTahapan | Prisma.EnumStatusTahapanFieldRefInput<$PrismaModel>
+  in?: $Enums.StatusTahapan[] | Prisma.ListEnumStatusTahapanFieldRefInput<$PrismaModel>
+  notIn?: $Enums.StatusTahapan[] | Prisma.ListEnumStatusTahapanFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumStatusTahapanWithAggregatesFilter<$PrismaModel> | $Enums.StatusTahapan
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumStatusTahapanFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumStatusTahapanFilter<$PrismaModel>
+}
+
 export type NestedStringFilter<$PrismaModel = never> = {
   equals?: string | Prisma.StringFieldRefInput<$PrismaModel>
   in?: string[] | Prisma.ListStringFieldRefInput<$PrismaModel>
@@ -457,6 +491,40 @@ export type NestedEnumProjectStatusWithAggregatesFilter<$PrismaModel = never> = 
   _count?: Prisma.NestedIntFilter<$PrismaModel>
   _min?: Prisma.NestedEnumProjectStatusFilter<$PrismaModel>
   _max?: Prisma.NestedEnumProjectStatusFilter<$PrismaModel>
+}
+
+export type NestedEnumTahapKomiteFilter<$PrismaModel = never> = {
+  equals?: $Enums.TahapKomite | Prisma.EnumTahapKomiteFieldRefInput<$PrismaModel>
+  in?: $Enums.TahapKomite[] | Prisma.ListEnumTahapKomiteFieldRefInput<$PrismaModel>
+  notIn?: $Enums.TahapKomite[] | Prisma.ListEnumTahapKomiteFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumTahapKomiteFilter<$PrismaModel> | $Enums.TahapKomite
+}
+
+export type NestedEnumStatusTahapanFilter<$PrismaModel = never> = {
+  equals?: $Enums.StatusTahapan | Prisma.EnumStatusTahapanFieldRefInput<$PrismaModel>
+  in?: $Enums.StatusTahapan[] | Prisma.ListEnumStatusTahapanFieldRefInput<$PrismaModel>
+  notIn?: $Enums.StatusTahapan[] | Prisma.ListEnumStatusTahapanFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumStatusTahapanFilter<$PrismaModel> | $Enums.StatusTahapan
+}
+
+export type NestedEnumTahapKomiteWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.TahapKomite | Prisma.EnumTahapKomiteFieldRefInput<$PrismaModel>
+  in?: $Enums.TahapKomite[] | Prisma.ListEnumTahapKomiteFieldRefInput<$PrismaModel>
+  notIn?: $Enums.TahapKomite[] | Prisma.ListEnumTahapKomiteFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumTahapKomiteWithAggregatesFilter<$PrismaModel> | $Enums.TahapKomite
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumTahapKomiteFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumTahapKomiteFilter<$PrismaModel>
+}
+
+export type NestedEnumStatusTahapanWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.StatusTahapan | Prisma.EnumStatusTahapanFieldRefInput<$PrismaModel>
+  in?: $Enums.StatusTahapan[] | Prisma.ListEnumStatusTahapanFieldRefInput<$PrismaModel>
+  notIn?: $Enums.StatusTahapan[] | Prisma.ListEnumStatusTahapanFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumStatusTahapanWithAggregatesFilter<$PrismaModel> | $Enums.StatusTahapan
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumStatusTahapanFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumStatusTahapanFilter<$PrismaModel>
 }
 
 

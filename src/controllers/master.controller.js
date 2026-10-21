@@ -1,5 +1,5 @@
 import prisma from "../lib/prisma.js";
-import { KATEGORI, JENIS, STATUS } from "../constants/enums.js";
+import { KATEGORI, JENIS, STATUS, TAHAP, STATUS_TAHAPAN } from "../constants/enums.js";
 
 // Membuat handler untuk mengambil seluruh baris dari model Prisma yang diberikan.
 // Fungsi ini dipakai ulang untuk beberapa jenis data master yang bentuk responsnya sama.
@@ -23,6 +23,6 @@ export const getUnits = listOf("unit");
 export function getEnums(req, res) {
   res.json({
     success: true,
-    data: { kategori: KATEGORI, jenis: JENIS, status: STATUS },
+    data: { kategori: KATEGORI, jenis: JENIS, status: STATUS, tahap: TAHAP, statusTahapan: STATUS_TAHAPAN },
   });
 }

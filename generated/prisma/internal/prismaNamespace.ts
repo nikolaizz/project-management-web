@@ -403,7 +403,8 @@ export const ModelName = {
   User: 'User',
   Project: 'Project',
   Document: 'Document',
-  ProjectUpdate: 'ProjectUpdate'
+  ProjectUpdate: 'ProjectUpdate',
+  ProjectStage: 'ProjectStage'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -419,7 +420,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "projectManager" | "businessPartner" | "unit" | "user" | "project" | "document" | "projectUpdate"
+    modelProps: "projectManager" | "businessPartner" | "unit" | "user" | "project" | "document" | "projectUpdate" | "projectStage"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -941,6 +942,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    ProjectStage: {
+      payload: Prisma.$ProjectStagePayload<ExtArgs>
+      fields: Prisma.ProjectStageFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.ProjectStageFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProjectStagePayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.ProjectStageFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProjectStagePayload>
+        }
+        findFirst: {
+          args: Prisma.ProjectStageFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProjectStagePayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.ProjectStageFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProjectStagePayload>
+        }
+        findMany: {
+          args: Prisma.ProjectStageFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProjectStagePayload>[]
+        }
+        create: {
+          args: Prisma.ProjectStageCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProjectStagePayload>
+        }
+        createMany: {
+          args: Prisma.ProjectStageCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.ProjectStageCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProjectStagePayload>[]
+        }
+        delete: {
+          args: Prisma.ProjectStageDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProjectStagePayload>
+        }
+        update: {
+          args: Prisma.ProjectStageUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProjectStagePayload>
+        }
+        deleteMany: {
+          args: Prisma.ProjectStageDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.ProjectStageUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.ProjectStageUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProjectStagePayload>[]
+        }
+        upsert: {
+          args: Prisma.ProjectStageUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProjectStagePayload>
+        }
+        aggregate: {
+          args: Prisma.ProjectStageAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateProjectStage>
+        }
+        groupBy: {
+          args: Prisma.ProjectStageGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ProjectStageGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.ProjectStageCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ProjectStageCountAggregateOutputType> | number
+        }
+      }
+    }
   }
 } & {
   other: {
@@ -1061,6 +1136,18 @@ export const ProjectUpdateScalarFieldEnum = {
 } as const
 
 export type ProjectUpdateScalarFieldEnum = (typeof ProjectUpdateScalarFieldEnum)[keyof typeof ProjectUpdateScalarFieldEnum]
+
+
+export const ProjectStageScalarFieldEnum = {
+  id: 'id',
+  projectId: 'projectId',
+  tahap: 'tahap',
+  tanggalRencana: 'tanggalRencana',
+  status: 'status',
+  catatan: 'catatan'
+} as const
+
+export type ProjectStageScalarFieldEnum = (typeof ProjectStageScalarFieldEnum)[keyof typeof ProjectStageScalarFieldEnum]
 
 
 export const SortOrder = {
@@ -1188,6 +1275,34 @@ export type EnumProjectStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$Pr
  * Reference to a field of type 'ProjectStatus[]'
  */
 export type ListEnumProjectStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'ProjectStatus[]'>
+    
+
+
+/**
+ * Reference to a field of type 'TahapKomite'
+ */
+export type EnumTahapKomiteFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'TahapKomite'>
+    
+
+
+/**
+ * Reference to a field of type 'TahapKomite[]'
+ */
+export type ListEnumTahapKomiteFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'TahapKomite[]'>
+    
+
+
+/**
+ * Reference to a field of type 'StatusTahapan'
+ */
+export type EnumStatusTahapanFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'StatusTahapan'>
+    
+
+
+/**
+ * Reference to a field of type 'StatusTahapan[]'
+ */
+export type ListEnumStatusTahapanFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'StatusTahapan[]'>
     
 
 
@@ -1362,6 +1477,7 @@ export type GlobalOmitConfig = {
   project?: Prisma.ProjectOmit
   document?: Prisma.DocumentOmit
   projectUpdate?: Prisma.ProjectUpdateOmit
+  projectStage?: Prisma.ProjectStageOmit
 }
 
 /* Types for Logging */

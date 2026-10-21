@@ -43,7 +43,26 @@ export type ProjectStatus = (typeof ProjectStatus)[keyof typeof ProjectStatus]
 export const Role = {
   ADMIN: 'ADMIN',
   PROJECT_MANAGER: 'PROJECT_MANAGER',
-  VIEWER: 'VIEWER'
+  VIEWER: 'VIEWER',
+  BUSINESS_PARTNER: 'BUSINESS_PARTNER'
 } as const
 
 export type Role = (typeof Role)[keyof typeof Role]
+
+
+export const TahapKomite = {
+  PRA_KOMITE: 'PRA_KOMITE',
+  KOMITE_TI_B: 'KOMITE_TI_B',
+  KOMITE_TI_A: 'KOMITE_TI_A'
+} as const
+
+export type TahapKomite = (typeof TahapKomite)[keyof typeof TahapKomite]
+
+
+export const StatusTahapan = {
+  PLANNED: 'PLANNED',
+  ON_PROGRESS: 'ON_PROGRESS',
+  SELESAI: 'SELESAI'
+} as const
+
+export type StatusTahapan = (typeof StatusTahapan)[keyof typeof StatusTahapan]

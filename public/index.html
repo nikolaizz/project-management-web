@@ -99,6 +99,10 @@ tr.project-detail td{background:#f7f9fd}
 .project-detail ul{margin:0;padding-left:20px}
 .project-detail .muted{color:var(--muted)}
 .empty{color:var(--muted);padding:12px 0}
+.stages{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px}
+.stage{border:1px solid var(--line);border-radius:10px;padding:12px;display:flex;flex-direction:column;gap:10px;background:#fafbfe}
+.stage h3{margin:0;font-size:15px;color:var(--navy)}
+.stage textarea{min-height:64px}
 </style>
 </head>
 <body>
@@ -156,10 +160,18 @@ const API = location.protocol === "file:" ? "http://localhost:3000" : "";
 const MAX_SIZE = 10 * 1024 * 1024;
 const MAX_FILES = 10;
 const ALLOWED = [".pdf", ".doc", ".docx", ".xls", ".xlsx", ".jpg", ".jpeg", ".png"];
-const STEPS = ["Jenis project", "Informasi project", "Dokumen", "Review"];
+const STEPS = ["Jenis project", "Informasi project", "Tahapan & dokumen", "Review"];
 const STATUS_LABEL = { DRAFT: "Draft", INISIASI: "Inisiasi", ON_PROGRESS: "On progress", PENDING: "Pending", ON_HOLD: "On hold", SELESAI: "Selesai" };
 const KATEGORI_LABEL = { FS: "FS", CR_FORM: "CR Form", AIR_FORM: "AIR Form", IC_FORM: "IC Form", SC_FORM: "SC Form" };
 const JENIS_LABEL = { NEW: "Project baru", ADDENDUM: "Addendum" };
+const TAHAP_LABEL = { PRA_KOMITE: "Pra Komite", KOMITE_TI_B: "Komite TI B", KOMITE_TI_A: "Komite TI A" };
+const TAHAP_ORDER = Object.keys(TAHAP_LABEL);
+const STATUS_TAHAP_LABEL = { PLANNED: "Planned", ON_PROGRESS: "On Progress", SELESAI: "Selesai" };
+function newStages() {
+  const o = {};
+  TAHAP_ORDER.forEach((t) => { o[t] = { tanggalRencana: "", status: "PLANNED", catatan: "" }; });
+  return o;
+}
 
 const $ = (s, r = document) => r.querySelector(s);
 const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
@@ -173,7 +185,7 @@ const FIELDS = Object.keys(newForm());
 
 let master = { pm: [], bp: [], units: [], enums: { kategori: [], status: [] } };
 let busy = false;
-const state = { step: 0, jenis: null, form: newForm(), files: [], errors: {}, createdId: null, createdNama: "", done: false };
+const state = { step: 0, jenis: null, form: newForm(), stages: newStages(), files: [], errors: {}, createdId: null, createdNama: "", done: false };
 
 // Tampilkan satu halaman menu dan tandai pilihan aktif pada sidebar.
 document.querySelector(".side-nav").addEventListener("click", (e) => {
@@ -242,9 +254,20 @@ function stepInfo() {
   </div>`;
 }
 
+function stageCard(t, i) {
+  const k = (f) => `stages.${i}.${f}`;
+  const opts = Object.entries(STATUS_TAHAP_LABEL).map(([v, l]) => `<option value="${v}">${l}</option>`).join("");
+  return `<div class="stage"><h3>${TAHAP_LABEL[t]}</h3>
+    <div><label for="s-${t}-tanggalRencana">Tanggal rencana</label><input id="s-${t}-tanggalRencana" type="date" data-stage="${t}" data-sf="tanggalRencana" data-ekey="${k("tanggalRencana")}"><div class="err" data-err="${k("tanggalRencana")}"></div></div>
+    <div><label for="s-${t}-status">Status</label><select id="s-${t}-status" data-stage="${t}" data-sf="status" data-ekey="${k("status")}">${opts}</select><div class="err" data-err="${k("status")}"></div></div>
+    <div><label for="s-${t}-catatan">Catatan</label><textarea id="s-${t}-catatan" maxlength="500" data-stage="${t}" data-sf="catatan" data-ekey="${k("catatan")}"></textarea><div class="err" data-err="${k("catatan")}"></div></div>
+  </div>`;
+}
+
 function stepDocs() {
   const list = state.files.map((f, i) => `<li><span class="nm">${esc(f.name)} <small>(${fmtSize(f.size)})</small></span><button type="button" class="small danger" data-rm="${i}">Hapus</button></li>`).join("");
-  return `<h2>Dokumen pendukung <small style="font-weight:400;color:var(--muted)">(opsional)</small></h2>
+  return `<h2>Informasi tahapan</h2><div class="stages">${TAHAP_ORDER.map(stageCard).join("")}</div>
+    <h2 style="margin-top:24px">Dokumen pendukung <small style="font-weight:400;color:var(--muted)">(opsional)</small></h2>
     <label class="drop" id="drop"><input type="file" id="fileInput" multiple accept="${ALLOWED.join(",")}" hidden>
       Klik atau seret file ke sini
       <small>PDF, DOC, DOCX, XLS, XLSX, JPG, PNG. Maksimal 10 MB per file, 10 file.</small>
@@ -262,7 +285,13 @@ function stepReview() {
     ["Status awal", STATUS_LABEL[f.status] || f.status],
     ["Dokumen", state.files.length ? state.files.map((x) => x.name).join(", ") : "Tidak ada"],
   ];
-  return `<h2>Review data</h2><dl class="rev">${rows.map(([k, v]) => `<dt>${k}</dt><dd>${esc(v)}</dd>`).join("")}</dl>`;
+  const stageRows = TAHAP_ORDER.map((t) => {
+    const x = state.stages[t];
+    return `<tr><td>${TAHAP_LABEL[t]}</td><td>${esc(x.tanggalRencana || "-")}</td><td>${esc(STATUS_TAHAP_LABEL[x.status] || x.status)}</td><td>${esc(x.catatan.trim() || "-")}</td></tr>`;
+  }).join("");
+  return `<h2>Review data</h2><dl class="rev">${rows.map(([k, v]) => `<dt>${k}</dt><dd>${esc(v)}</dd>`).join("")}</dl>
+    <h3 style="margin:20px 0 8px;font-size:15px">Tahapan</h3>
+    <div class="tablewrap"><table><thead><tr><th>Tahapan</th><th>Tanggal rencana</th><th>Status</th><th>Catatan</th></tr></thead><tbody>${stageRows}</tbody></table></div>`;
 }
 
 function successHtml() {
@@ -283,7 +312,7 @@ function updateNav() {
   $("#nav").hidden = state.done;
   $("#btnBack").disabled = busy || state.step === 0 || (!!state.createdId && state.step <= 2);
   $("#btnNext").disabled = busy;
-  $("#btnNext").textContent = busy ? (last ? "Menyimpan..." : "Memeriksa...") : last ? (state.createdId ? "Coba unggah ulang dokumen" : "Simpan & kirim") : "Selanjutnya";
+  $("#btnNext").textContent = busy ? "Menyimpan..." : last ? (state.createdId ? "Coba unggah ulang dokumen" : "Simpan & kirim") : "Selanjutnya";
 }
 
 function render() {
@@ -291,10 +320,11 @@ function render() {
   const p = $("#panel");
   p.innerHTML = state.done ? successHtml() : [stepJenis, stepInfo, stepDocs, stepReview][state.step]();
   p.querySelectorAll("[data-f]").forEach((el) => { el.value = state.form[el.dataset.f]; });
+  p.querySelectorAll("[data-stage]").forEach((el) => { el.value = state.stages[el.dataset.stage][el.dataset.sf]; });
   p.querySelectorAll("[data-err]").forEach((el) => {
     const m = state.errors[el.dataset.err];
     el.textContent = m || "";
-    const inp = p.querySelector(`[data-f="${el.dataset.err}"]`);
+    const inp = p.querySelector(`[data-f="${el.dataset.err}"],[data-ekey="${el.dataset.err}"]`);
     if (inp) inp.classList.toggle("invalid", !!m);
   });
   updateNav();
@@ -321,6 +351,10 @@ function payload() {
     kategori: f.kategori, jenis: state.jenis, kodeProject: f.kodeProject.trim(), nama: f.nama.trim(),
     deskripsi: f.deskripsi.trim(), pmId: f.pmId, bpId: f.bpId, unitId: f.unitId, ownerPic: f.ownerPic.trim(),
     tanggalProject: f.tanggalProject, targetGoLive: f.targetGoLive || null, status: f.status,
+    stages: TAHAP_ORDER.map((t) => {
+      const x = state.stages[t];
+      return { tahap: t, tanggalRencana: x.tanggalRencana || null, status: x.status, catatan: x.catatan.trim() || null };
+    }),
   };
 }
 
@@ -375,14 +409,16 @@ async function submit() {
 
 function handleSubmitError(e) {
   if (state.createdId) {
-    setAlert("warn", `Project sudah tersimpan (ID ${state.createdId}), tetapi dokumen gagal diunggah: ${e.message}. Kembali ke langkah Dokumen untuk memperbaiki file, lalu coba unggah ulang.`);
+    setAlert("warn", `Project sudah tersimpan (ID ${state.createdId}), tetapi dokumen gagal diunggah: ${e.message}. Kembali ke langkah Tahapan & dokumen untuk memperbaiki file, lalu coba unggah ulang.`);
     loadProjects();
     return;
   }
   if (e.status === 400 && e.errors && e.errors.length) {
     const errs = {}, other = [];
-    for (const x of e.errors) { if (FIELDS.includes(x.field)) errs[x.field] = x.message; else other.push(x.message); }
-    state.errors = errs; state.step = 1; render();
+    for (const x of e.errors) { if (FIELDS.includes(x.field) || x.field.startsWith("stages.")) errs[x.field] = x.message; else other.push(x.message); }
+    state.errors = errs;
+    state.step = Object.keys(errs).some((k) => FIELDS.includes(k)) ? 1 : (Object.keys(errs).length ? 2 : 1);
+    render();
     const first = $("#panel .invalid"); if (first) first.focus();
     setAlert("error", other.length ? other.join("; ") : "Server menolak data. Perbaiki isian yang ditandai.");
     return;
@@ -392,36 +428,17 @@ function handleSubmitError(e) {
 }
 
 function resetAll() {
-  Object.assign(state, { step: 0, jenis: null, form: newForm(), files: [], errors: {}, createdId: null, createdNama: "", done: false });
+  Object.assign(state, { step: 0, jenis: null, form: newForm(), stages: newStages(), files: [], errors: {}, createdId: null, createdNama: "", done: false });
   clearAlert(); render();
 }
 
-$("#btnNext").onclick = async () => {
-  if (busy) return;
+$("#btnNext").onclick = () => {
   clearAlert();
   if (state.step === 0) {
     if (!state.jenis) return setAlert("error", "Pilih jenis project dulu.");
     state.step = 1; render();
   } else if (state.step === 1) {
-    validateInfo();
-    // Cek ke server apakah kode sudah dipakai, supaya ditolak di langkah ini juga
-    const kode = state.form.kodeProject.trim();
-    if (kode && !state.errors.kodeProject) {
-      busy = true; updateNav();
-      try {
-        const r = await api("/projects/check-code?kode=" + encodeURIComponent(kode));
-        if (r.data.exists) state.errors.kodeProject = `Kode sudah terdaftar pada project "${r.data.project.nama}".`;
-      } catch (e) {
-        busy = false; render();
-        return setAlert("error", e.message);
-      }
-      busy = false;
-    }
-    if (Object.keys(state.errors).length) {
-      render();
-      const first = $("#panel .invalid"); if (first) first.focus();
-      return setAlert("error", "Lengkapi atau perbaiki isian yang ditandai.");
-    }
+    if (!validateInfo()) { render(); const first = $("#panel .invalid"); if (first) first.focus(); return setAlert("error", "Lengkapi isian yang ditandai."); }
     state.step = 2; render();
   } else if (state.step === 2) {
     state.step = 3; render();
@@ -431,6 +448,17 @@ $("#btnBack").onclick = () => { clearAlert(); state.step -= 1; render(); };
 
 const panel = $("#panel");
 panel.addEventListener("input", (e) => {
+  const st = e.target.dataset.stage;
+  if (st) {
+    state.stages[st][e.target.dataset.sf] = e.target.value;
+    const k = e.target.dataset.ekey;
+    if (state.errors[k]) {
+      delete state.errors[k];
+      e.target.classList.remove("invalid");
+      const el = $(`[data-err="${k}"]`); if (el) el.textContent = "";
+    }
+    return;
+  }
   const n = e.target.dataset.f;
   if (!n) return;
   state.form[n] = e.target.value;
@@ -468,6 +496,10 @@ function renderProjectDetail(p) {
   const updates = p.updates.length
     ? `<ul>${p.updates.map((u) => `<li><strong>${date(u.tanggalInput)} — ${esc(STATUS_LABEL[u.status] || u.status)}</strong>: ${esc(u.aktivitas)}${u.kendala ? ` <span class="muted">Kendala: ${esc(u.kendala)}</span>` : ""}<br>Next action: ${esc(u.nextAction)}</li>`).join("")}</ul>`
     : `<p class="hint">Belum ada riwayat update.</p>`;
+  const stageList = Array.isArray(p.stages) ? p.stages : [];
+  const stages = stageList.length
+    ? `<div class="tablewrap"><table><thead><tr><th>Tahapan</th><th>Tanggal rencana</th><th>Status</th><th>Catatan</th></tr></thead><tbody>${stageList.map((x) => `<tr><td>${esc(TAHAP_LABEL[x.tahap] || x.tahap)}</td><td>${date(x.tanggalRencana)}</td><td>${esc(STATUS_TAHAP_LABEL[x.status] || x.status)}</td><td>${esc(x.catatan || "-")}</td></tr>`).join("")}</tbody></table></div>`
+    : `<p class="hint">Belum ada data tahapan.</p>`;
   return `<div class="project-detail"><dl>
     <dt>Kategori</dt><dd>${esc(KATEGORI_LABEL[p.kategori] || p.kategori)}</dd>
     <dt>Jenis</dt><dd>${esc(JENIS_LABEL[p.jenis] || p.jenis)}</dd>
@@ -481,7 +513,7 @@ function renderProjectDetail(p) {
     <dt>Target go live</dt><dd>${date(p.targetGoLive)}</dd>
     <dt>Dibuat</dt><dd>${date(p.createdAt)}</dd>
     <dt>Terakhir diperbarui</dt><dd>${date(p.updatedAt)}</dd>
-  </dl><h3>Dokumen</h3>${docs}<h3>Riwayat update</h3>${updates}</div>`;
+  </dl><h3>Tahapan</h3>${stages}<h3>Dokumen</h3>${docs}<h3>Riwayat update</h3>${updates}</div>`;
 }
 
 function renderProjects(list, total) {
@@ -581,7 +613,6 @@ $("#editProjectDialog").addEventListener("submit", async (e) => {
   const payload = {
     kategori: data.get("kategori"),
     jenis: data.get("jenis"),
-    status: data.get("status"),
     kodeProject: String(data.get("kodeProject")).trim() || null,
     nama: String(data.get("nama")).trim(),
     deskripsi: String(data.get("deskripsi")).trim(),
