@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { KATEGORI, JENIS, STATUS, TAHAP, STATUS_TAHAPAN} from "../constants/enums.js";
+import { KATEGORI, JENIS, STATUS, TAHAP, STATUS_TAHAPAN, PRIORITAS} from "../constants/enums.js";
 
 const id = (label) =>
   z.coerce
@@ -23,6 +23,7 @@ const projectFields = {
   ownerPic: z.string().trim().min(1, "Owner / PIC wajib diisi"),
   tanggalProject: z.iso.date("Tanggal project harus berformat YYYY-MM-DD"),
   targetGoLive: z.iso.date("Target go live harus berformat YYYY-MM-DD").nullish(),
+  prioritas: z.enum(PRIORITAS, `Prioritas harus salah satu dari: ${PRIORITAS.join(", ")}`),
 };
 
 const stageSchema = z.object({
@@ -45,6 +46,7 @@ const stagesSchema = z
 export const createProjectSchema = z
   .object({
     ...projectFields,
+    prioritas: z.enum(PRIORITAS, `Prioritas harus salah satu dari: ${PRIORITAS.join(", ")}`).default("MEDIUM"),
     status: z.enum(STATUS, "Status tidak valid").default("INISIASI"),
     stages: stagesSchema.optional(),
   })

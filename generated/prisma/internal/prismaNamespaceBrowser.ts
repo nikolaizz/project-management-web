@@ -127,6 +127,7 @@ export const ProjectScalarFieldEnum = {
   tanggalProject: 'tanggalProject',
   targetGoLive: 'targetGoLive',
   status: 'status',
+  prioritas: 'prioritas',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const

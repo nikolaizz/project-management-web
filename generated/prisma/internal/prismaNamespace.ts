@@ -1105,6 +1105,7 @@ export const ProjectScalarFieldEnum = {
   tanggalProject: 'tanggalProject',
   targetGoLive: 'targetGoLive',
   status: 'status',
+  prioritas: 'prioritas',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const
@@ -1275,6 +1276,20 @@ export type EnumProjectStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$Pr
  * Reference to a field of type 'ProjectStatus[]'
  */
 export type ListEnumProjectStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'ProjectStatus[]'>
+    
+
+
+/**
+ * Reference to a field of type 'Prioritas'
+ */
+export type EnumPrioritasFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Prioritas'>
+    
+
+
+/**
+ * Reference to a field of type 'Prioritas[]'
+ */
+export type ListEnumPrioritasFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Prioritas[]'>
     
 
 

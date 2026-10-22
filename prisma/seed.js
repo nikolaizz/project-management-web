@@ -53,6 +53,7 @@ async function main() {
       tanggalProject: new Date("2026-09-01"),
       targetGoLive: new Date("2026-12-20"),
       status: "ON_PROGRESS",
+      prioritas: "HIGH",
       stages: {
         create: buildStages([
           { tahap: "PRA_KOMITE", tanggalRencana: new Date("2026-09-12"), status: "SELESAI" },
@@ -76,6 +77,7 @@ async function main() {
       tanggalProject: new Date("2026-10-05"),
       targetGoLive: new Date("2027-03-31"),
       status: "INISIASI",
+      prioritas: "MEDIUM",
       stages: {
         create: buildStages(), 
       },
@@ -96,6 +98,7 @@ async function main() {
       tanggalProject: new Date("2026-07-15"),
       targetGoLive: new Date("2027-01-30"),
       status: "ON_HOLD",
+      prioritas: "LOW",
       stages: { create: buildStages() },
     },
   });
@@ -114,6 +117,7 @@ async function main() {
       tanggalProject: new Date("2026-08-10"),
       targetGoLive: new Date("2027-02-15"),
       status: "PENDING",
+      prioritas: "MEDIUM",
       stages: { create: buildStages() },
     },
   });

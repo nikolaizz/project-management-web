@@ -66,3 +66,12 @@ export const StatusTahapan = {
 } as const
 
 export type StatusTahapan = (typeof StatusTahapan)[keyof typeof StatusTahapan]
+
+
+export const Prioritas = {
+  LOW: 'LOW',
+  MEDIUM: 'MEDIUM',
+  HIGH: 'HIGH'
+} as const
+
+export type Prioritas = (typeof Prioritas)[keyof typeof Prioritas]

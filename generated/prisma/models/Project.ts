@@ -50,6 +50,7 @@ export type ProjectMinAggregateOutputType = {
   tanggalProject: Date | null
   targetGoLive: Date | null
   status: $Enums.ProjectStatus | null
+  prioritas: $Enums.Prioritas | null
   createdAt: Date | null
   updatedAt: Date | null
 }
@@ -68,6 +69,7 @@ export type ProjectMaxAggregateOutputType = {
   tanggalProject: Date | null
   targetGoLive: Date | null
   status: $Enums.ProjectStatus | null
+  prioritas: $Enums.Prioritas | null
   createdAt: Date | null
   updatedAt: Date | null
 }
@@ -86,6 +88,7 @@ export type ProjectCountAggregateOutputType = {
   tanggalProject: number
   targetGoLive: number
   status: number
+  prioritas: number
   createdAt: number
   updatedAt: number
   _all: number
@@ -116,6 +119,7 @@ export type ProjectMinAggregateInputType = {
   tanggalProject?: true
   targetGoLive?: true
   status?: true
+  prioritas?: true
   createdAt?: true
   updatedAt?: true
 }
@@ -134,6 +138,7 @@ export type ProjectMaxAggregateInputType = {
   tanggalProject?: true
   targetGoLive?: true
   status?: true
+  prioritas?: true
   createdAt?: true
   updatedAt?: true
 }
@@ -152,6 +157,7 @@ export type ProjectCountAggregateInputType = {
   tanggalProject?: true
   targetGoLive?: true
   status?: true
+  prioritas?: true
   createdAt?: true
   updatedAt?: true
   _all?: true
@@ -257,6 +263,7 @@ export type ProjectGroupByOutputType = {
   tanggalProject: Date
   targetGoLive: Date | null
   status: $Enums.ProjectStatus
+  prioritas: $Enums.Prioritas
   createdAt: Date
   updatedAt: Date
   _count: ProjectCountAggregateOutputType | null
@@ -298,6 +305,7 @@ export type ProjectWhereInput = {
   tanggalProject?: Prisma.DateTimeFilter<"Project"> | Date | string
   targetGoLive?: Prisma.DateTimeNullableFilter<"Project"> | Date | string | null
   status?: Prisma.EnumProjectStatusFilter<"Project"> | $Enums.ProjectStatus
+  prioritas?: Prisma.EnumPrioritasFilter<"Project"> | $Enums.Prioritas
   createdAt?: Prisma.DateTimeFilter<"Project"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Project"> | Date | string
   pm?: Prisma.XOR<Prisma.ProjectManagerScalarRelationFilter, Prisma.ProjectManagerWhereInput>
@@ -322,6 +330,7 @@ export type ProjectOrderByWithRelationInput = {
   tanggalProject?: Prisma.SortOrder
   targetGoLive?: Prisma.SortOrderInput | Prisma.SortOrder
   status?: Prisma.SortOrder
+  prioritas?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   pm?: Prisma.ProjectManagerOrderByWithRelationInput
@@ -349,6 +358,7 @@ export type ProjectWhereUniqueInput = Prisma.AtLeast<{
   tanggalProject?: Prisma.DateTimeFilter<"Project"> | Date | string
   targetGoLive?: Prisma.DateTimeNullableFilter<"Project"> | Date | string | null
   status?: Prisma.EnumProjectStatusFilter<"Project"> | $Enums.ProjectStatus
+  prioritas?: Prisma.EnumPrioritasFilter<"Project"> | $Enums.Prioritas
   createdAt?: Prisma.DateTimeFilter<"Project"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Project"> | Date | string
   pm?: Prisma.XOR<Prisma.ProjectManagerScalarRelationFilter, Prisma.ProjectManagerWhereInput>
@@ -373,6 +383,7 @@ export type ProjectOrderByWithAggregationInput = {
   tanggalProject?: Prisma.SortOrder
   targetGoLive?: Prisma.SortOrderInput | Prisma.SortOrder
   status?: Prisma.SortOrder
+  prioritas?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   _count?: Prisma.ProjectCountOrderByAggregateInput
@@ -399,6 +410,7 @@ export type ProjectScalarWhereWithAggregatesInput = {
   tanggalProject?: Prisma.DateTimeWithAggregatesFilter<"Project"> | Date | string
   targetGoLive?: Prisma.DateTimeNullableWithAggregatesFilter<"Project"> | Date | string | null
   status?: Prisma.EnumProjectStatusWithAggregatesFilter<"Project"> | $Enums.ProjectStatus
+  prioritas?: Prisma.EnumPrioritasWithAggregatesFilter<"Project"> | $Enums.Prioritas
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"Project"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"Project"> | Date | string
 }
@@ -413,6 +425,7 @@ export type ProjectCreateInput = {
   tanggalProject: Date | string
   targetGoLive?: Date | string | null
   status?: $Enums.ProjectStatus
+  prioritas?: $Enums.Prioritas
   createdAt?: Date | string
   updatedAt?: Date | string
   pm: Prisma.ProjectManagerCreateNestedOneWithoutProjectsInput
@@ -437,6 +450,7 @@ export type ProjectUncheckedCreateInput = {
   tanggalProject: Date | string
   targetGoLive?: Date | string | null
   status?: $Enums.ProjectStatus
+  prioritas?: $Enums.Prioritas
   createdAt?: Date | string
   updatedAt?: Date | string
   documents?: Prisma.DocumentUncheckedCreateNestedManyWithoutProjectInput
@@ -454,6 +468,7 @@ export type ProjectUpdateInput = {
   tanggalProject?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   targetGoLive?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   status?: Prisma.EnumProjectStatusFieldUpdateOperationsInput | $Enums.ProjectStatus
+  prioritas?: Prisma.EnumPrioritasFieldUpdateOperationsInput | $Enums.Prioritas
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   pm?: Prisma.ProjectManagerUpdateOneRequiredWithoutProjectsNestedInput
@@ -478,6 +493,7 @@ export type ProjectUncheckedUpdateInput = {
   tanggalProject?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   targetGoLive?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   status?: Prisma.EnumProjectStatusFieldUpdateOperationsInput | $Enums.ProjectStatus
+  prioritas?: Prisma.EnumPrioritasFieldUpdateOperationsInput | $Enums.Prioritas
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   documents?: Prisma.DocumentUncheckedUpdateManyWithoutProjectNestedInput
@@ -499,6 +515,7 @@ export type ProjectCreateManyInput = {
   tanggalProject: Date | string
   targetGoLive?: Date | string | null
   status?: $Enums.ProjectStatus
+  prioritas?: $Enums.Prioritas
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -513,6 +530,7 @@ export type ProjectUpdateManyMutationInput = {
   tanggalProject?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   targetGoLive?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   status?: Prisma.EnumProjectStatusFieldUpdateOperationsInput | $Enums.ProjectStatus
+  prioritas?: Prisma.EnumPrioritasFieldUpdateOperationsInput | $Enums.Prioritas
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -531,6 +549,7 @@ export type ProjectUncheckedUpdateManyInput = {
   tanggalProject?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   targetGoLive?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   status?: Prisma.EnumProjectStatusFieldUpdateOperationsInput | $Enums.ProjectStatus
+  prioritas?: Prisma.EnumPrioritasFieldUpdateOperationsInput | $Enums.Prioritas
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -559,6 +578,7 @@ export type ProjectCountOrderByAggregateInput = {
   tanggalProject?: Prisma.SortOrder
   targetGoLive?: Prisma.SortOrder
   status?: Prisma.SortOrder
+  prioritas?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -582,6 +602,7 @@ export type ProjectMaxOrderByAggregateInput = {
   tanggalProject?: Prisma.SortOrder
   targetGoLive?: Prisma.SortOrder
   status?: Prisma.SortOrder
+  prioritas?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -600,6 +621,7 @@ export type ProjectMinOrderByAggregateInput = {
   tanggalProject?: Prisma.SortOrder
   targetGoLive?: Prisma.SortOrder
   status?: Prisma.SortOrder
+  prioritas?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -760,6 +782,10 @@ export type EnumProjectStatusFieldUpdateOperationsInput = {
   set?: $Enums.ProjectStatus
 }
 
+export type EnumPrioritasFieldUpdateOperationsInput = {
+  set?: $Enums.Prioritas
+}
+
 export type ProjectCreateNestedOneWithoutDocumentsInput = {
   create?: Prisma.XOR<Prisma.ProjectCreateWithoutDocumentsInput, Prisma.ProjectUncheckedCreateWithoutDocumentsInput>
   connectOrCreate?: Prisma.ProjectCreateOrConnectWithoutDocumentsInput
@@ -812,6 +838,7 @@ export type ProjectCreateWithoutPmInput = {
   tanggalProject: Date | string
   targetGoLive?: Date | string | null
   status?: $Enums.ProjectStatus
+  prioritas?: $Enums.Prioritas
   createdAt?: Date | string
   updatedAt?: Date | string
   bp: Prisma.BusinessPartnerCreateNestedOneWithoutProjectsInput
@@ -834,6 +861,7 @@ export type ProjectUncheckedCreateWithoutPmInput = {
   tanggalProject: Date | string
   targetGoLive?: Date | string | null
   status?: $Enums.ProjectStatus
+  prioritas?: $Enums.Prioritas
   createdAt?: Date | string
   updatedAt?: Date | string
   documents?: Prisma.DocumentUncheckedCreateNestedManyWithoutProjectInput
@@ -884,6 +912,7 @@ export type ProjectScalarWhereInput = {
   tanggalProject?: Prisma.DateTimeFilter<"Project"> | Date | string
   targetGoLive?: Prisma.DateTimeNullableFilter<"Project"> | Date | string | null
   status?: Prisma.EnumProjectStatusFilter<"Project"> | $Enums.ProjectStatus
+  prioritas?: Prisma.EnumPrioritasFilter<"Project"> | $Enums.Prioritas
   createdAt?: Prisma.DateTimeFilter<"Project"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Project"> | Date | string
 }
@@ -898,6 +927,7 @@ export type ProjectCreateWithoutBpInput = {
   tanggalProject: Date | string
   targetGoLive?: Date | string | null
   status?: $Enums.ProjectStatus
+  prioritas?: $Enums.Prioritas
   createdAt?: Date | string
   updatedAt?: Date | string
   pm: Prisma.ProjectManagerCreateNestedOneWithoutProjectsInput
@@ -920,6 +950,7 @@ export type ProjectUncheckedCreateWithoutBpInput = {
   tanggalProject: Date | string
   targetGoLive?: Date | string | null
   status?: $Enums.ProjectStatus
+  prioritas?: $Enums.Prioritas
   createdAt?: Date | string
   updatedAt?: Date | string
   documents?: Prisma.DocumentUncheckedCreateNestedManyWithoutProjectInput
@@ -963,6 +994,7 @@ export type ProjectCreateWithoutUnitPengusulInput = {
   tanggalProject: Date | string
   targetGoLive?: Date | string | null
   status?: $Enums.ProjectStatus
+  prioritas?: $Enums.Prioritas
   createdAt?: Date | string
   updatedAt?: Date | string
   pm: Prisma.ProjectManagerCreateNestedOneWithoutProjectsInput
@@ -985,6 +1017,7 @@ export type ProjectUncheckedCreateWithoutUnitPengusulInput = {
   tanggalProject: Date | string
   targetGoLive?: Date | string | null
   status?: $Enums.ProjectStatus
+  prioritas?: $Enums.Prioritas
   createdAt?: Date | string
   updatedAt?: Date | string
   documents?: Prisma.DocumentUncheckedCreateNestedManyWithoutProjectInput
@@ -1028,6 +1061,7 @@ export type ProjectCreateWithoutDocumentsInput = {
   tanggalProject: Date | string
   targetGoLive?: Date | string | null
   status?: $Enums.ProjectStatus
+  prioritas?: $Enums.Prioritas
   createdAt?: Date | string
   updatedAt?: Date | string
   pm: Prisma.ProjectManagerCreateNestedOneWithoutProjectsInput
@@ -1051,6 +1085,7 @@ export type ProjectUncheckedCreateWithoutDocumentsInput = {
   tanggalProject: Date | string
   targetGoLive?: Date | string | null
   status?: $Enums.ProjectStatus
+  prioritas?: $Enums.Prioritas
   createdAt?: Date | string
   updatedAt?: Date | string
   updates?: Prisma.ProjectUpdateUncheckedCreateNestedManyWithoutProjectInput
@@ -1083,6 +1118,7 @@ export type ProjectUpdateWithoutDocumentsInput = {
   tanggalProject?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   targetGoLive?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   status?: Prisma.EnumProjectStatusFieldUpdateOperationsInput | $Enums.ProjectStatus
+  prioritas?: Prisma.EnumPrioritasFieldUpdateOperationsInput | $Enums.Prioritas
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   pm?: Prisma.ProjectManagerUpdateOneRequiredWithoutProjectsNestedInput
@@ -1106,6 +1142,7 @@ export type ProjectUncheckedUpdateWithoutDocumentsInput = {
   tanggalProject?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   targetGoLive?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   status?: Prisma.EnumProjectStatusFieldUpdateOperationsInput | $Enums.ProjectStatus
+  prioritas?: Prisma.EnumPrioritasFieldUpdateOperationsInput | $Enums.Prioritas
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updates?: Prisma.ProjectUpdateUncheckedUpdateManyWithoutProjectNestedInput
@@ -1122,6 +1159,7 @@ export type ProjectCreateWithoutUpdatesInput = {
   tanggalProject: Date | string
   targetGoLive?: Date | string | null
   status?: $Enums.ProjectStatus
+  prioritas?: $Enums.Prioritas
   createdAt?: Date | string
   updatedAt?: Date | string
   pm: Prisma.ProjectManagerCreateNestedOneWithoutProjectsInput
@@ -1145,6 +1183,7 @@ export type ProjectUncheckedCreateWithoutUpdatesInput = {
   tanggalProject: Date | string
   targetGoLive?: Date | string | null
   status?: $Enums.ProjectStatus
+  prioritas?: $Enums.Prioritas
   createdAt?: Date | string
   updatedAt?: Date | string
   documents?: Prisma.DocumentUncheckedCreateNestedManyWithoutProjectInput
@@ -1177,6 +1216,7 @@ export type ProjectUpdateWithoutUpdatesInput = {
   tanggalProject?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   targetGoLive?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   status?: Prisma.EnumProjectStatusFieldUpdateOperationsInput | $Enums.ProjectStatus
+  prioritas?: Prisma.EnumPrioritasFieldUpdateOperationsInput | $Enums.Prioritas
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   pm?: Prisma.ProjectManagerUpdateOneRequiredWithoutProjectsNestedInput
@@ -1200,6 +1240,7 @@ export type ProjectUncheckedUpdateWithoutUpdatesInput = {
   tanggalProject?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   targetGoLive?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   status?: Prisma.EnumProjectStatusFieldUpdateOperationsInput | $Enums.ProjectStatus
+  prioritas?: Prisma.EnumPrioritasFieldUpdateOperationsInput | $Enums.Prioritas
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   documents?: Prisma.DocumentUncheckedUpdateManyWithoutProjectNestedInput
@@ -1216,6 +1257,7 @@ export type ProjectCreateWithoutStagesInput = {
   tanggalProject: Date | string
   targetGoLive?: Date | string | null
   status?: $Enums.ProjectStatus
+  prioritas?: $Enums.Prioritas
   createdAt?: Date | string
   updatedAt?: Date | string
   pm: Prisma.ProjectManagerCreateNestedOneWithoutProjectsInput
@@ -1239,6 +1281,7 @@ export type ProjectUncheckedCreateWithoutStagesInput = {
   tanggalProject: Date | string
   targetGoLive?: Date | string | null
   status?: $Enums.ProjectStatus
+  prioritas?: $Enums.Prioritas
   createdAt?: Date | string
   updatedAt?: Date | string
   documents?: Prisma.DocumentUncheckedCreateNestedManyWithoutProjectInput
@@ -1271,6 +1314,7 @@ export type ProjectUpdateWithoutStagesInput = {
   tanggalProject?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   targetGoLive?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   status?: Prisma.EnumProjectStatusFieldUpdateOperationsInput | $Enums.ProjectStatus
+  prioritas?: Prisma.EnumPrioritasFieldUpdateOperationsInput | $Enums.Prioritas
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   pm?: Prisma.ProjectManagerUpdateOneRequiredWithoutProjectsNestedInput
@@ -1294,6 +1338,7 @@ export type ProjectUncheckedUpdateWithoutStagesInput = {
   tanggalProject?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   targetGoLive?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   status?: Prisma.EnumProjectStatusFieldUpdateOperationsInput | $Enums.ProjectStatus
+  prioritas?: Prisma.EnumPrioritasFieldUpdateOperationsInput | $Enums.Prioritas
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   documents?: Prisma.DocumentUncheckedUpdateManyWithoutProjectNestedInput
@@ -1313,6 +1358,7 @@ export type ProjectCreateManyPmInput = {
   tanggalProject: Date | string
   targetGoLive?: Date | string | null
   status?: $Enums.ProjectStatus
+  prioritas?: $Enums.Prioritas
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -1327,6 +1373,7 @@ export type ProjectUpdateWithoutPmInput = {
   tanggalProject?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   targetGoLive?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   status?: Prisma.EnumProjectStatusFieldUpdateOperationsInput | $Enums.ProjectStatus
+  prioritas?: Prisma.EnumPrioritasFieldUpdateOperationsInput | $Enums.Prioritas
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   bp?: Prisma.BusinessPartnerUpdateOneRequiredWithoutProjectsNestedInput
@@ -1349,6 +1396,7 @@ export type ProjectUncheckedUpdateWithoutPmInput = {
   tanggalProject?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   targetGoLive?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   status?: Prisma.EnumProjectStatusFieldUpdateOperationsInput | $Enums.ProjectStatus
+  prioritas?: Prisma.EnumPrioritasFieldUpdateOperationsInput | $Enums.Prioritas
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   documents?: Prisma.DocumentUncheckedUpdateManyWithoutProjectNestedInput
@@ -1369,6 +1417,7 @@ export type ProjectUncheckedUpdateManyWithoutPmInput = {
   tanggalProject?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   targetGoLive?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   status?: Prisma.EnumProjectStatusFieldUpdateOperationsInput | $Enums.ProjectStatus
+  prioritas?: Prisma.EnumPrioritasFieldUpdateOperationsInput | $Enums.Prioritas
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -1386,6 +1435,7 @@ export type ProjectCreateManyBpInput = {
   tanggalProject: Date | string
   targetGoLive?: Date | string | null
   status?: $Enums.ProjectStatus
+  prioritas?: $Enums.Prioritas
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -1400,6 +1450,7 @@ export type ProjectUpdateWithoutBpInput = {
   tanggalProject?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   targetGoLive?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   status?: Prisma.EnumProjectStatusFieldUpdateOperationsInput | $Enums.ProjectStatus
+  prioritas?: Prisma.EnumPrioritasFieldUpdateOperationsInput | $Enums.Prioritas
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   pm?: Prisma.ProjectManagerUpdateOneRequiredWithoutProjectsNestedInput
@@ -1422,6 +1473,7 @@ export type ProjectUncheckedUpdateWithoutBpInput = {
   tanggalProject?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   targetGoLive?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   status?: Prisma.EnumProjectStatusFieldUpdateOperationsInput | $Enums.ProjectStatus
+  prioritas?: Prisma.EnumPrioritasFieldUpdateOperationsInput | $Enums.Prioritas
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   documents?: Prisma.DocumentUncheckedUpdateManyWithoutProjectNestedInput
@@ -1442,6 +1494,7 @@ export type ProjectUncheckedUpdateManyWithoutBpInput = {
   tanggalProject?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   targetGoLive?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   status?: Prisma.EnumProjectStatusFieldUpdateOperationsInput | $Enums.ProjectStatus
+  prioritas?: Prisma.EnumPrioritasFieldUpdateOperationsInput | $Enums.Prioritas
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -1459,6 +1512,7 @@ export type ProjectCreateManyUnitPengusulInput = {
   tanggalProject: Date | string
   targetGoLive?: Date | string | null
   status?: $Enums.ProjectStatus
+  prioritas?: $Enums.Prioritas
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -1473,6 +1527,7 @@ export type ProjectUpdateWithoutUnitPengusulInput = {
   tanggalProject?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   targetGoLive?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   status?: Prisma.EnumProjectStatusFieldUpdateOperationsInput | $Enums.ProjectStatus
+  prioritas?: Prisma.EnumPrioritasFieldUpdateOperationsInput | $Enums.Prioritas
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   pm?: Prisma.ProjectManagerUpdateOneRequiredWithoutProjectsNestedInput
@@ -1495,6 +1550,7 @@ export type ProjectUncheckedUpdateWithoutUnitPengusulInput = {
   tanggalProject?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   targetGoLive?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   status?: Prisma.EnumProjectStatusFieldUpdateOperationsInput | $Enums.ProjectStatus
+  prioritas?: Prisma.EnumPrioritasFieldUpdateOperationsInput | $Enums.Prioritas
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   documents?: Prisma.DocumentUncheckedUpdateManyWithoutProjectNestedInput
@@ -1515,6 +1571,7 @@ export type ProjectUncheckedUpdateManyWithoutUnitPengusulInput = {
   tanggalProject?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   targetGoLive?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   status?: Prisma.EnumProjectStatusFieldUpdateOperationsInput | $Enums.ProjectStatus
+  prioritas?: Prisma.EnumPrioritasFieldUpdateOperationsInput | $Enums.Prioritas
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -1582,6 +1639,7 @@ export type ProjectSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   tanggalProject?: boolean
   targetGoLive?: boolean
   status?: boolean
+  prioritas?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   pm?: boolean | Prisma.ProjectManagerDefaultArgs<ExtArgs>
@@ -1607,6 +1665,7 @@ export type ProjectSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Exten
   tanggalProject?: boolean
   targetGoLive?: boolean
   status?: boolean
+  prioritas?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   pm?: boolean | Prisma.ProjectManagerDefaultArgs<ExtArgs>
@@ -1628,6 +1687,7 @@ export type ProjectSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Exten
   tanggalProject?: boolean
   targetGoLive?: boolean
   status?: boolean
+  prioritas?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   pm?: boolean | Prisma.ProjectManagerDefaultArgs<ExtArgs>
@@ -1649,11 +1709,12 @@ export type ProjectSelectScalar = {
   tanggalProject?: boolean
   targetGoLive?: boolean
   status?: boolean
+  prioritas?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }
 
-export type ProjectOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "kategori" | "jenis" | "kodeProject" | "nama" | "deskripsi" | "pmId" | "bpId" | "unitId" | "ownerPic" | "tanggalProject" | "targetGoLive" | "status" | "createdAt" | "updatedAt", ExtArgs["result"]["project"]>
+export type ProjectOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "kategori" | "jenis" | "kodeProject" | "nama" | "deskripsi" | "pmId" | "bpId" | "unitId" | "ownerPic" | "tanggalProject" | "targetGoLive" | "status" | "prioritas" | "createdAt" | "updatedAt", ExtArgs["result"]["project"]>
 export type ProjectInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   pm?: boolean | Prisma.ProjectManagerDefaultArgs<ExtArgs>
   bp?: boolean | Prisma.BusinessPartnerDefaultArgs<ExtArgs>
@@ -1698,6 +1759,7 @@ export type $ProjectPayload<ExtArgs extends runtime.Types.Extensions.InternalArg
     tanggalProject: Date
     targetGoLive: Date | null
     status: $Enums.ProjectStatus
+    prioritas: $Enums.Prioritas
     createdAt: Date
     updatedAt: Date
   }, ExtArgs["result"]["project"]>
@@ -2142,6 +2204,7 @@ export interface ProjectFieldRefs {
   readonly tanggalProject: Prisma.FieldRef<"Project", 'DateTime'>
   readonly targetGoLive: Prisma.FieldRef<"Project", 'DateTime'>
   readonly status: Prisma.FieldRef<"Project", 'ProjectStatus'>
+  readonly prioritas: Prisma.FieldRef<"Project", 'Prioritas'>
   readonly createdAt: Prisma.FieldRef<"Project", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"Project", 'DateTime'>
 }

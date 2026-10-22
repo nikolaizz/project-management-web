@@ -103,6 +103,9 @@ tr.project-detail td{background:#f7f9fd}
 .stage{border:1px solid var(--line);border-radius:10px;padding:12px;display:flex;flex-direction:column;gap:10px;background:#fafbfe}
 .stage h3{margin:0;font-size:15px;color:var(--navy)}
 .stage textarea{min-height:64px}
+.b-HIGH{background:var(--bad-bg);color:var(--bad)}
+.b-MEDIUM{background:var(--warn-bg);color:var(--warn)}
+.b-LOW{background:#e9ebf2;color:#444c63}
 </style>
 </head>
 <body>
@@ -164,6 +167,7 @@ const STEPS = ["Jenis project", "Informasi project", "Tahapan & dokumen", "Revie
 const STATUS_LABEL = { DRAFT: "Draft", INISIASI: "Inisiasi", ON_PROGRESS: "On progress", PENDING: "Pending", ON_HOLD: "On hold", SELESAI: "Selesai" };
 const KATEGORI_LABEL = { FS: "FS", CR_FORM: "CR Form", AIR_FORM: "AIR Form", IC_FORM: "IC Form", SC_FORM: "SC Form" };
 const JENIS_LABEL = { NEW: "Project baru", ADDENDUM: "Addendum" };
+const PRIORITAS_LABEL = { LOW: "Low", MEDIUM: "Medium", HIGH: "High" };
 const TAHAP_LABEL = { PRA_KOMITE: "Pra Komite", KOMITE_TI_B: "Komite TI B", KOMITE_TI_A: "Komite TI A" };
 const TAHAP_ORDER = Object.keys(TAHAP_LABEL);
 const STATUS_TAHAP_LABEL = { PLANNED: "Planned", ON_PROGRESS: "On Progress", SELESAI: "Selesai" };
@@ -179,7 +183,7 @@ const fmtSize = (n) => (n >= 1048576 ? (n / 1048576).toFixed(1) + " MB" : Math.m
 const today = () => new Date(Date.now() - new Date().getTimezoneOffset() * 60000).toISOString().slice(0, 10);
 
 function newForm() {
-  return { kategori: "", kodeProject: "", nama: "", deskripsi: "", pmId: "", bpId: "", unitId: "", ownerPic: "", tanggalProject: today(), targetGoLive: "", status: "INISIASI" };
+  return { kategori: "", kodeProject: "", nama: "", deskripsi: "", pmId: "", bpId: "", unitId: "", prioritas: "MEDIUM", ownerPic: "", tanggalProject: today(), targetGoLive: "", status: "INISIASI" };
 }
 const FIELDS = Object.keys(newForm());
 
@@ -237,6 +241,7 @@ function stepJenis() {
 function stepInfo() {
   const kat = `<select id="f-kategori" data-f="kategori"><option value="">Pilih kategori</option>${master.enums.kategori.map((k) => `<option value="${k}">${esc(KATEGORI_LABEL[k] || k)}</option>`).join("")}</select>`;
   const status = `<select id="f-status" data-f="status">${master.enums.status.map((s) => `<option value="${s}">${esc(STATUS_LABEL[s] || s)}</option>`).join("")}</select>`;
+  const prio = `<select id="f-prioritas" data-f="prioritas">${Object.entries(PRIORITAS_LABEL).map(([v, l]) => `<option value="${v}">${l}</option>`).join("")}</select>`;
   const hint = state.jenis === "ADDENDUM" ? "Wajib diisi untuk Addendum." : "Boleh dikosongkan untuk project baru.";
   const kode = `<div class="row"><input id="f-kodeProject" data-f="kodeProject" autocomplete="off"><button type="button" id="btnCheck">Cek kode</button></div><div class="hint" id="codeResult">${hint}</div>`;
   return `<h2>Informasi project</h2><div class="grid">
@@ -247,6 +252,7 @@ function stepInfo() {
     ${fld("pmId", "Project manager", `<select id="f-pmId" data-f="pmId">${options(master.pm, "Pilih PM")}</select>`)}
     ${fld("bpId", "Business partner", `<select id="f-bpId" data-f="bpId">${options(master.bp, "Pilih BP")}</select>`)}
     ${fld("unitId", "Unit pengusul", `<select id="f-unitId" data-f="unitId">${options(master.units, "Pilih unit")}</select>`)}
+    ${fld("prioritas", "Prioritas", prio)}
     ${fld("ownerPic", "Owner / PIC", `<input id="f-ownerPic" data-f="ownerPic">`)}
     ${fld("tanggalProject", "Tanggal project", `<input id="f-tanggalProject" data-f="tanggalProject" type="date">`)}
     ${fld("targetGoLive", "Target go live", `<input id="f-targetGoLive" data-f="targetGoLive" type="date">`)}
@@ -283,6 +289,7 @@ function stepReview() {
     ["PM", nameOf(master.pm, f.pmId)], ["BP", nameOf(master.bp, f.bpId)], ["Unit pengusul", nameOf(master.units, f.unitId)],
     ["Owner / PIC", f.ownerPic], ["Tanggal project", f.tanggalProject], ["Target go live", f.targetGoLive || "-"],
     ["Status awal", STATUS_LABEL[f.status] || f.status],
+    ["Prioritas", PRIORITAS_LABEL[f.prioritas] || f.prioritas],
     ["Dokumen", state.files.length ? state.files.map((x) => x.name).join(", ") : "Tidak ada"],
   ];
   const stageRows = TAHAP_ORDER.map((t) => {
@@ -350,7 +357,7 @@ function payload() {
   return {
     kategori: f.kategori, jenis: state.jenis, kodeProject: f.kodeProject.trim(), nama: f.nama.trim(),
     deskripsi: f.deskripsi.trim(), pmId: f.pmId, bpId: f.bpId, unitId: f.unitId, ownerPic: f.ownerPic.trim(),
-    tanggalProject: f.tanggalProject, targetGoLive: f.targetGoLive || null, status: f.status,
+    tanggalProject: f.tanggalProject, targetGoLive: f.targetGoLive || null, status: f.status, prioritas: f.prioritas,
     stages: TAHAP_ORDER.map((t) => {
       const x = state.stages[t];
       return { tahap: t, tanggalRencana: x.tanggalRencana || null, status: x.status, catatan: x.catatan.trim() || null };
@@ -504,6 +511,7 @@ function renderProjectDetail(p) {
     <dt>Kategori</dt><dd>${esc(KATEGORI_LABEL[p.kategori] || p.kategori)}</dd>
     <dt>Jenis</dt><dd>${esc(JENIS_LABEL[p.jenis] || p.jenis)}</dd>
     <dt>Status</dt><dd>${esc(STATUS_LABEL[p.status] || p.status)}</dd>
+    <dt>Prioritas</dt><dd>${esc(PRIORITAS_LABEL[p.prioritas] || p.prioritas || "-")}</dd>
     <dt>Project manager</dt><dd>${esc(p.pm ? p.pm.nama : "-")}</dd>
     <dt>Deskripsi</dt><dd>${esc(p.deskripsi)}</dd>
     <dt>Business partner</dt><dd>${esc(p.bp ? p.bp.nama : "-")}</dd>
@@ -519,9 +527,9 @@ function renderProjectDetail(p) {
 function renderProjects(list, total) {
   const box = $("#projects");
   if (!list.length) { box.innerHTML = `<p class="empty">Belum ada project.</p>`; return; }
-  box.innerHTML = `<table><thead><tr><th>Kode</th><th>Nama</th><th>Kategori</th><th>Jenis</th><th>Status</th><th>PM</th><th>Unit pengusul</th><th>Dokumen</th><th>Aksi</th></tr></thead><tbody>${list.map((p) => `<tr>
+  box.innerHTML = `<table><thead><tr><th>Kode</th><th>Nama</th><th>Kategori</th><th>Jenis</th><th>Status</th><th>Prioritas</th><th>PM</th><th>Unit pengusul</th><th>Dokumen</th><th>Aksi</th></tr></thead><tbody>${list.map((p) => `<tr>
     <td>${esc(p.kodeProject || "-")}</td><td>${esc(p.nama)}</td><td>${esc(KATEGORI_LABEL[p.kategori] || p.kategori)}</td>
-    <td>${esc(JENIS_LABEL[p.jenis] || p.jenis)}</td><td><span class="badge b-${esc(p.status)}">${esc(STATUS_LABEL[p.status] || p.status)}</span></td>
+    <td>${esc(JENIS_LABEL[p.jenis] || p.jenis)}</td><td><span class="badge b-${esc(p.status)}">${esc(STATUS_LABEL[p.status] || p.status)}</span></td><td><span class="badge b-${esc(p.prioritas)}">${esc(PRIORITAS_LABEL[p.prioritas] || p.prioritas || "-")}</span></td>
     <td>${esc(p.pm ? p.pm.nama : "-")}</td><td>${esc(p.unitPengusul ? p.unitPengusul.nama : "-")}</td>
     <td><button type="button" class="small" data-docs="${p.id}">${p._count ? p._count.documents : 0} file</button></td>
     <td><button type="button" class="small" data-edit="${p.id}">Edit</button>
@@ -549,6 +557,7 @@ function renderEditForm(p) {
       <div><label for="edit-kodeProject">Kode project</label><input id="edit-kodeProject" name="kodeProject" value="${esc(p.kodeProject || "")}"></div>
       ${editSelect("jenis", "Jenis project", Object.keys(JENIS_LABEL), p.jenis, JENIS_LABEL)}
       ${editSelect("status", "Status", master.enums.status, p.status, STATUS_LABEL)}
+      ${editSelect("prioritas", "Prioritas", Object.keys(PRIORITAS_LABEL), p.prioritas, PRIORITAS_LABEL)}
       ${editMasterSelect("pmId", "Project manager", master.pm, p.pmId)}
       <div class="full"><label for="edit-nama">Nama project</label><input id="edit-nama" name="nama" value="${esc(p.nama)}" required></div>
       <div class="full"><label for="edit-deskripsi">Deskripsi</label><textarea id="edit-deskripsi" name="deskripsi" required>${esc(p.deskripsi)}</textarea></div>
@@ -613,6 +622,8 @@ $("#editProjectDialog").addEventListener("submit", async (e) => {
   const payload = {
     kategori: data.get("kategori"),
     jenis: data.get("jenis"),
+    status: data.get("status"),
+    prioritas: data.get("prioritas"),
     kodeProject: String(data.get("kodeProject")).trim() || null,
     nama: String(data.get("nama")).trim(),
     deskripsi: String(data.get("deskripsi")).trim(),
@@ -673,7 +684,7 @@ $("#projects").addEventListener("click", async (e) => {
       const r = await api(`/projects/${detail.dataset.detail}`);
       const tr = document.createElement("tr");
       tr.className = "project-detail";
-      tr.innerHTML = `<td colspan="9">${renderProjectDetail(r.data)}</td>`;
+      tr.innerHTML = `<td colspan="10">${renderProjectDetail(r.data)}</td>`;
       row.after(tr);
       detail.setAttribute("aria-expanded", "true");
       detail.textContent = "Tutup detail";
@@ -685,7 +696,7 @@ $("#projects").addEventListener("click", async (e) => {
       if (next && next.classList.contains("docs")) { next.remove(); return; }
       const r = await api(`/projects/${d.dataset.docs}/documents`);
       const tr = document.createElement("tr");
-      tr.className = "docs"; tr.innerHTML = `<td colspan="9">${docsHtml(r.data)}</td>`;
+      tr.className = "docs"; tr.innerHTML = `<td colspan="10">${docsHtml(r.data)}</td>`;
       row.after(tr);
       return;
     }

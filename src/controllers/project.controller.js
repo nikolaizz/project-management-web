@@ -1,5 +1,5 @@
 import prisma from "../lib/prisma.js";
-import { STATUS, KATEGORI } from "../constants/enums.js";
+import { STATUS, KATEGORI, PRIORITAS} from "../constants/enums.js";
 import { removeFiles } from "../lib/files.js";
 import { buildStages } from "../lib/stages.js";
 
@@ -17,7 +17,7 @@ export async function getProjects(req, res, next) {
     // Ambil filter dan pagination dari query URL; batasi jumlah hasil maksimal 100.
     const page = Math.max(parseInt(req.query.page) || 1, 1);
     const limit = Math.min(parseInt(req.query.limit) || 10, 100);
-    const { search, status, kategori, unitId } = req.query;
+    const { search, status, kategori, unitId, prioritas } = req.query;
 
     // Tolak filter yang tidak termasuk pilihan resmi sebelum menjalankan query database.
     if (status && !STATUS.includes(status)) {
@@ -32,11 +32,19 @@ export async function getProjects(req, res, next) {
         message: `Kategori tidak valid. Pilihan: ${KATEGORI.join(", ")}`,
       });
     }
+    // BARU: validasi filter prioritas
+    if (prioritas && !PRIORITAS.includes(prioritas)) {
+      return res.status(400).json({
+        success: false,
+        message: `Prioritas tidak valid. Pilihan: ${PRIORITAS.join(", ")}`,
+      });
+    }
 
     // Bangun kondisi pencarian hanya dari filter yang benar-benar dikirim pemanggil.
     const where = {};
     if (status) where.status = status;
     if (kategori) where.kategori = kategori;
+    if (prioritas) where.prioritas = prioritas; // BARU: filter prioritas
     if (unitId) where.unitId = parseInt(unitId);
     if (search) {
       where.OR = [
@@ -162,6 +170,7 @@ export async function createProject(req, res, next) {
         tanggalProject: new Date(d.tanggalProject),
         targetGoLive: d.targetGoLive ? new Date(d.targetGoLive) : null,
         status: d.status,
+        prioritas: d.prioritas,
         stages: {
           create: buildStages(d.stages),
         },
@@ -223,7 +232,7 @@ export async function updateProject(req, res, next) {
 
     // Hanya ubah field yang memang dikirim
     const data = {};
-    for (const key of ["kategori", "jenis", "nama", "deskripsi", "pmId", "bpId", "unitId", "ownerPic"]) {
+    for (const key of ["kategori", "jenis", "nama", "deskripsi", "pmId", "bpId", "unitId", "ownerPic", "prioritas"]) {
       if (key in d) data[key] = d[key];
     }
     if ("kodeProject" in d) data.kodeProject = kode;

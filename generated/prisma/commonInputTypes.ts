@@ -163,6 +163,13 @@ export type EnumProjectStatusFilter<$PrismaModel = never> = {
   not?: Prisma.NestedEnumProjectStatusFilter<$PrismaModel> | $Enums.ProjectStatus
 }
 
+export type EnumPrioritasFilter<$PrismaModel = never> = {
+  equals?: $Enums.Prioritas | Prisma.EnumPrioritasFieldRefInput<$PrismaModel>
+  in?: $Enums.Prioritas[] | Prisma.ListEnumPrioritasFieldRefInput<$PrismaModel>
+  notIn?: $Enums.Prioritas[] | Prisma.ListEnumPrioritasFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumPrioritasFilter<$PrismaModel> | $Enums.Prioritas
+}
+
 export type SortOrderInput = {
   sort: Prisma.SortOrder
   nulls?: Prisma.NullsOrder
@@ -228,6 +235,16 @@ export type EnumProjectStatusWithAggregatesFilter<$PrismaModel = never> = {
   _count?: Prisma.NestedIntFilter<$PrismaModel>
   _min?: Prisma.NestedEnumProjectStatusFilter<$PrismaModel>
   _max?: Prisma.NestedEnumProjectStatusFilter<$PrismaModel>
+}
+
+export type EnumPrioritasWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.Prioritas | Prisma.EnumPrioritasFieldRefInput<$PrismaModel>
+  in?: $Enums.Prioritas[] | Prisma.ListEnumPrioritasFieldRefInput<$PrismaModel>
+  notIn?: $Enums.Prioritas[] | Prisma.ListEnumPrioritasFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumPrioritasWithAggregatesFilter<$PrismaModel> | $Enums.Prioritas
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumPrioritasFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumPrioritasFilter<$PrismaModel>
 }
 
 export type EnumTahapKomiteFilter<$PrismaModel = never> = {
@@ -421,6 +438,13 @@ export type NestedEnumProjectStatusFilter<$PrismaModel = never> = {
   not?: Prisma.NestedEnumProjectStatusFilter<$PrismaModel> | $Enums.ProjectStatus
 }
 
+export type NestedEnumPrioritasFilter<$PrismaModel = never> = {
+  equals?: $Enums.Prioritas | Prisma.EnumPrioritasFieldRefInput<$PrismaModel>
+  in?: $Enums.Prioritas[] | Prisma.ListEnumPrioritasFieldRefInput<$PrismaModel>
+  notIn?: $Enums.Prioritas[] | Prisma.ListEnumPrioritasFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumPrioritasFilter<$PrismaModel> | $Enums.Prioritas
+}
+
 export type NestedEnumKategoriProjectWithAggregatesFilter<$PrismaModel = never> = {
   equals?: $Enums.KategoriProject | Prisma.EnumKategoriProjectFieldRefInput<$PrismaModel>
   in?: $Enums.KategoriProject[] | Prisma.ListEnumKategoriProjectFieldRefInput<$PrismaModel>
@@ -491,6 +515,16 @@ export type NestedEnumProjectStatusWithAggregatesFilter<$PrismaModel = never> = 
   _count?: Prisma.NestedIntFilter<$PrismaModel>
   _min?: Prisma.NestedEnumProjectStatusFilter<$PrismaModel>
   _max?: Prisma.NestedEnumProjectStatusFilter<$PrismaModel>
+}
+
+export type NestedEnumPrioritasWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.Prioritas | Prisma.EnumPrioritasFieldRefInput<$PrismaModel>
+  in?: $Enums.Prioritas[] | Prisma.ListEnumPrioritasFieldRefInput<$PrismaModel>
+  notIn?: $Enums.Prioritas[] | Prisma.ListEnumPrioritasFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumPrioritasWithAggregatesFilter<$PrismaModel> | $Enums.Prioritas
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumPrioritasFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumPrioritasFilter<$PrismaModel>
 }
 
 export type NestedEnumTahapKomiteFilter<$PrismaModel = never> = {

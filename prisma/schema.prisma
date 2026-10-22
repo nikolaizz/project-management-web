@@ -52,6 +52,12 @@ enum StatusTahapan {
   SELESAI
 }
 
+enum Prioritas {
+  LOW
+  MEDIUM
+  HIGH
+}
+
 // Data referensi untuk mengisi dropdown dan relasinya ke project.
 
 model ProjectManager {
@@ -101,6 +107,7 @@ model Project {
   tanggalProject DateTime       @db.Date
   targetGoLive  DateTime?       @db.Date
   status        ProjectStatus   @default(INISIASI)
+  prioritas     Prioritas      @default(MEDIUM)
   createdAt     DateTime        @default(now())
   updatedAt     DateTime        @updatedAt
 
