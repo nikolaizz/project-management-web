@@ -155,7 +155,8 @@ export const ProjectUpdateScalarFieldEnum = {
   status: 'status',
   aktivitas: 'aktivitas',
   kendala: 'kendala',
-  nextAction: 'nextAction'
+  nextAction: 'nextAction',
+  modifiedById: 'modifiedById'
 } as const
 
 export type ProjectUpdateScalarFieldEnum = (typeof ProjectUpdateScalarFieldEnum)[keyof typeof ProjectUpdateScalarFieldEnum]

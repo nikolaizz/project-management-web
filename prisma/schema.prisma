@@ -87,6 +87,8 @@ model User {
   passwordHash String
   role         Role     @default(PROJECT_MANAGER)
   createdAt    DateTime @default(now())
+  projectUpdates ProjectUpdate[]
+
 }
 
 // Data utama project dan relasinya ke data master, dokumen, serta riwayat update.
@@ -141,6 +143,8 @@ model ProjectUpdate {
   aktivitas    String        // Aktivitas / Progress / Outcome
   kendala      String?       // Kendala / Issue
   nextAction   String
+  modifiedById String?
+  modifiedBy   User?  @relation(fields: [modifiedById], references: [id], onDelete: SetNull)
 
   @@index([projectId, tanggalInput])
 }

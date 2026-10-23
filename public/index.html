@@ -106,6 +106,9 @@ tr.project-detail td{background:#f7f9fd}
 .b-HIGH{background:var(--bad-bg);color:var(--bad)}
 .b-MEDIUM{background:var(--warn-bg);color:var(--warn)}
 .b-LOW{background:#e9ebf2;color:#444c63}
+.nowrap{white-space:nowrap}
+table.history{background:#fff;border:1px solid var(--line)}
+tr.project-detail table.history td,tr.project-detail table.history th{background:#fff}
 </style>
 </head>
 <body>
@@ -495,13 +498,27 @@ function docsHtml(list) {
   return `<ul class="files">${list.map((d) => `<li><span class="nm"><a href="${API}/documents/${d.id}/download">${esc(d.namaFile)}</a> <small>(${fmtSize(d.ukuran)})</small></span><button type="button" class="small danger" data-deldoc="${d.id}">Hapus</button></li>`).join("")}</ul>`;
 }
 
+// Tanggal dan jam dalam zona waktu browser, contoh: 23 Okt 2026, 14:35
+function fmtDateTime(value) {
+  if (!value) return "-";
+  const d = new Date(value);
+  if (Number.isNaN(d.getTime())) return "-";
+  const tgl = d.toLocaleDateString("id-ID", { day: "numeric", month: "short", year: "numeric" });
+  const jam = d.toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit", hour12: false }).replace(".", ":");
+  return `${esc(tgl)}, <strong>${esc(jam)}</strong>`;
+}
+
 function renderProjectDetail(p) {
   const date = (value) => value ? esc(String(value).slice(0, 10)) : "-";
   const docs = p.documents.length
     ? `<ul>${p.documents.map((d) => `<li><a href="${API}/documents/${d.id}/download">${esc(d.namaFile)}</a> <small>(${fmtSize(d.ukuran)})</small></li>`).join("")}</ul>`
     : `<p class="hint">Belum ada dokumen.</p>`;
   const updates = p.updates.length
-    ? `<ul>${p.updates.map((u) => `<li><strong>${date(u.tanggalInput)} — ${esc(STATUS_LABEL[u.status] || u.status)}</strong>: ${esc(u.aktivitas)}${u.kendala ? ` <span class="muted">Kendala: ${esc(u.kendala)}</span>` : ""}<br>Next action: ${esc(u.nextAction)}</li>`).join("")}</ul>`
+    ? `<div class="tablewrap"><table class="history"><thead><tr><th>Tanggal &amp; jam</th><th>Status</th><th>Aktivitas</th><th>Kendala</th><th>Next action</th><th>Diubah oleh</th></tr></thead><tbody>${p.updates.map((u) => `<tr>
+        <td class="nowrap">${fmtDateTime(u.tanggalInput)}</td>
+        <td><span class="badge b-${esc(u.status)}">${esc(STATUS_LABEL[u.status] || u.status)}</span></td>
+        <td>${esc(u.aktivitas)}</td><td>${esc(u.kendala || "-")}</td><td>${esc(u.nextAction)}</td>
+        <td class="nowrap">${esc(u.modifiedBy ? u.modifiedBy.nama : "-")}</td></tr>`).join("")}</tbody></table></div>`
     : `<p class="hint">Belum ada riwayat update.</p>`;
   const stageList = Array.isArray(p.stages) ? p.stages : [];
   const stages = stageList.length
@@ -519,8 +536,8 @@ function renderProjectDetail(p) {
     <dt>Owner / PIC</dt><dd>${esc(p.ownerPic)}</dd>
     <dt>Tanggal project</dt><dd>${date(p.tanggalProject)}</dd>
     <dt>Target go live</dt><dd>${date(p.targetGoLive)}</dd>
-    <dt>Dibuat</dt><dd>${date(p.createdAt)}</dd>
-    <dt>Terakhir diperbarui</dt><dd>${date(p.updatedAt)}</dd>
+    <dt>Dibuat</dt><dd>${fmtDateTime(p.createdAt)}</dd>
+    <dt>Terakhir diperbarui</dt><dd>${fmtDateTime(p.updatedAt)}</dd>
   </dl><h3>Tahapan</h3>${stages}<h3>Dokumen</h3>${docs}<h3>Riwayat update</h3>${updates}</div>`;
 }
 

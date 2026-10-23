@@ -122,7 +122,7 @@ export async function getProjectById(req, res, next) {
         ...projectInclude,
         // Pada tampilan detail, ambil seluruh dokumen dan riwayat update terbaru dahulu.
         documents: { orderBy: { uploadedAt: "desc" } },
-        updates: { orderBy: { tanggalInput: "desc" } },
+        updates: { orderBy: { tanggalInput: "desc" }, include : { modifiedBy: { select: { id: true, nama: true } } } },
       },
     });
 
