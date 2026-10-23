@@ -256,6 +256,7 @@ export async function updateProject(req, res, next) {
             aktivitas: d.aktivitas,
             kendala: d.kendala || null,
             nextAction: d.nextAction,
+            modifiedById: req.user.id 
           },
         });
       }

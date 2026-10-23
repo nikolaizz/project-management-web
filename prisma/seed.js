@@ -132,6 +132,7 @@ async function main() {
         aktivitas: "Analisa data tenaga kerja",
         kendala: null,
         nextAction: "Lanjut analisa",
+        
       },
       {
         projectId: hcms.id,
