@@ -109,6 +109,14 @@ tr.project-detail td{background:#f7f9fd}
 .nowrap{white-space:nowrap}
 table.history{background:#fff;border:1px solid var(--line)}
 tr.project-detail table.history td,tr.project-detail table.history th{background:#fff}
+.tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px}
+.tab{padding:6px 14px}
+.tab.active{background:var(--blue-soft);border-color:var(--blue);color:var(--navy);font-weight:600}
+.cfg-add{margin-bottom:14px}
+.check{display:flex;align-items:center;gap:8px;font-weight:400;margin-top:14px}
+.check input{width:auto}
+#deleteProjectDialog{width:min(520px,calc(100% - 28px))}
+button.danger-solid{background:var(--bad);border-color:var(--bad);color:#fff}
 </style>
 </head>
 <body>
@@ -128,6 +136,10 @@ tr.project-detail table.history td,tr.project-detail table.history th{background
       <button type="button" class="side-link" data-page="projectsPage">
         Daftar project
         <span>Lihat project tersimpan</span>
+      </button>
+      <button type="button" class="side-link" data-page="configPage">
+        Konfigurasi
+        <span>Data dropdown (PM, BP, Unit)</span>
       </button>
     </nav>
   </aside>
@@ -156,10 +168,20 @@ tr.project-detail table.history td,tr.project-detail table.history th{background
         <div id="projects" class="tablewrap"><p class="empty">Memuat...</p></div>
       </div>
     </section>
+
+    <section class="page" id="configPage" aria-labelledby="configTitle" hidden>
+      <div class="card">
+        <div class="head"><h1 id="configTitle">Konfigurasi data dropdown</h1></div>
+        <div class="tabs" id="configTabs" role="tablist" aria-label="Jenis data"></div>
+        <div id="configMessage" aria-live="polite"></div>
+        <div id="configBody"><p class="empty">Memuat...</p></div>
+      </div>
+    </section>
   </div>
 </main>
 
 <dialog id="editProjectDialog" aria-labelledby="editProjectTitle"></dialog>
+<dialog id="deleteProjectDialog" aria-labelledby="deleteProjectTitle"></dialog>
 
 <script>
 const API = location.protocol === "file:" ? "http://localhost:3000" : "";
@@ -729,26 +751,177 @@ $("#projects").addEventListener("click", async (e) => {
       return;
     }
     const dp = e.target.closest("[data-delp]");
-    if (dp) {
-      if (!confirm("Hapus project ini beserta dokumennya? Tindakan ini permanen.")) return;
-      await api(`/projects/${dp.dataset.delp}`, { method: "DELETE" });
-      loadProjects(); return;
-    }
+    if (dp) { await openDeleteProject(dp.dataset.delp); return; }
     const dd = e.target.closest("[data-deldoc]");
     if (dd) {
       if (!confirm("Hapus dokumen ini?")) return;
       await api(`/documents/${dd.dataset.deldoc}`, { method: "DELETE" });
       loadProjects();
     }
-  } catch (err) { setAlert("error", err.message); }
+  } catch (err) { $("#projectsMessage").innerHTML = `<div class="alert error">${esc(err.message)}</div>`; }
 });
+
+const ACTIVE_STATUS = ["ON_PROGRESS", "PENDING", "ON_HOLD"];
+
+async function openDeleteProject(id) {
+  const r = await api(`/projects/${id}`);
+  const p = r.data;
+  const label = STATUS_LABEL[p.status] || p.status;
+  const dlg = $("#deleteProjectDialog");
+  dlg.dataset.projectId = id;
+  dlg.dataset.projectName = p.nama;
+  dlg.innerHTML = `<h2 id="deleteProjectTitle">Hapus project ini?</h2>
+    <dl class="rev">
+      <dt>Nama</dt><dd>${esc(p.nama)}</dd>
+      <dt>Kode project</dt><dd>${esc(p.kodeProject || "-")}</dd>
+      <dt>Status saat ini</dt><dd><span class="badge b-${esc(p.status)}">${esc(label)}</span></dd>
+      <dt>Isi project</dt><dd>${p.documents.length} dokumen, ${p.updates.length} riwayat update, ${Array.isArray(p.stages) ? p.stages.length : 0} tahapan</dd>
+    </dl>
+    ${ACTIVE_STATUS.includes(p.status) ? `<div class="alert warn">Project ini masih aktif (status ${esc(label)}). Pastikan memang perlu dihapus.</div>` : ""}
+    <div class="alert error">Tindakan ini permanen. Project beserta tahapan, dokumen (termasuk filenya), dan riwayat update akan terhapus dan tidak bisa dikembalikan.</div>
+    <label class="check"><input type="checkbox" id="deleteConfirmCheck"> Saya mengerti dan ingin menghapus project ini</label>
+    <div id="deleteProjectError" class="alert error" role="alert" hidden></div>
+    <div class="dialog-actions"><button type="button" data-close-delete>Batal</button><button type="button" class="danger-solid" id="btnConfirmDelete" disabled>Hapus permanen</button></div>`;
+  dlg.showModal();
+}
+
+$("#deleteProjectDialog").addEventListener("change", (e) => {
+  if (e.target.id === "deleteConfirmCheck") $("#btnConfirmDelete").disabled = !e.target.checked;
+});
+$("#deleteProjectDialog").addEventListener("click", async (e) => {
+  const dlg = $("#deleteProjectDialog");
+  if (e.target.closest("[data-close-delete]")) { dlg.close(); return; }
+  const btn = e.target.closest("#btnConfirmDelete");
+  if (!btn) return;
+  const err = $("#deleteProjectError");
+  btn.disabled = true; btn.textContent = "Menghapus..."; err.hidden = true;
+  try {
+    await api(`/projects/${dlg.dataset.projectId}`, { method: "DELETE" });
+    dlg.close();
+    $("#projectsMessage").innerHTML = `<div class="alert ok">Project "${esc(dlg.dataset.projectName)}" berhasil dihapus.</div>`;
+    loadProjects();
+  } catch (ex) {
+    err.textContent = ex.message; err.hidden = false;
+    btn.disabled = false; btn.textContent = "Hapus permanen";
+  }
+});
+
+// ---------- Konfigurasi data dropdown (PM, BP, Unit) ----------
+const MASTER_TYPES = {
+  pm: { label: "Project Manager", path: "/master/pm", singular: "PM" },
+  bp: { label: "Business Partner", path: "/master/bp", singular: "BP" },
+  units: { label: "Unit pengusul", path: "/master/units", singular: "unit" },
+};
+const cfg = { type: "pm", rows: [], editingId: null };
+const jsonOpts = (method, body) => ({ method, headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
+const errText = (err) => (err.errors && err.errors.length ? err.errors.map((x) => x.message).join("; ") : err.message);
+
+function cfgMsg(type, msg) { $("#configMessage").innerHTML = msg ? `<div class="alert ${type}">${esc(msg)}</div>` : ""; }
+
+function renderConfigTabs() {
+  $("#configTabs").innerHTML = Object.entries(MASTER_TYPES).map(([k, t]) =>
+    `<button type="button" class="tab ${k === cfg.type ? "active" : ""}" data-cfgtab="${k}" role="tab" aria-selected="${k === cfg.type}">${esc(t.label)}</button>`).join("");
+}
+
+function renderConfigBody() {
+  const t = MASTER_TYPES[cfg.type];
+  const rows = cfg.rows.map((r) => {
+    const used = r._count ? r._count.projects : 0;
+    const editing = String(cfg.editingId) === String(r.id);
+    const nameCell = editing ? `<input id="cfgEditInput" value="${esc(r.nama)}" maxlength="100" aria-label="Nama ${esc(t.singular)}">` : esc(r.nama);
+    const actions = editing
+      ? `<button type="button" class="small primary" data-cfgsave="${esc(r.id)}">Simpan</button> <button type="button" class="small" data-cfgcancel>Batal</button>`
+      : `<button type="button" class="small" data-cfgedit="${esc(r.id)}">Ubah</button> <button type="button" class="small danger" data-cfgdel="${esc(r.id)}"${used ? ' disabled title="Masih dipakai oleh project"' : ""}>Hapus</button>`;
+    return `<tr><td>${esc(r.id)}</td><td>${nameCell}</td><td>${used} project</td><td class="nowrap">${actions}</td></tr>`;
+  }).join("");
+  $("#configBody").innerHTML = `<form id="cfgAddForm" class="row cfg-add">
+      <input id="cfgNewName" maxlength="100" placeholder="Nama ${esc(t.singular)} baru" aria-label="Nama ${esc(t.singular)} baru">
+      <button type="submit" class="primary">Tambah</button>
+    </form>
+    ${cfg.rows.length ? `<div class="tablewrap"><table><thead><tr><th>Kode</th><th>Nama</th><th>Dipakai</th><th>Aksi</th></tr></thead><tbody>${rows}</tbody></table></div>
+    <p class="hint">Data yang masih dipakai project tidak bisa dihapus.</p>` : `<p class="empty">Belum ada data ${esc(t.label)}.</p>`}`;
+}
+
+async function loadConfig() {
+  try { cfg.rows = (await api(MASTER_TYPES[cfg.type].path)).data; }
+  catch (e) { cfg.rows = []; cfgMsg("error", e.message); }
+  renderConfigBody();
+}
+
+// Muat ulang data master supaya dropdown di form ikut terbarui
+async function refreshAfterMasterChange() {
+  await Promise.all([loadMaster(), loadConfig()]);
+  render();
+}
+
+$(".side-nav").addEventListener("click", (e) => {
+  if (e.target.closest('[data-page="configPage"]')) { renderConfigTabs(); loadConfig(); }
+});
+$("#configTabs").addEventListener("click", (e) => {
+  const tab = e.target.closest("[data-cfgtab]");
+  if (!tab) return;
+  cfg.type = tab.dataset.cfgtab; cfg.editingId = null; cfgMsg("ok", "");
+  renderConfigTabs(); loadConfig();
+});
+$("#configBody").addEventListener("submit", async (e) => {
+  if (e.target.id !== "cfgAddForm") return;
+  e.preventDefault();
+  const t = MASTER_TYPES[cfg.type], input = $("#cfgNewName"), nama = input.value.trim();
+  if (!nama) { cfgMsg("error", "Nama wajib diisi."); input.focus(); return; }
+  try {
+    await api(t.path, jsonOpts("POST", { nama }));
+    cfgMsg("ok", `${t.singular} "${nama}" berhasil ditambahkan.`);
+    await refreshAfterMasterChange();
+  } catch (err) { cfgMsg("error", errText(err)); }
+});
+$("#configBody").addEventListener("click", async (e) => {
+  const t = MASTER_TYPES[cfg.type];
+  const edit = e.target.closest("[data-cfgedit]");
+  if (edit) {
+    cfg.editingId = edit.dataset.cfgedit; cfgMsg("ok", ""); renderConfigBody();
+    const i = $("#cfgEditInput"); if (i) { i.focus(); i.select(); }
+    return;
+  }
+  if (e.target.closest("[data-cfgcancel]")) { cfg.editingId = null; renderConfigBody(); return; }
+  const save = e.target.closest("[data-cfgsave]");
+  if (save) {
+    const nama = $("#cfgEditInput").value.trim();
+    if (!nama) { cfgMsg("error", "Nama wajib diisi."); return; }
+    try {
+      await api(`${t.path}/${encodeURIComponent(save.dataset.cfgsave)}`, jsonOpts("PUT", { nama }));
+      cfg.editingId = null; cfgMsg("ok", `${t.singular} berhasil diubah.`);
+      await refreshAfterMasterChange();
+    } catch (err) { cfgMsg("error", errText(err)); }
+    return;
+  }
+  const del = e.target.closest("[data-cfgdel]");
+  if (del) {
+    const row = cfg.rows.find((r) => String(r.id) === del.dataset.cfgdel);
+    if (!confirm(`Hapus ${t.singular} "${row ? row.nama : ""}"?`)) return;
+    try {
+      await api(`${t.path}/${encodeURIComponent(del.dataset.cfgdel)}`, { method: "DELETE" });
+      cfgMsg("ok", `${t.singular} berhasil dihapus.`);
+      await refreshAfterMasterChange();
+    } catch (err) { cfgMsg("error", errText(err)); }
+  }
+});
+$("#configBody").addEventListener("keydown", (e) => {
+  if (e.target.id !== "cfgEditInput") return;
+  if (e.key === "Enter") { e.preventDefault(); const b = $("[data-cfgsave]"); if (b) b.click(); }
+  if (e.key === "Escape") { cfg.editingId = null; renderConfigBody(); }
+});
+
+async function loadMaster() {
+  const [pm, bp, units, enums] = await Promise.all([api("/master/pm"), api("/master/bp"), api("/master/units"), api("/master/enums")]);
+  master = { pm: pm.data, bp: bp.data, units: units.data, enums: { kategori: enums.data.kategori, status: enums.data.status } };
+  return master;
+}
 
 async function init() {
   try {
-    const [pm, bp, units, enums] = await Promise.all([api("/master/pm"), api("/master/bp"), api("/master/units"), api("/master/enums")]);
-    master = { pm: pm.data, bp: bp.data, units: units.data, enums: { kategori: enums.data.kategori, status: enums.data.status } };
+    await loadMaster();
     setPill("ok", "Server terhubung");
-    if (!pm.data.length || !bp.data.length || !units.data.length) setAlert("warn", "Data master (PM / BP / Unit) masih kosong. Jalankan: npx prisma db seed");
+    if (!master.pm.length || !master.bp.length || !master.units.length) setAlert("warn", "Data master (PM / BP / Unit) masih kosong. Jalankan: npx prisma db seed");
   } catch (e) {
     setPill("down", "Server tidak terjangkau");
     setAlert("error", e.message);
