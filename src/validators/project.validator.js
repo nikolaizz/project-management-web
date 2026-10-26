@@ -66,15 +66,14 @@ export const updateProjectSchema = z
     nextAction: z.string().trim().min(1, "Next action wajib diisi").optional(),
   })
   .partial()
-  .superRefine((data, ctx) => {
-    if (data.status === undefined) return;
-    if (!data.aktivitas) {
-      ctx.addIssue({ code: "custom", path: ["aktivitas"], message: "Aktivitas wajib diisi saat status diubah" });
-    }
-    if (!data.nextAction) {
-      ctx.addIssue({ code: "custom", path: ["nextAction"], message: "Next action wajib diisi saat status diubah" });
-    }
-  });
+  .refine(
+    (d) => {
+      const adaCatatan = d.aktivitas || d.kendala || d.nextAction;
+      const perluCatatan = d.status !== undefined || adaCatatan;
+      return !perluCatatan || (d.aktivitas && d.nextAction);
+    },
+    { message: "Aktivitas dan next action wajib diisi untuk mencatat update", path: ["aktivitas"] }
+  );
   
   // PUT /projects/:id/stages: kirim hanya tahapan yang berubah
 export const updateStagesSchema = z.object({

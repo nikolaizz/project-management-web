@@ -241,22 +241,23 @@ export async function updateProject(req, res, next) {
     if ("status" in d) data.status = d.status;
 
     const statusChanged = d.status !== undefined && d.status !== existing.status;
+    const adaCatatan = Boolean(d.aktivitas && d.nextAction);
     const project = await prisma.$transaction(async (tx) => {
       const updated = await tx.project.update({
         where: { id },
-        data,
+        data: { ...data, ...(statusChanged ? { status: d.status } : {}) },
         include: projectInclude,
       });
 
-      if (statusChanged) {
+      if (statusChanged || adaCatatan) {
         await tx.projectUpdate.create({
           data: {
             projectId: id,
-            status: d.status,
+            status: updated.status,
             aktivitas: d.aktivitas,
             kendala: d.kendala || null,
             nextAction: d.nextAction,
-            modifiedById: req.user.id 
+            modifiedById: req.user?.id ?? null, // middleware auth menambahkan req.user
           },
         });
       }

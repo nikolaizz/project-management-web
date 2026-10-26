@@ -583,8 +583,9 @@ function renderEditForm(p) {
       <div><label for="edit-ownerPic">Owner / PIC</label><input id="edit-ownerPic" name="ownerPic" value="${esc(p.ownerPic)}" required></div>
       <div><label for="edit-tanggalProject">Tanggal project</label><input id="edit-tanggalProject" name="tanggalProject" type="date" value="${date(p.tanggalProject)}" required></div>
       <div><label for="edit-targetGoLive">Target go live</label><input id="edit-targetGoLive" name="targetGoLive" type="date" value="${date(p.targetGoLive)}"></div>
-      <div id="statusUpdateFields" class="full" hidden>
-        <h3>Catatan perubahan status</h3>
+      <div id="statusUpdateFields" class="full">
+        <h3>Catatan update</h3>
+        <p class="hint" id="noteHint"></p>
         <div class="grid">
           <div class="full"><label for="edit-aktivitas">Aktivitas / progress / outcome</label><textarea id="edit-aktivitas" name="aktivitas"></textarea></div>
           <div><label for="edit-kendala">Kendala / issue (opsional)</label><textarea id="edit-kendala" name="kendala"></textarea></div>
@@ -592,7 +593,6 @@ function renderEditForm(p) {
         </div>
       </div>
     </div>
-    <p class="hint">Jika status berubah, isi aktivitas dan next action untuk mencatatnya di riwayat project.</p>
     <div id="editProjectError" class="alert error" role="alert" hidden></div>
     <div class="dialog-actions"><button type="button" data-close-edit>Batal</button><button type="submit" class="primary">Simpan perubahan</button></div>
   </form>`;
@@ -602,9 +602,14 @@ function updateStatusFields() {
   const form = $("#editProjectForm");
   if (!form) return;
   const changed = form.elements.status.value !== form.dataset.originalStatus;
-  $("#statusUpdateFields").hidden = !changed;
-  form.elements.aktivitas.required = changed;
-  form.elements.nextAction.required = changed;
+  const hasNote = ["aktivitas", "kendala", "nextAction"].some((n) => form.elements[n].value.trim() !== "");
+  // Catatan wajib jika status berubah, atau jika salah satu kolom catatan sudah diisi
+  const needed = changed || hasNote;
+  form.elements.aktivitas.required = needed;
+  form.elements.nextAction.required = needed;
+  $("#noteHint").textContent = changed
+    ? "Status berubah, jadi aktivitas dan next action wajib diisi."
+    : "Status tidak berubah. Isi aktivitas dan next action jika ingin mencatat update tanpa mengubah status.";
 }
 
 async function openEditProject(id) {
@@ -630,6 +635,9 @@ $("#editProjectDialog").addEventListener("click", (e) => {
 $("#editProjectDialog").addEventListener("change", (e) => {
   if (e.target.name === "status") updateStatusFields();
 });
+$("#editProjectDialog").addEventListener("input", (e) => {
+  if (["aktivitas", "kendala", "nextAction"].includes(e.target.name)) updateStatusFields();
+});
 $("#editProjectDialog").addEventListener("submit", async (e) => {
   if (e.target.id !== "editProjectForm") return;
   e.preventDefault();
@@ -651,12 +659,15 @@ $("#editProjectDialog").addEventListener("submit", async (e) => {
     tanggalProject: data.get("tanggalProject"),
     targetGoLive: data.get("targetGoLive") || null,
   };
-  if (payload.status !== form.dataset.originalStatus) {
-    payload.aktivitas = String(data.get("aktivitas")).trim();
-    payload.kendala = String(data.get("kendala")).trim() || null;
-    payload.nextAction = String(data.get("nextAction")).trim();
-  } else {
-    delete payload.status;
+  const statusChanged = payload.status !== form.dataset.originalStatus;
+  const aktivitas = String(data.get("aktivitas")).trim();
+  const kendala = String(data.get("kendala")).trim();
+  const nextAction = String(data.get("nextAction")).trim();
+  if (!statusChanged) delete payload.status;
+  if (statusChanged || aktivitas || kendala || nextAction) {
+    payload.aktivitas = aktivitas;
+    payload.kendala = kendala || null;
+    payload.nextAction = nextAction;
   }
   submitButton.disabled = true;
   submitButton.textContent = "Menyimpan...";
