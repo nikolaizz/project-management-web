@@ -587,6 +587,35 @@ function editMasterSelect(name, label, choices, selected) {
   return `<div><label for="edit-${name}">${label}</label><select id="edit-${name}" name="${name}" required>${optionsHtml}</select></div>`;
 }
 
+let editFiles = [];
+
+function editDocsListHtml(list) {
+  if (!list.length) return `<p class="hint">Belum ada dokumen.</p>`;
+  return `<ul class="files">${list.map((d) => `<li><span class="nm"><a href="${API}/documents/${d.id}/download">${esc(d.namaFile)}</a> <small>(${fmtSize(d.ukuran)})</small></span><button type="button" class="small danger" data-editdeldoc="${d.id}">Hapus</button></li>`).join("")}</ul>`;
+}
+
+function renderEditNewFiles() {
+  const box = $("#editNewFiles");
+  if (!box) return;
+  box.innerHTML = editFiles.map((f, i) => `<li><span class="nm">${esc(f.name)} <small>(${fmtSize(f.size)}) · akan ditambahkan</small></span><button type="button" class="small danger" data-editrm="${i}">Batal</button></li>`).join("");
+}
+
+function addEditFiles(list) {
+  const bad = [];
+  for (const f of list) {
+    const ext = (f.name.match(/\.[^.]+$/) || [""])[0].toLowerCase();
+    if (!ALLOWED.includes(ext)) { bad.push(`${f.name}: tipe file tidak diizinkan`); continue; }
+    if (f.size > MAX_SIZE) { bad.push(`${f.name}: lebih dari 10 MB`); continue; }
+    if (editFiles.some((x) => x.name === f.name && x.size === f.size)) continue;
+    if (editFiles.length >= MAX_FILES) { bad.push(`${f.name}: maksimal ${MAX_FILES} file sekali tambah`); continue; }
+    editFiles.push(f);
+  }
+  renderEditNewFiles();
+  const warn = $("#editFileWarn");
+  warn.textContent = bad.length ? "Sebagian file ditolak. " + bad.join("; ") : "";
+  warn.hidden = !bad.length;
+}
+
 function renderEditForm(p) {
   const date = (value) => value ? esc(String(value).slice(0, 10)) : "";
   $("#editProjectDialog").innerHTML = `<form id="editProjectForm">
@@ -614,7 +643,17 @@ function renderEditForm(p) {
           <div><label for="edit-nextAction">Next action</label><textarea id="edit-nextAction" name="nextAction"></textarea></div>
         </div>
       </div>
+      <div class="full" id="editDocsSection">
+        <h3>Dokumen pendukung</h3>
+        <div id="editExistingDocs">${editDocsListHtml(p.documents || [])}</div>
+        <label class="drop" id="editDrop" style="margin-top:12px"><input type="file" id="editFileInput" multiple accept="${ALLOWED.join(",")}" hidden>
+          Klik atau seret file ke sini untuk menambah dokumen
+          <small>PDF, DOC, DOCX, XLS, XLSX, JPG, PNG. Maksimal 10 MB per file, 10 file sekali tambah.</small>
+        </label>
+        <ul class="files" id="editNewFiles"></ul>
+      </div>
     </div>
+    <div id="editFileWarn" class="alert warn" role="status" hidden></div>
     <div id="editProjectError" class="alert error" role="alert" hidden></div>
     <div class="dialog-actions"><button type="button" data-close-edit>Batal</button><button type="submit" class="primary">Simpan perubahan</button></div>
   </form>`;
@@ -636,6 +675,7 @@ function updateStatusFields() {
 
 async function openEditProject(id) {
   const r = await api(`/projects/${id}`);
+  editFiles = [];
   renderEditForm(r.data);
   $("#editProjectForm").dataset.projectId = id;
   $("#editProjectForm").dataset.originalStatus = r.data.status;
@@ -656,6 +696,27 @@ $("#editProjectDialog").addEventListener("click", (e) => {
 });
 $("#editProjectDialog").addEventListener("change", (e) => {
   if (e.target.name === "status") updateStatusFields();
+});
+$("#editProjectDialog").addEventListener("change", (e) => {
+  if (e.target.id === "editFileInput") { addEditFiles([...e.target.files]); e.target.value = ""; }
+});
+$("#editProjectDialog").addEventListener("dragover", (e) => { const d = e.target.closest("#editDrop"); if (d) { e.preventDefault(); d.classList.add("over"); } });
+$("#editProjectDialog").addEventListener("dragleave", (e) => { const d = e.target.closest("#editDrop"); if (d) d.classList.remove("over"); });
+$("#editProjectDialog").addEventListener("drop", (e) => { const d = e.target.closest("#editDrop"); if (d) { e.preventDefault(); d.classList.remove("over"); addEditFiles([...e.dataTransfer.files]); } });
+$("#editProjectDialog").addEventListener("click", async (e) => {
+  const rm = e.target.closest("[data-editrm]");
+  if (rm) { editFiles.splice(Number(rm.dataset.editrm), 1); renderEditNewFiles(); return; }
+  const del = e.target.closest("[data-editdeldoc]");
+  if (!del) return;
+  if (!confirm("Hapus dokumen ini? Penghapusan langsung berlaku, tanpa menunggu tombol Simpan.")) return;
+  const error = $("#editProjectError");
+  error.hidden = true;
+  try {
+    await api(`/documents/${del.dataset.editdeldoc}`, { method: "DELETE" });
+    const r = await api(`/projects/${$("#editProjectForm").dataset.projectId}/documents`);
+    $("#editExistingDocs").innerHTML = editDocsListHtml(r.data);
+    loadProjects();
+  } catch (err) { error.textContent = err.message; error.hidden = false; }
 });
 $("#editProjectDialog").addEventListener("input", (e) => {
   if (["aktivitas", "kendala", "nextAction"].includes(e.target.name)) updateStatusFields();
@@ -694,18 +755,33 @@ $("#editProjectDialog").addEventListener("submit", async (e) => {
   submitButton.disabled = true;
   submitButton.textContent = "Menyimpan...";
   error.hidden = true;
+  const saved = () => form.dataset.saved === "1";
   try {
-    await api(`/projects/${form.dataset.projectId}`, {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload),
-    });
+    // Data project disimpan sekali saja; kalau unggah dokumen gagal, percobaan ulang hanya mengirim dokumen
+    if (!saved()) {
+      await api(`/projects/${form.dataset.projectId}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+      form.dataset.saved = "1";
+    }
+    const jumlah = editFiles.length;
+    if (jumlah) {
+      const fd = new FormData();
+      editFiles.forEach((f) => fd.append("files", f));
+      await api(`/projects/${form.dataset.projectId}/documents`, { method: "POST", body: fd });
+      editFiles = [];
+    }
     $("#editProjectDialog").close();
-    $("#projectsMessage").innerHTML = `<div class="alert ok">Perubahan project berhasil disimpan.</div>`;
+    $("#projectsMessage").innerHTML = `<div class="alert ok">Perubahan project berhasil disimpan${jumlah ? `, ${jumlah} dokumen ditambahkan` : ""}.</div>`;
     await loadProjects();
   } catch (err) {
-    error.textContent = err.message;
+    error.textContent = saved()
+      ? `Perubahan data project sudah tersimpan, tetapi dokumen gagal diunggah: ${err.message}. Periksa file lalu klik Simpan lagi; hanya dokumen yang akan dikirim ulang.`
+      : err.message;
     error.hidden = false;
+    if (saved()) loadProjects();
   } finally {
     submitButton.disabled = false;
     submitButton.textContent = "Simpan perubahan";
