@@ -2,25 +2,75 @@ import prisma from "../lib/prisma.js";
 import { buildWhatsAppText } from "../lib/whatsapp.js";
 import { todayWIB } from "../lib/dates.js";
 
+const projectInclude = {
+  pm: { select: { nama: true } },
+  bp: { select: { nama: true } },
+};
+
+// Ambil semua project yang disebut; kembalikan Map beserta daftar ID yang tidak ada
+async function loadProjects(items) {
+  const ids = items.map((i) => i.projectId);
+  const projects = await prisma.project.findMany({
+    where: { id: { in: ids } },
+    include: projectInclude,
+  });
+  const byId = new Map(projects.map((p) => [p.id, p]));
+  const hilang = ids.filter((id) => !byId.has(id));
+  return { byId, hilang };
+}
+
+// Susun teks WhatsApp dari isian dan data project.
+// placeholder: untuk preview, isian kosong ditampilkan sebagai "-"
+function composeText(items, byId, tanggal, { placeholder = false } = {}) {
+  return buildWhatsAppText(
+    items.map((it) => {
+      const p = byId.get(it.projectId);
+      return {
+        nama: p.nama,
+        status: it.status ?? p.status,
+        prioritas: p.prioritas,
+        pmNama: p.pm.nama,
+        bpNama: p.bp.nama,
+        ownerPic: p.ownerPic,
+        targetGoLive: p.targetGoLive,
+        aktivitas: it.aktivitas || (placeholder ? "-" : it.aktivitas),
+        kendala: it.kendala,
+        nextAction: it.nextAction || (placeholder ? "-" : it.nextAction),
+      };
+    }),
+    tanggal
+  );
+}
+
+const tidakDitemukan = (res, hilang) =>
+  res.status(404).json({
+    success: false,
+    message: `Project tidak ditemukan: ID ${hilang.join(", ")}`,
+  });
+
+// ---------- POST /daily-updates/preview (tidak menyimpan apa pun) ----------
+export async function previewDailyUpdates(req, res, next) {
+  try {
+    const { items } = req.body;
+    const { byId, hilang } = await loadProjects(items);
+    if (hilang.length) return tidakDitemukan(res, hilang);
+
+    res.json({
+      success: true,
+      text: composeText(items, byId, todayWIB(), { placeholder: true }),
+    });
+  } catch (err) {
+    next(err);
+  }
+}
+
 // ---------- POST /daily-updates ----------
 export async function createDailyUpdates(req, res, next) {
   try {
     const { items } = req.body; // sudah divalidasi
 
-    // Pastikan semua project ada sebelum menyimpan apa pun
-    const ids = items.map((i) => i.projectId);
-    const projects = await prisma.project.findMany({
-      where: { id: { in: ids } },
-      include: { pm: { select: { nama: true } }, bp: { select: { nama: true } } },
-    });
-    const byId = new Map(projects.map((p) => [p.id, p]));
-    const hilang = ids.filter((id) => !byId.has(id));
-    if (hilang.length) {
-      return res.status(404).json({
-        success: false,
-        message: `Project tidak ditemukan: ID ${hilang.join(", ")}`,
-      });
-    }
+    const { byId, hilang } = await loadProjects(items);
+    if (hilang.length) return tidakDitemukan(res, hilang);
 
     const tanggal = todayWIB(); // "YYYY-MM-DD" menurut WIB
 
@@ -53,30 +103,11 @@ export async function createDailyUpdates(req, res, next) {
       return created;
     });
 
-    const text = buildWhatsAppText(
-      items.map((it) => {
-        const p = byId.get(it.projectId);
-        return {
-          nama: p.nama,
-          status: it.status ?? p.status,
-          prioritas: p.prioritas,
-          pmNama: p.pm.nama,
-          bpNama: p.bp.nama,
-          ownerPic: p.ownerPic,
-          targetGoLive: p.targetGoLive,
-          aktivitas: it.aktivitas,
-          kendala: it.kendala,
-          nextAction: it.nextAction,
-        };
-      }),
-      tanggal
-    );
-
     res.status(201).json({
       success: true,
       message: `${rows.length} update berhasil disimpan`,
       data: rows,
-      text,
+      text: composeText(items, byId, tanggal),
     });
   } catch (err) {
     next(err);

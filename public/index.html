@@ -126,6 +126,9 @@ input.ro{background:var(--bg);color:var(--muted)}
 .daily-actions .spacer{flex:1}
 .wa-bubble{background:#e7f6d8;border:1px solid #cfe8bb;border-radius:12px;padding:14px;font-size:14px;line-height:1.5;white-space:pre-wrap;min-height:180px;overflow-wrap:anywhere}
 button.wa-copy{background:#1f8a4c;border-color:#1f8a4c;color:#fff}
+.wa-state{display:inline-block;font-size:12px;font-weight:600;padding:2px 10px;border-radius:999px;margin-bottom:8px}
+.wa-state.warn{background:var(--warn-bg);color:var(--warn)}
+.wa-state.ok{background:var(--ok-bg);color:var(--ok)}
 .wa-actions{display:grid;gap:8px;margin-top:12px}
 .wa-actions button{width:100%}
 .history-pick{display:flex;align-items:center;gap:8px;min-width:0;flex:1;max-width:460px}
@@ -207,11 +210,13 @@ button.wa-copy{background:#1f8a4c;border-color:#1f8a4c;color:#fff}
             <button type="button" id="btnAddBlock">+ Tambah project lainnya</button>
             <span class="spacer"></span>
             <button type="button" id="btnDailyReset">Reset</button>
+            <button type="button" id="btnDailyPreview">Preview</button>
             <button type="button" class="primary" id="btnDailySubmit">Simpan &amp; Generate</button>
           </div>
         </div>
         <div class="card">
           <h2>Preview format WhatsApp</h2>
+          <div id="waState" class="wa-state" hidden></div>
           <div id="waPreview" class="wa-bubble"></div>
           <p class="hint" style="margin-top:8px">Tanda * pada teks yang disalin otomatis menjadi huruf tebal di WhatsApp.</p>
           <div class="wa-actions">
@@ -1041,7 +1046,7 @@ $("#configBody").addEventListener("keydown", (e) => {
 
 // ---------- Update progress harian ----------
 const newBlock = () => ({ projectId: "", status: "", aktivitas: "", kendala: "", nextAction: "" });
-const daily = { projects: [], historyId: "", latestId: "", blocks: [newBlock()], locked: false, busy: false, text: "", errors: {} };
+const daily = { projects: [], historyId: "", latestId: "", blocks: [newBlock()], locked: false, busy: false, previewing: false, text: "", previewText: "", stale: false, errors: {} };
 const fmtTodayWIB = () => new Intl.DateTimeFormat("id-ID", { timeZone: "Asia/Jakarta", weekday: "long", day: "numeric", month: "long", year: "numeric" }).format(new Date());
 const dailyMsg = (type, msg) => { $("#dailyMessage").innerHTML = msg ? `<div class="alert ${type}">${esc(msg)}</div>` : ""; };
 const projectOf = (id) => daily.projects.find((x) => String(x.id) === String(id));
@@ -1096,9 +1101,52 @@ function renderDaily() {
   $("#btnCopyClip").disabled = !daily.text;
   $("#btnCopyOpen").disabled = !daily.text;
   if (!daily.text) $("#waStatus").innerHTML = "";
+  $("#btnDailyPreview").disabled = daily.locked || daily.busy || daily.previewing;
+  $("#btnDailyPreview").textContent = daily.previewing ? "Memuat..." : "Preview";
+  const shown = daily.locked ? daily.text : daily.previewText; // teks tersimpan lebih diutamakan
   const wa = $("#waPreview");
-  if (daily.text) wa.innerHTML = waToHtml(daily.text);
-  else wa.innerHTML = `<span class="hint">Teks WhatsApp muncul di sini setelah Simpan &amp; Generate.</span>`;
+  if (shown) wa.innerHTML = waToHtml(shown);
+  else wa.innerHTML = `<span class="hint">Klik Preview untuk melihat teks tanpa menyimpan, atau Simpan &amp; Generate untuk menyimpan.</span>`;
+  updatePreviewState();
+}
+
+// Label di atas preview: Tersimpan / Preview (belum disimpan) / Preview lama
+function updatePreviewState() {
+  const st = $("#waState");
+  if (daily.locked && daily.text) {
+    st.hidden = false; st.className = "wa-state ok"; st.textContent = "Tersimpan";
+  } else if (daily.previewText) {
+    st.hidden = false; st.className = "wa-state warn";
+    st.textContent = daily.stale ? "Preview lama: isian sudah berubah, klik Preview lagi" : "Preview, belum disimpan";
+  } else {
+    st.hidden = true;
+  }
+}
+function markStale() {
+  if (daily.previewText && !daily.locked && !daily.stale) { daily.stale = true; updatePreviewState(); }
+}
+
+const dailyItems = () => daily.blocks.map((b) => ({
+  projectId: b.projectId, status: b.status || undefined,
+  aktivitas: b.aktivitas.trim(), kendala: b.kendala.trim() || null, nextAction: b.nextAction.trim(),
+}));
+
+// Preview: teks dibuat server dari isian saat ini, tanpa menyimpan apa pun
+async function previewDaily() {
+  if (daily.busy || daily.locked || daily.previewing) return;
+  dailyMsg("ok", "");
+  const e = {};
+  daily.blocks.forEach((b, i) => { if (!b.projectId) e[`items.${i}.projectId`] = "Pilih project"; });
+  if (Object.keys(e).length) {
+    daily.errors = e; renderDaily();
+    return dailyMsg("error", "Pilih project di setiap blok untuk melihat preview.");
+  }
+  daily.errors = {}; daily.previewing = true; renderDaily();
+  try {
+    const r = await api("/daily-updates/preview", jsonOpts("POST", { items: dailyItems() }));
+    daily.previewText = r.text; daily.stale = false;
+  } catch (err) { dailyMsg("error", errText(err)); }
+  daily.previewing = false; renderDaily();
 }
 
 async function loadDailyProjects() {
@@ -1145,7 +1193,7 @@ async function openDailyPage() {
 }
 
 function resetDaily() {
-  Object.assign(daily, { blocks: [newBlock()], locked: false, busy: false, text: "", errors: {} });
+  Object.assign(daily, { blocks: [newBlock()], locked: false, busy: false, previewing: false, text: "", previewText: "", stale: false, errors: {} });
   dailyMsg("ok", "");
   openDailyPage();
 }
@@ -1171,12 +1219,7 @@ async function submitDaily() {
   }
   daily.busy = true; renderDaily();
   try {
-    const r = await api("/daily-updates", jsonOpts("POST", {
-      items: daily.blocks.map((b) => ({
-        projectId: b.projectId, status: b.status || undefined,
-        aktivitas: b.aktivitas.trim(), kendala: b.kendala.trim() || null, nextAction: b.nextAction.trim(),
-      })),
-    }));
+    const r = await api("/daily-updates", jsonOpts("POST", { items: dailyItems() }));
     daily.text = r.text; daily.locked = true; daily.busy = false;
     renderDaily();
     dailyMsg("ok", `${r.data.length} update tersimpan. Teks WhatsApp siap disalin.`);
@@ -1193,6 +1236,7 @@ async function submitDaily() {
 $(".side-nav").addEventListener("click", (e) => { if (e.target.closest('[data-page="dailyPage"]')) openDailyPage(); });
 $("#btnAddBlock").onclick = () => {
   daily.blocks.push(newBlock());
+  markStale();
   renderDaily();
   const sel = $(`#d-project-${daily.blocks.length - 1}`); if (sel) sel.focus();
 };
@@ -1202,6 +1246,7 @@ $("#btnDailyReset").onclick = () => {
   resetDaily();
 };
 $("#btnDailySubmit").onclick = submitDaily;
+$("#btnDailyPreview").onclick = previewDaily;
 async function copyToClipboard(text) {
   try {
     await navigator.clipboard.writeText(text);
@@ -1247,6 +1292,7 @@ $("#dailyBlocks").addEventListener("input", (e) => {
   const k = e.target.dataset.d;
   if (k === undefined || k === "projectId") return;
   daily.blocks[e.target.dataset.i][k] = e.target.value;
+  markStale();
   const key = e.target.dataset.ek;
   if (daily.errors[key]) {
     delete daily.errors[key]; e.target.classList.remove("invalid");
@@ -1256,10 +1302,11 @@ $("#dailyBlocks").addEventListener("input", (e) => {
 $("#dailyBlocks").addEventListener("change", (e) => {
   const k = e.target.dataset.d;
   if (k === undefined) return;
-  if (k !== "projectId") { daily.blocks[e.target.dataset.i][k] = e.target.value; return; }
+  if (k !== "projectId") { daily.blocks[e.target.dataset.i][k] = e.target.value; markStale(); return; }
   const i = Number(e.target.dataset.i), b = daily.blocks[i], p = projectOf(e.target.value);
   b.projectId = e.target.value;
   b.status = p ? p.status : "";
+  markStale();
   delete daily.errors[`items.${i}.projectId`];
   if (b.projectId) { // tabel riwayat ikut berpindah ke project yang baru dipilih
     daily.historyId = b.projectId;
@@ -1274,6 +1321,7 @@ $("#dailyBlocks").addEventListener("click", (e) => {
   if (!rm) return;
   daily.blocks.splice(Number(rm.dataset.dremove), 1);
   daily.errors = {};
+  markStale();
   renderDaily();
 });
 
