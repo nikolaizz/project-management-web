@@ -213,6 +213,7 @@ button.wa-copy{background:#1f8a4c;border-color:#1f8a4c;color:#fff}
         <div class="card">
           <h2>Preview format WhatsApp</h2>
           <div id="waPreview" class="wa-bubble"></div>
+          <p class="hint" style="margin-top:8px">Tanda * pada teks yang disalin otomatis menjadi huruf tebal di WhatsApp.</p>
           <div class="wa-actions">
             <button type="button" id="btnCopyClip" disabled>Copy to clipboard</button>
             <button type="button" class="wa-copy" id="btnCopyOpen" disabled>Copy &amp; buka WhatsApp</button>
@@ -222,7 +223,7 @@ button.wa-copy{background:#1f8a4c;border-color:#1f8a4c;color:#fff}
       </div>
       <div class="card" style="margin-top:20px">
         <div class="head">
-          <h2 id="historyTitle">Riwayat Generate Update WhatsApp</h2>
+          <h2 id="historyTitle">Historical aktivitas &amp; updates</h2>
           <div class="history-pick"><label for="historySelect">Project</label><select id="historySelect"></select></div>
         </div>
         <div id="dailyHistory" class="tablewrap"><p class="empty">Pilih project untuk melihat riwayat.</p></div>
@@ -1073,6 +1074,12 @@ function dailyBlockHtml(i) {
   </div>`;
 }
 
+// Tampilan preview: teks *tebal* ala WhatsApp ditampilkan sebagai huruf tebal.
+// Teks yang disalin tetap asli (dengan tanda *), karena WhatsApp yang akan membuatnya tebal.
+function waToHtml(text) {
+  return esc(text).replace(/\*(?=\S)([^*\n]*?\S)\*/g, "<strong>$1</strong>");
+}
+
 function renderDaily() {
   const box = $("#dailyBlocks");
   box.innerHTML = daily.blocks.map((_, i) => dailyBlockHtml(i)).join("");
@@ -1090,7 +1097,7 @@ function renderDaily() {
   $("#btnCopyOpen").disabled = !daily.text;
   if (!daily.text) $("#waStatus").innerHTML = "";
   const wa = $("#waPreview");
-  if (daily.text) wa.textContent = daily.text;
+  if (daily.text) wa.innerHTML = waToHtml(daily.text);
   else wa.innerHTML = `<span class="hint">Teks WhatsApp muncul di sini setelah Simpan &amp; Generate.</span>`;
 }
 
