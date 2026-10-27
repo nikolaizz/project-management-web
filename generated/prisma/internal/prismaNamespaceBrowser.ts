@@ -58,7 +58,8 @@ export const ModelName = {
   Project: 'Project',
   Document: 'Document',
   ProjectUpdate: 'ProjectUpdate',
-  ProjectStage: 'ProjectStage'
+  ProjectStage: 'ProjectStage',
+  DailyUpdate: 'DailyUpdate'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -172,6 +173,21 @@ export const ProjectStageScalarFieldEnum = {
 } as const
 
 export type ProjectStageScalarFieldEnum = (typeof ProjectStageScalarFieldEnum)[keyof typeof ProjectStageScalarFieldEnum]
+
+
+export const DailyUpdateScalarFieldEnum = {
+  id: 'id',
+  projectId: 'projectId',
+  tanggal: 'tanggal',
+  createdAt: 'createdAt',
+  status: 'status',
+  aktivitas: 'aktivitas',
+  kendala: 'kendala',
+  nextAction: 'nextAction',
+  updatedById: 'updatedById'
+} as const
+
+export type DailyUpdateScalarFieldEnum = (typeof DailyUpdateScalarFieldEnum)[keyof typeof DailyUpdateScalarFieldEnum]
 
 
 export const SortOrder = {

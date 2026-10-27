@@ -314,6 +314,7 @@ export type ProjectWhereInput = {
   documents?: Prisma.DocumentListRelationFilter
   updates?: Prisma.ProjectUpdateListRelationFilter
   stages?: Prisma.ProjectStageListRelationFilter
+  dailyUpdates?: Prisma.DailyUpdateListRelationFilter
 }
 
 export type ProjectOrderByWithRelationInput = {
@@ -339,6 +340,7 @@ export type ProjectOrderByWithRelationInput = {
   documents?: Prisma.DocumentOrderByRelationAggregateInput
   updates?: Prisma.ProjectUpdateOrderByRelationAggregateInput
   stages?: Prisma.ProjectStageOrderByRelationAggregateInput
+  dailyUpdates?: Prisma.DailyUpdateOrderByRelationAggregateInput
 }
 
 export type ProjectWhereUniqueInput = Prisma.AtLeast<{
@@ -367,6 +369,7 @@ export type ProjectWhereUniqueInput = Prisma.AtLeast<{
   documents?: Prisma.DocumentListRelationFilter
   updates?: Prisma.ProjectUpdateListRelationFilter
   stages?: Prisma.ProjectStageListRelationFilter
+  dailyUpdates?: Prisma.DailyUpdateListRelationFilter
 }, "id" | "kodeProject">
 
 export type ProjectOrderByWithAggregationInput = {
@@ -434,6 +437,7 @@ export type ProjectCreateInput = {
   documents?: Prisma.DocumentCreateNestedManyWithoutProjectInput
   updates?: Prisma.ProjectUpdateCreateNestedManyWithoutProjectInput
   stages?: Prisma.ProjectStageCreateNestedManyWithoutProjectInput
+  dailyUpdates?: Prisma.DailyUpdateCreateNestedManyWithoutProjectInput
 }
 
 export type ProjectUncheckedCreateInput = {
@@ -456,6 +460,7 @@ export type ProjectUncheckedCreateInput = {
   documents?: Prisma.DocumentUncheckedCreateNestedManyWithoutProjectInput
   updates?: Prisma.ProjectUpdateUncheckedCreateNestedManyWithoutProjectInput
   stages?: Prisma.ProjectStageUncheckedCreateNestedManyWithoutProjectInput
+  dailyUpdates?: Prisma.DailyUpdateUncheckedCreateNestedManyWithoutProjectInput
 }
 
 export type ProjectUpdateInput = {
@@ -477,6 +482,7 @@ export type ProjectUpdateInput = {
   documents?: Prisma.DocumentUpdateManyWithoutProjectNestedInput
   updates?: Prisma.ProjectUpdateUpdateManyWithoutProjectNestedInput
   stages?: Prisma.ProjectStageUpdateManyWithoutProjectNestedInput
+  dailyUpdates?: Prisma.DailyUpdateUpdateManyWithoutProjectNestedInput
 }
 
 export type ProjectUncheckedUpdateInput = {
@@ -499,6 +505,7 @@ export type ProjectUncheckedUpdateInput = {
   documents?: Prisma.DocumentUncheckedUpdateManyWithoutProjectNestedInput
   updates?: Prisma.ProjectUpdateUncheckedUpdateManyWithoutProjectNestedInput
   stages?: Prisma.ProjectStageUncheckedUpdateManyWithoutProjectNestedInput
+  dailyUpdates?: Prisma.DailyUpdateUncheckedUpdateManyWithoutProjectNestedInput
 }
 
 export type ProjectCreateManyInput = {
@@ -828,6 +835,20 @@ export type ProjectUpdateOneRequiredWithoutStagesNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.ProjectUpdateToOneWithWhereWithoutStagesInput, Prisma.ProjectUpdateWithoutStagesInput>, Prisma.ProjectUncheckedUpdateWithoutStagesInput>
 }
 
+export type ProjectCreateNestedOneWithoutDailyUpdatesInput = {
+  create?: Prisma.XOR<Prisma.ProjectCreateWithoutDailyUpdatesInput, Prisma.ProjectUncheckedCreateWithoutDailyUpdatesInput>
+  connectOrCreate?: Prisma.ProjectCreateOrConnectWithoutDailyUpdatesInput
+  connect?: Prisma.ProjectWhereUniqueInput
+}
+
+export type ProjectUpdateOneRequiredWithoutDailyUpdatesNestedInput = {
+  create?: Prisma.XOR<Prisma.ProjectCreateWithoutDailyUpdatesInput, Prisma.ProjectUncheckedCreateWithoutDailyUpdatesInput>
+  connectOrCreate?: Prisma.ProjectCreateOrConnectWithoutDailyUpdatesInput
+  upsert?: Prisma.ProjectUpsertWithoutDailyUpdatesInput
+  connect?: Prisma.ProjectWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.ProjectUpdateToOneWithWhereWithoutDailyUpdatesInput, Prisma.ProjectUpdateWithoutDailyUpdatesInput>, Prisma.ProjectUncheckedUpdateWithoutDailyUpdatesInput>
+}
+
 export type ProjectCreateWithoutPmInput = {
   kategori: $Enums.KategoriProject
   jenis: $Enums.JenisProject
@@ -846,6 +867,7 @@ export type ProjectCreateWithoutPmInput = {
   documents?: Prisma.DocumentCreateNestedManyWithoutProjectInput
   updates?: Prisma.ProjectUpdateCreateNestedManyWithoutProjectInput
   stages?: Prisma.ProjectStageCreateNestedManyWithoutProjectInput
+  dailyUpdates?: Prisma.DailyUpdateCreateNestedManyWithoutProjectInput
 }
 
 export type ProjectUncheckedCreateWithoutPmInput = {
@@ -867,6 +889,7 @@ export type ProjectUncheckedCreateWithoutPmInput = {
   documents?: Prisma.DocumentUncheckedCreateNestedManyWithoutProjectInput
   updates?: Prisma.ProjectUpdateUncheckedCreateNestedManyWithoutProjectInput
   stages?: Prisma.ProjectStageUncheckedCreateNestedManyWithoutProjectInput
+  dailyUpdates?: Prisma.DailyUpdateUncheckedCreateNestedManyWithoutProjectInput
 }
 
 export type ProjectCreateOrConnectWithoutPmInput = {
@@ -935,6 +958,7 @@ export type ProjectCreateWithoutBpInput = {
   documents?: Prisma.DocumentCreateNestedManyWithoutProjectInput
   updates?: Prisma.ProjectUpdateCreateNestedManyWithoutProjectInput
   stages?: Prisma.ProjectStageCreateNestedManyWithoutProjectInput
+  dailyUpdates?: Prisma.DailyUpdateCreateNestedManyWithoutProjectInput
 }
 
 export type ProjectUncheckedCreateWithoutBpInput = {
@@ -956,6 +980,7 @@ export type ProjectUncheckedCreateWithoutBpInput = {
   documents?: Prisma.DocumentUncheckedCreateNestedManyWithoutProjectInput
   updates?: Prisma.ProjectUpdateUncheckedCreateNestedManyWithoutProjectInput
   stages?: Prisma.ProjectStageUncheckedCreateNestedManyWithoutProjectInput
+  dailyUpdates?: Prisma.DailyUpdateUncheckedCreateNestedManyWithoutProjectInput
 }
 
 export type ProjectCreateOrConnectWithoutBpInput = {
@@ -1002,6 +1027,7 @@ export type ProjectCreateWithoutUnitPengusulInput = {
   documents?: Prisma.DocumentCreateNestedManyWithoutProjectInput
   updates?: Prisma.ProjectUpdateCreateNestedManyWithoutProjectInput
   stages?: Prisma.ProjectStageCreateNestedManyWithoutProjectInput
+  dailyUpdates?: Prisma.DailyUpdateCreateNestedManyWithoutProjectInput
 }
 
 export type ProjectUncheckedCreateWithoutUnitPengusulInput = {
@@ -1023,6 +1049,7 @@ export type ProjectUncheckedCreateWithoutUnitPengusulInput = {
   documents?: Prisma.DocumentUncheckedCreateNestedManyWithoutProjectInput
   updates?: Prisma.ProjectUpdateUncheckedCreateNestedManyWithoutProjectInput
   stages?: Prisma.ProjectStageUncheckedCreateNestedManyWithoutProjectInput
+  dailyUpdates?: Prisma.DailyUpdateUncheckedCreateNestedManyWithoutProjectInput
 }
 
 export type ProjectCreateOrConnectWithoutUnitPengusulInput = {
@@ -1069,6 +1096,7 @@ export type ProjectCreateWithoutDocumentsInput = {
   unitPengusul: Prisma.UnitCreateNestedOneWithoutProjectsInput
   updates?: Prisma.ProjectUpdateCreateNestedManyWithoutProjectInput
   stages?: Prisma.ProjectStageCreateNestedManyWithoutProjectInput
+  dailyUpdates?: Prisma.DailyUpdateCreateNestedManyWithoutProjectInput
 }
 
 export type ProjectUncheckedCreateWithoutDocumentsInput = {
@@ -1090,6 +1118,7 @@ export type ProjectUncheckedCreateWithoutDocumentsInput = {
   updatedAt?: Date | string
   updates?: Prisma.ProjectUpdateUncheckedCreateNestedManyWithoutProjectInput
   stages?: Prisma.ProjectStageUncheckedCreateNestedManyWithoutProjectInput
+  dailyUpdates?: Prisma.DailyUpdateUncheckedCreateNestedManyWithoutProjectInput
 }
 
 export type ProjectCreateOrConnectWithoutDocumentsInput = {
@@ -1126,6 +1155,7 @@ export type ProjectUpdateWithoutDocumentsInput = {
   unitPengusul?: Prisma.UnitUpdateOneRequiredWithoutProjectsNestedInput
   updates?: Prisma.ProjectUpdateUpdateManyWithoutProjectNestedInput
   stages?: Prisma.ProjectStageUpdateManyWithoutProjectNestedInput
+  dailyUpdates?: Prisma.DailyUpdateUpdateManyWithoutProjectNestedInput
 }
 
 export type ProjectUncheckedUpdateWithoutDocumentsInput = {
@@ -1147,6 +1177,7 @@ export type ProjectUncheckedUpdateWithoutDocumentsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updates?: Prisma.ProjectUpdateUncheckedUpdateManyWithoutProjectNestedInput
   stages?: Prisma.ProjectStageUncheckedUpdateManyWithoutProjectNestedInput
+  dailyUpdates?: Prisma.DailyUpdateUncheckedUpdateManyWithoutProjectNestedInput
 }
 
 export type ProjectCreateWithoutUpdatesInput = {
@@ -1167,6 +1198,7 @@ export type ProjectCreateWithoutUpdatesInput = {
   unitPengusul: Prisma.UnitCreateNestedOneWithoutProjectsInput
   documents?: Prisma.DocumentCreateNestedManyWithoutProjectInput
   stages?: Prisma.ProjectStageCreateNestedManyWithoutProjectInput
+  dailyUpdates?: Prisma.DailyUpdateCreateNestedManyWithoutProjectInput
 }
 
 export type ProjectUncheckedCreateWithoutUpdatesInput = {
@@ -1188,6 +1220,7 @@ export type ProjectUncheckedCreateWithoutUpdatesInput = {
   updatedAt?: Date | string
   documents?: Prisma.DocumentUncheckedCreateNestedManyWithoutProjectInput
   stages?: Prisma.ProjectStageUncheckedCreateNestedManyWithoutProjectInput
+  dailyUpdates?: Prisma.DailyUpdateUncheckedCreateNestedManyWithoutProjectInput
 }
 
 export type ProjectCreateOrConnectWithoutUpdatesInput = {
@@ -1224,6 +1257,7 @@ export type ProjectUpdateWithoutUpdatesInput = {
   unitPengusul?: Prisma.UnitUpdateOneRequiredWithoutProjectsNestedInput
   documents?: Prisma.DocumentUpdateManyWithoutProjectNestedInput
   stages?: Prisma.ProjectStageUpdateManyWithoutProjectNestedInput
+  dailyUpdates?: Prisma.DailyUpdateUpdateManyWithoutProjectNestedInput
 }
 
 export type ProjectUncheckedUpdateWithoutUpdatesInput = {
@@ -1245,6 +1279,7 @@ export type ProjectUncheckedUpdateWithoutUpdatesInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   documents?: Prisma.DocumentUncheckedUpdateManyWithoutProjectNestedInput
   stages?: Prisma.ProjectStageUncheckedUpdateManyWithoutProjectNestedInput
+  dailyUpdates?: Prisma.DailyUpdateUncheckedUpdateManyWithoutProjectNestedInput
 }
 
 export type ProjectCreateWithoutStagesInput = {
@@ -1265,6 +1300,7 @@ export type ProjectCreateWithoutStagesInput = {
   unitPengusul: Prisma.UnitCreateNestedOneWithoutProjectsInput
   documents?: Prisma.DocumentCreateNestedManyWithoutProjectInput
   updates?: Prisma.ProjectUpdateCreateNestedManyWithoutProjectInput
+  dailyUpdates?: Prisma.DailyUpdateCreateNestedManyWithoutProjectInput
 }
 
 export type ProjectUncheckedCreateWithoutStagesInput = {
@@ -1286,6 +1322,7 @@ export type ProjectUncheckedCreateWithoutStagesInput = {
   updatedAt?: Date | string
   documents?: Prisma.DocumentUncheckedCreateNestedManyWithoutProjectInput
   updates?: Prisma.ProjectUpdateUncheckedCreateNestedManyWithoutProjectInput
+  dailyUpdates?: Prisma.DailyUpdateUncheckedCreateNestedManyWithoutProjectInput
 }
 
 export type ProjectCreateOrConnectWithoutStagesInput = {
@@ -1322,6 +1359,7 @@ export type ProjectUpdateWithoutStagesInput = {
   unitPengusul?: Prisma.UnitUpdateOneRequiredWithoutProjectsNestedInput
   documents?: Prisma.DocumentUpdateManyWithoutProjectNestedInput
   updates?: Prisma.ProjectUpdateUpdateManyWithoutProjectNestedInput
+  dailyUpdates?: Prisma.DailyUpdateUpdateManyWithoutProjectNestedInput
 }
 
 export type ProjectUncheckedUpdateWithoutStagesInput = {
@@ -1343,6 +1381,109 @@ export type ProjectUncheckedUpdateWithoutStagesInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   documents?: Prisma.DocumentUncheckedUpdateManyWithoutProjectNestedInput
   updates?: Prisma.ProjectUpdateUncheckedUpdateManyWithoutProjectNestedInput
+  dailyUpdates?: Prisma.DailyUpdateUncheckedUpdateManyWithoutProjectNestedInput
+}
+
+export type ProjectCreateWithoutDailyUpdatesInput = {
+  kategori: $Enums.KategoriProject
+  jenis: $Enums.JenisProject
+  kodeProject?: string | null
+  nama: string
+  deskripsi: string
+  ownerPic: string
+  tanggalProject: Date | string
+  targetGoLive?: Date | string | null
+  status?: $Enums.ProjectStatus
+  prioritas?: $Enums.Prioritas
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  pm: Prisma.ProjectManagerCreateNestedOneWithoutProjectsInput
+  bp: Prisma.BusinessPartnerCreateNestedOneWithoutProjectsInput
+  unitPengusul: Prisma.UnitCreateNestedOneWithoutProjectsInput
+  documents?: Prisma.DocumentCreateNestedManyWithoutProjectInput
+  updates?: Prisma.ProjectUpdateCreateNestedManyWithoutProjectInput
+  stages?: Prisma.ProjectStageCreateNestedManyWithoutProjectInput
+}
+
+export type ProjectUncheckedCreateWithoutDailyUpdatesInput = {
+  id?: number
+  kategori: $Enums.KategoriProject
+  jenis: $Enums.JenisProject
+  kodeProject?: string | null
+  nama: string
+  deskripsi: string
+  pmId: string
+  bpId: string
+  unitId: number
+  ownerPic: string
+  tanggalProject: Date | string
+  targetGoLive?: Date | string | null
+  status?: $Enums.ProjectStatus
+  prioritas?: $Enums.Prioritas
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  documents?: Prisma.DocumentUncheckedCreateNestedManyWithoutProjectInput
+  updates?: Prisma.ProjectUpdateUncheckedCreateNestedManyWithoutProjectInput
+  stages?: Prisma.ProjectStageUncheckedCreateNestedManyWithoutProjectInput
+}
+
+export type ProjectCreateOrConnectWithoutDailyUpdatesInput = {
+  where: Prisma.ProjectWhereUniqueInput
+  create: Prisma.XOR<Prisma.ProjectCreateWithoutDailyUpdatesInput, Prisma.ProjectUncheckedCreateWithoutDailyUpdatesInput>
+}
+
+export type ProjectUpsertWithoutDailyUpdatesInput = {
+  update: Prisma.XOR<Prisma.ProjectUpdateWithoutDailyUpdatesInput, Prisma.ProjectUncheckedUpdateWithoutDailyUpdatesInput>
+  create: Prisma.XOR<Prisma.ProjectCreateWithoutDailyUpdatesInput, Prisma.ProjectUncheckedCreateWithoutDailyUpdatesInput>
+  where?: Prisma.ProjectWhereInput
+}
+
+export type ProjectUpdateToOneWithWhereWithoutDailyUpdatesInput = {
+  where?: Prisma.ProjectWhereInput
+  data: Prisma.XOR<Prisma.ProjectUpdateWithoutDailyUpdatesInput, Prisma.ProjectUncheckedUpdateWithoutDailyUpdatesInput>
+}
+
+export type ProjectUpdateWithoutDailyUpdatesInput = {
+  kategori?: Prisma.EnumKategoriProjectFieldUpdateOperationsInput | $Enums.KategoriProject
+  jenis?: Prisma.EnumJenisProjectFieldUpdateOperationsInput | $Enums.JenisProject
+  kodeProject?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  nama?: Prisma.StringFieldUpdateOperationsInput | string
+  deskripsi?: Prisma.StringFieldUpdateOperationsInput | string
+  ownerPic?: Prisma.StringFieldUpdateOperationsInput | string
+  tanggalProject?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  targetGoLive?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  status?: Prisma.EnumProjectStatusFieldUpdateOperationsInput | $Enums.ProjectStatus
+  prioritas?: Prisma.EnumPrioritasFieldUpdateOperationsInput | $Enums.Prioritas
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  pm?: Prisma.ProjectManagerUpdateOneRequiredWithoutProjectsNestedInput
+  bp?: Prisma.BusinessPartnerUpdateOneRequiredWithoutProjectsNestedInput
+  unitPengusul?: Prisma.UnitUpdateOneRequiredWithoutProjectsNestedInput
+  documents?: Prisma.DocumentUpdateManyWithoutProjectNestedInput
+  updates?: Prisma.ProjectUpdateUpdateManyWithoutProjectNestedInput
+  stages?: Prisma.ProjectStageUpdateManyWithoutProjectNestedInput
+}
+
+export type ProjectUncheckedUpdateWithoutDailyUpdatesInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  kategori?: Prisma.EnumKategoriProjectFieldUpdateOperationsInput | $Enums.KategoriProject
+  jenis?: Prisma.EnumJenisProjectFieldUpdateOperationsInput | $Enums.JenisProject
+  kodeProject?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  nama?: Prisma.StringFieldUpdateOperationsInput | string
+  deskripsi?: Prisma.StringFieldUpdateOperationsInput | string
+  pmId?: Prisma.StringFieldUpdateOperationsInput | string
+  bpId?: Prisma.StringFieldUpdateOperationsInput | string
+  unitId?: Prisma.IntFieldUpdateOperationsInput | number
+  ownerPic?: Prisma.StringFieldUpdateOperationsInput | string
+  tanggalProject?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  targetGoLive?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  status?: Prisma.EnumProjectStatusFieldUpdateOperationsInput | $Enums.ProjectStatus
+  prioritas?: Prisma.EnumPrioritasFieldUpdateOperationsInput | $Enums.Prioritas
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  documents?: Prisma.DocumentUncheckedUpdateManyWithoutProjectNestedInput
+  updates?: Prisma.ProjectUpdateUncheckedUpdateManyWithoutProjectNestedInput
+  stages?: Prisma.ProjectStageUncheckedUpdateManyWithoutProjectNestedInput
 }
 
 export type ProjectCreateManyPmInput = {
@@ -1381,6 +1522,7 @@ export type ProjectUpdateWithoutPmInput = {
   documents?: Prisma.DocumentUpdateManyWithoutProjectNestedInput
   updates?: Prisma.ProjectUpdateUpdateManyWithoutProjectNestedInput
   stages?: Prisma.ProjectStageUpdateManyWithoutProjectNestedInput
+  dailyUpdates?: Prisma.DailyUpdateUpdateManyWithoutProjectNestedInput
 }
 
 export type ProjectUncheckedUpdateWithoutPmInput = {
@@ -1402,6 +1544,7 @@ export type ProjectUncheckedUpdateWithoutPmInput = {
   documents?: Prisma.DocumentUncheckedUpdateManyWithoutProjectNestedInput
   updates?: Prisma.ProjectUpdateUncheckedUpdateManyWithoutProjectNestedInput
   stages?: Prisma.ProjectStageUncheckedUpdateManyWithoutProjectNestedInput
+  dailyUpdates?: Prisma.DailyUpdateUncheckedUpdateManyWithoutProjectNestedInput
 }
 
 export type ProjectUncheckedUpdateManyWithoutPmInput = {
@@ -1458,6 +1601,7 @@ export type ProjectUpdateWithoutBpInput = {
   documents?: Prisma.DocumentUpdateManyWithoutProjectNestedInput
   updates?: Prisma.ProjectUpdateUpdateManyWithoutProjectNestedInput
   stages?: Prisma.ProjectStageUpdateManyWithoutProjectNestedInput
+  dailyUpdates?: Prisma.DailyUpdateUpdateManyWithoutProjectNestedInput
 }
 
 export type ProjectUncheckedUpdateWithoutBpInput = {
@@ -1479,6 +1623,7 @@ export type ProjectUncheckedUpdateWithoutBpInput = {
   documents?: Prisma.DocumentUncheckedUpdateManyWithoutProjectNestedInput
   updates?: Prisma.ProjectUpdateUncheckedUpdateManyWithoutProjectNestedInput
   stages?: Prisma.ProjectStageUncheckedUpdateManyWithoutProjectNestedInput
+  dailyUpdates?: Prisma.DailyUpdateUncheckedUpdateManyWithoutProjectNestedInput
 }
 
 export type ProjectUncheckedUpdateManyWithoutBpInput = {
@@ -1535,6 +1680,7 @@ export type ProjectUpdateWithoutUnitPengusulInput = {
   documents?: Prisma.DocumentUpdateManyWithoutProjectNestedInput
   updates?: Prisma.ProjectUpdateUpdateManyWithoutProjectNestedInput
   stages?: Prisma.ProjectStageUpdateManyWithoutProjectNestedInput
+  dailyUpdates?: Prisma.DailyUpdateUpdateManyWithoutProjectNestedInput
 }
 
 export type ProjectUncheckedUpdateWithoutUnitPengusulInput = {
@@ -1556,6 +1702,7 @@ export type ProjectUncheckedUpdateWithoutUnitPengusulInput = {
   documents?: Prisma.DocumentUncheckedUpdateManyWithoutProjectNestedInput
   updates?: Prisma.ProjectUpdateUncheckedUpdateManyWithoutProjectNestedInput
   stages?: Prisma.ProjectStageUncheckedUpdateManyWithoutProjectNestedInput
+  dailyUpdates?: Prisma.DailyUpdateUncheckedUpdateManyWithoutProjectNestedInput
 }
 
 export type ProjectUncheckedUpdateManyWithoutUnitPengusulInput = {
@@ -1585,12 +1732,14 @@ export type ProjectCountOutputType = {
   documents: number
   updates: number
   stages: number
+  dailyUpdates: number
 }
 
 export type ProjectCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   documents?: boolean | ProjectCountOutputTypeCountDocumentsArgs
   updates?: boolean | ProjectCountOutputTypeCountUpdatesArgs
   stages?: boolean | ProjectCountOutputTypeCountStagesArgs
+  dailyUpdates?: boolean | ProjectCountOutputTypeCountDailyUpdatesArgs
 }
 
 /**
@@ -1624,6 +1773,13 @@ export type ProjectCountOutputTypeCountStagesArgs<ExtArgs extends runtime.Types.
   where?: Prisma.ProjectStageWhereInput
 }
 
+/**
+ * ProjectCountOutputType without action
+ */
+export type ProjectCountOutputTypeCountDailyUpdatesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.DailyUpdateWhereInput
+}
+
 
 export type ProjectSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -1648,6 +1804,7 @@ export type ProjectSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   documents?: boolean | Prisma.Project$documentsArgs<ExtArgs>
   updates?: boolean | Prisma.Project$updatesArgs<ExtArgs>
   stages?: boolean | Prisma.Project$stagesArgs<ExtArgs>
+  dailyUpdates?: boolean | Prisma.Project$dailyUpdatesArgs<ExtArgs>
   _count?: boolean | Prisma.ProjectCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["project"]>
 
@@ -1722,6 +1879,7 @@ export type ProjectInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs
   documents?: boolean | Prisma.Project$documentsArgs<ExtArgs>
   updates?: boolean | Prisma.Project$updatesArgs<ExtArgs>
   stages?: boolean | Prisma.Project$stagesArgs<ExtArgs>
+  dailyUpdates?: boolean | Prisma.Project$dailyUpdatesArgs<ExtArgs>
   _count?: boolean | Prisma.ProjectCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type ProjectIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -1744,6 +1902,7 @@ export type $ProjectPayload<ExtArgs extends runtime.Types.Extensions.InternalArg
     documents: Prisma.$DocumentPayload<ExtArgs>[]
     updates: Prisma.$ProjectUpdatePayload<ExtArgs>[]
     stages: Prisma.$ProjectStagePayload<ExtArgs>[]
+    dailyUpdates: Prisma.$DailyUpdatePayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: number
@@ -2162,6 +2321,7 @@ export interface Prisma__ProjectClient<T, Null = never, ExtArgs extends runtime.
   documents<T extends Prisma.Project$documentsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Project$documentsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$DocumentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   updates<T extends Prisma.Project$updatesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Project$updatesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ProjectUpdatePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   stages<T extends Prisma.Project$stagesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Project$stagesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ProjectStagePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  dailyUpdates<T extends Prisma.Project$dailyUpdatesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Project$dailyUpdatesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$DailyUpdatePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -2677,6 +2837,30 @@ export type Project$stagesArgs<ExtArgs extends runtime.Types.Extensions.Internal
   take?: number
   skip?: number
   distinct?: Prisma.ProjectStageScalarFieldEnum | Prisma.ProjectStageScalarFieldEnum[]
+}
+
+/**
+ * Project.dailyUpdates
+ */
+export type Project$dailyUpdatesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the DailyUpdate
+   */
+  select?: Prisma.DailyUpdateSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the DailyUpdate
+   */
+  omit?: Prisma.DailyUpdateOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.DailyUpdateInclude<ExtArgs> | null
+  where?: Prisma.DailyUpdateWhereInput
+  orderBy?: Prisma.DailyUpdateOrderByWithRelationInput | Prisma.DailyUpdateOrderByWithRelationInput[]
+  cursor?: Prisma.DailyUpdateWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.DailyUpdateScalarFieldEnum | Prisma.DailyUpdateScalarFieldEnum[]
 }
 
 /**

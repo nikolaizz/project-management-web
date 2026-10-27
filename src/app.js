@@ -5,6 +5,7 @@ import projectRoutes from "./routes/project.routes.js";
 import documentRoutes from "./routes/document.routes.js";
 import masterRoutes from "./routes/master.routes.js";
 import { notFound, errorHandler } from "./middlewares/error.js";
+import dailyUpdateRoutes from "./routes/dailyUpdate.routes.js";
 
 const app = express();
 
@@ -19,6 +20,7 @@ app.get("/health", (req, res) => {
 app.use("/projects", projectRoutes);
 app.use("/documents", documentRoutes);
 app.use("/master", masterRoutes);
+app.use("/daily-updates", dailyUpdateRoutes);
 
 app.use(notFound);
 app.use(errorHandler);

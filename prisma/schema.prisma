@@ -87,7 +87,9 @@ model User {
   passwordHash String
   role         Role     @default(PROJECT_MANAGER)
   createdAt    DateTime @default(now())
+
   projectUpdates ProjectUpdate[]
+  dailyUpdates   DailyUpdate[]
 
 }
 
@@ -116,6 +118,7 @@ model Project {
   documents     Document[]
   updates       ProjectUpdate[]
   stages        ProjectStage[]
+  dailyUpdates  DailyUpdate[]
 
   @@index([status])
   @@index([nama])
@@ -159,4 +162,20 @@ model ProjectStage {
   catatan        String?
 
   @@unique([projectId, tahap])
+}
+
+model DailyUpdate {
+  id          Int           @id @default(autoincrement())
+  projectId   Int
+  project     Project       @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  tanggal     DateTime      @db.Date
+  createdAt   DateTime      @default(now())
+  status      ProjectStatus
+  aktivitas   String
+  kendala     String?
+  nextAction  String
+  updatedById String?
+  updatedBy   User?         @relation(fields: [updatedById], references: [id], onDelete: SetNull)
+
+  @@index([projectId, createdAt])
 }

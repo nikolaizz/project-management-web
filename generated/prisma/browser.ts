@@ -57,3 +57,8 @@ export type ProjectUpdate = Prisma.ProjectUpdateModel
  * 
  */
 export type ProjectStage = Prisma.ProjectStageModel
+/**
+ * Model DailyUpdate
+ * 
+ */
+export type DailyUpdate = Prisma.DailyUpdateModel

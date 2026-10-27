@@ -12,6 +12,7 @@ async function main() {
   await prisma.businessPartner.deleteMany();
   await prisma.unit.deleteMany();
   await prisma.user.deleteMany();
+  await prisma.dailyUpdate.deleteMany();
 
   // Buat satu user contoh. Hash ini hanya data dummy untuk pengembangan.
   await prisma.user.create({

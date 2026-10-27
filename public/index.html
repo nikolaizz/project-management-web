@@ -117,6 +117,20 @@ tr.project-detail table.history td,tr.project-detail table.history th{background
 .check input{width:auto}
 #deleteProjectDialog{width:min(520px,calc(100% - 28px))}
 button.danger-solid{background:var(--bad);border-color:var(--bad);color:#fff}
+.daily-layout{display:grid;grid-template-columns:minmax(0,3fr) minmax(0,2fr);gap:20px;align-items:start}
+@media(max-width:1000px){.daily-layout{grid-template-columns:minmax(0,1fr)}}
+.dblock{border:1px solid var(--line);border-radius:10px;padding:14px;margin-bottom:14px;background:#fff}
+.dblock-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+input.ro{background:var(--bg);color:var(--muted)}
+.daily-actions{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:6px}
+.daily-actions .spacer{flex:1}
+.wa-bubble{background:#e7f6d8;border:1px solid #cfe8bb;border-radius:12px;padding:14px;font-size:14px;line-height:1.5;white-space:pre-wrap;min-height:180px;overflow-wrap:anywhere}
+button.wa-copy{background:#1f8a4c;border-color:#1f8a4c;color:#fff}
+.wa-actions{display:grid;gap:8px;margin-top:12px}
+.wa-actions button{width:100%}
+.history-pick{display:flex;align-items:center;gap:8px;min-width:0;flex:1;max-width:460px}
+.history-pick label{margin:0;white-space:nowrap}
+.pre{white-space:pre-wrap}
 </style>
 </head>
 <body>
@@ -132,6 +146,10 @@ button.danger-solid{background:var(--bad);border-color:var(--bad);color:#fff}
       <button type="button" class="side-link active" data-page="uploadPage" aria-current="page">
         Upload project
         <span>Tambah project baru</span>
+      </button>
+      <button type="button" class="side-link" data-page="dailyPage">
+        Update progress
+        <span>Catat progress harian</span>
       </button>
       <button type="button" class="side-link" data-page="projectsPage">
         Daftar project
@@ -175,6 +193,39 @@ button.danger-solid{background:var(--bad);border-color:var(--bad);color:#fff}
         <div class="tabs" id="configTabs" role="tablist" aria-label="Jenis data"></div>
         <div id="configMessage" aria-live="polite"></div>
         <div id="configBody"><p class="empty">Memuat...</p></div>
+      </div>
+    </section>
+
+    <section class="page" id="dailyPage" aria-labelledby="dailyTitle" hidden>
+      <div class="daily-layout">
+        <div class="card">
+          <div class="head"><h1 id="dailyTitle">Update progress project</h1></div>
+          <p class="hint" id="dailyDate"></p>
+          <div id="dailyBlocks"></div>
+          <div id="dailyMessage" aria-live="polite"></div>
+          <div class="daily-actions">
+            <button type="button" id="btnAddBlock">+ Tambah project lainnya</button>
+            <span class="spacer"></span>
+            <button type="button" id="btnDailyReset">Reset</button>
+            <button type="button" class="primary" id="btnDailySubmit">Simpan &amp; Generate</button>
+          </div>
+        </div>
+        <div class="card">
+          <h2>Preview format WhatsApp</h2>
+          <div id="waPreview" class="wa-bubble"></div>
+          <div class="wa-actions">
+            <button type="button" id="btnCopyClip" disabled>Copy to clipboard</button>
+            <button type="button" class="wa-copy" id="btnCopyOpen" disabled>Copy &amp; buka WhatsApp</button>
+          </div>
+          <div id="waStatus" class="hint" role="status" aria-live="polite"></div>
+        </div>
+      </div>
+      <div class="card" style="margin-top:20px">
+        <div class="head">
+          <h2 id="historyTitle">Riwayat Generate Update WhatsApp</h2>
+          <div class="history-pick"><label for="historySelect">Project</label><select id="historySelect"></select></div>
+        </div>
+        <div id="dailyHistory" class="tablewrap"><p class="empty">Pilih project untuk melihat riwayat.</p></div>
       </div>
     </section>
   </div>
@@ -854,7 +905,7 @@ async function openDeleteProject(id) {
       <dt>Isi project</dt><dd>${p.documents.length} dokumen, ${p.updates.length} riwayat update, ${Array.isArray(p.stages) ? p.stages.length : 0} tahapan</dd>
     </dl>
     ${ACTIVE_STATUS.includes(p.status) ? `<div class="alert warn">Project ini masih aktif (status ${esc(label)}). Pastikan memang perlu dihapus.</div>` : ""}
-    <div class="alert error">Tindakan ini permanen. Project beserta tahapan, dokumen (termasuk filenya), dan riwayat update akan terhapus dan tidak bisa dikembalikan.</div>
+    <div class="alert error">Tindakan ini permanen. Project beserta tahapan, dokumen (termasuk filenya), riwayat update, dan daily update akan terhapus dan tidak bisa dikembalikan.</div>
     <label class="check"><input type="checkbox" id="deleteConfirmCheck"> Saya mengerti dan ingin menghapus project ini</label>
     <div id="deleteProjectError" class="alert error" role="alert" hidden></div>
     <div class="dialog-actions"><button type="button" data-close-delete>Batal</button><button type="button" class="danger-solid" id="btnConfirmDelete" disabled>Hapus permanen</button></div>`;
@@ -985,6 +1036,238 @@ $("#configBody").addEventListener("keydown", (e) => {
   if (e.target.id !== "cfgEditInput") return;
   if (e.key === "Enter") { e.preventDefault(); const b = $("[data-cfgsave]"); if (b) b.click(); }
   if (e.key === "Escape") { cfg.editingId = null; renderConfigBody(); }
+});
+
+// ---------- Update progress harian ----------
+const newBlock = () => ({ projectId: "", status: "", aktivitas: "", kendala: "", nextAction: "" });
+const daily = { projects: [], historyId: "", latestId: "", blocks: [newBlock()], locked: false, busy: false, text: "", errors: {} };
+const fmtTodayWIB = () => new Intl.DateTimeFormat("id-ID", { timeZone: "Asia/Jakarta", weekday: "long", day: "numeric", month: "long", year: "numeric" }).format(new Date());
+const dailyMsg = (type, msg) => { $("#dailyMessage").innerHTML = msg ? `<div class="alert ${type}">${esc(msg)}</div>` : ""; };
+const projectOf = (id) => daily.projects.find((x) => String(x.id) === String(id));
+
+function dailyBlockHtml(i) {
+  const b = daily.blocks[i];
+  const p = projectOf(b.projectId);
+  const taken = new Set(daily.blocks.filter((_, j) => j !== i).map((x) => String(x.projectId)).filter(Boolean));
+  const dis = daily.locked ? " disabled" : "";
+  const projOpts = `<option value="">Pilih project</option>` + daily.projects.map((x) =>
+    `<option value="${x.id}"${taken.has(String(x.id)) ? " disabled" : ""}>${esc(x.nama)}${x.kodeProject ? ` (${esc(x.kodeProject)})` : ""}</option>`).join("");
+  const statusOpts = master.enums.status.map((s) => `<option value="${s}">${esc(STATUS_LABEL[s] || s)}</option>`).join("");
+  const ro = (label, val) => `<div><label>${label}</label><input class="ro" readonly tabindex="-1" aria-label="${label}" value="${esc(val || "-")}"></div>`;
+  const ta = (key, label) => `<div class="full"><label for="d-${key}-${i}">${label}</label><textarea id="d-${key}-${i}" maxlength="1000" data-d="${key}" data-i="${i}" data-ek="items.${i}.${key}"${dis}></textarea><div class="err" data-derr="items.${i}.${key}"></div></div>`;
+  const target = p && p.targetGoLive ? String(p.targetGoLive).slice(0, 10) : "-";
+  return `<div class="dblock" data-block="${i}">
+    <div class="dblock-head"><strong>Project ${i + 1}</strong>${daily.blocks.length > 1 && !daily.locked ? `<button type="button" class="small danger" data-dremove="${i}">Hapus blok</button>` : ""}</div>
+    <div class="grid">
+      <div class="full"><label for="d-project-${i}">Project</label><select id="d-project-${i}" data-d="projectId" data-i="${i}" data-ek="items.${i}.projectId"${dis}>${projOpts}</select><div class="err" data-derr="items.${i}.projectId"></div></div>
+      <div><label for="d-status-${i}">Status</label><select id="d-status-${i}" data-d="status" data-i="${i}" data-ek="items.${i}.status"${dis}${p ? "" : " disabled"}>${statusOpts}</select><div class="err" data-derr="items.${i}.status"></div></div>
+      ${ro("PIC", p && p.ownerPic)}
+      ${ro("Target penyelesaian", target)}
+      ${ro("Prioritas", p && (PRIORITAS_LABEL[p.prioritas] || p.prioritas))}
+      ${ro("Project manager", p && p.pm && p.pm.nama)}
+      ${ro("Business partner", p && p.bp && p.bp.nama)}
+      ${ta("aktivitas", "Aktivitas / Progress")}
+      ${ta("kendala", "Kendala / Isu (opsional)")}
+      ${ta("nextAction", "Next Action")}
+    </div>
+  </div>`;
+}
+
+function renderDaily() {
+  const box = $("#dailyBlocks");
+  box.innerHTML = daily.blocks.map((_, i) => dailyBlockHtml(i)).join("");
+  box.querySelectorAll("[data-d]").forEach((el) => { el.value = daily.blocks[el.dataset.i][el.dataset.d]; });
+  box.querySelectorAll("[data-derr]").forEach((el) => {
+    const m = daily.errors[el.dataset.derr];
+    el.textContent = m || "";
+    const inp = box.querySelector(`[data-ek="${el.dataset.derr}"]`);
+    if (inp) inp.classList.toggle("invalid", !!m);
+  });
+  $("#btnAddBlock").disabled = daily.locked || daily.blocks.length >= 10;
+  $("#btnDailySubmit").disabled = daily.locked || daily.busy;
+  $("#btnDailySubmit").textContent = daily.busy ? "Menyimpan..." : "Simpan & Generate";
+  $("#btnCopyClip").disabled = !daily.text;
+  $("#btnCopyOpen").disabled = !daily.text;
+  if (!daily.text) $("#waStatus").innerHTML = "";
+  const wa = $("#waPreview");
+  if (daily.text) wa.textContent = daily.text;
+  else wa.innerHTML = `<span class="hint">Teks WhatsApp muncul di sini setelah Simpan &amp; Generate.</span>`;
+}
+
+async function loadDailyProjects() {
+  try {
+    const r = await api("/projects?limit=100");
+    daily.latestId = r.data.length ? String(r.data[0].id) : ""; // project yang terakhir diperbarui
+    daily.projects = r.data.slice().sort((a, b) => a.nama.localeCompare(b.nama, "id"));
+  } catch (e) { dailyMsg("error", e.message); }
+}
+
+function renderHistorySelect() {
+  const sel = $("#historySelect");
+  sel.innerHTML = `<option value="">Pilih project</option>` + daily.projects.map((x) =>
+    `<option value="${x.id}">${esc(x.nama)}${x.kodeProject ? ` (${esc(x.kodeProject)})` : ""}</option>`).join("");
+  sel.value = daily.historyId;
+  daily.historyId = sel.value; // kosong kalau project-nya sudah tidak ada
+}
+
+async function loadDailyHistory() {
+  const box = $("#dailyHistory"), id = daily.historyId, p = projectOf(id);
+  if (!p) {
+    box.innerHTML = `<p class="empty">Pilih project untuk melihat riwayat.</p>`;
+    return;
+  }
+  try {
+    const r = await api(`/daily-updates?projectId=${encodeURIComponent(p.id)}&limit=10`);
+    if (daily.historyId !== id) return; // pilihan sudah berganti selama menunggu
+    box.innerHTML = r.data.length
+      ? `<table><thead><tr><th>Tanggal &amp; jam</th><th>Aktivitas / Progress</th><th>Kendala</th><th>Next action</th><th>Updated by</th></tr></thead><tbody>${r.data.map((u) => `<tr>
+          <td class="nowrap">${fmtDateTime(u.createdAt)}</td><td class="pre">${esc(u.aktivitas)}</td><td class="pre">${esc(u.kendala || "-")}</td>
+          <td class="pre">${esc(u.nextAction)}</td><td class="nowrap">${esc(u.updatedBy ? u.updatedBy.nama : "-")}</td></tr>`).join("")}</tbody></table>
+        <p class="hint">Menampilkan ${r.data.length} update terakhir dari ${esc(p.nama)}.</p>`
+      : `<p class="empty">Belum ada update untuk ${esc(p.nama)}.</p>`;
+  } catch (e) { box.innerHTML = `<p class="empty">${esc(e.message)}</p>`; }
+}
+
+async function openDailyPage() {
+  $("#dailyDate").textContent = `Tanggal: ${fmtTodayWIB()} (hari ini, otomatis)`;
+  await loadDailyProjects();
+  if (!projectOf(daily.historyId)) daily.historyId = daily.latestId; // tabel langsung terisi
+  renderHistorySelect();
+  renderDaily();
+  loadDailyHistory();
+}
+
+function resetDaily() {
+  Object.assign(daily, { blocks: [newBlock()], locked: false, busy: false, text: "", errors: {} });
+  dailyMsg("ok", "");
+  openDailyPage();
+}
+
+function validateDaily() {
+  const e = {};
+  daily.blocks.forEach((b, i) => {
+    if (!b.projectId) e[`items.${i}.projectId`] = "Pilih project";
+    if (!b.aktivitas.trim()) e[`items.${i}.aktivitas`] = "Aktivitas / progress wajib diisi";
+    if (!b.nextAction.trim()) e[`items.${i}.nextAction`] = "Next action wajib diisi";
+  });
+  daily.errors = e;
+  return Object.keys(e).length === 0;
+}
+
+async function submitDaily() {
+  if (daily.busy || daily.locked) return;
+  dailyMsg("ok", "");
+  if (!validateDaily()) {
+    renderDaily();
+    const first = $("#dailyBlocks .invalid"); if (first) first.focus();
+    return dailyMsg("error", "Lengkapi isian yang ditandai.");
+  }
+  daily.busy = true; renderDaily();
+  try {
+    const r = await api("/daily-updates", jsonOpts("POST", {
+      items: daily.blocks.map((b) => ({
+        projectId: b.projectId, status: b.status || undefined,
+        aktivitas: b.aktivitas.trim(), kendala: b.kendala.trim() || null, nextAction: b.nextAction.trim(),
+      })),
+    }));
+    daily.text = r.text; daily.locked = true; daily.busy = false;
+    renderDaily();
+    dailyMsg("ok", `${r.data.length} update tersimpan. Teks WhatsApp siap disalin.`);
+    loadDailyHistory();
+  } catch (err) {
+    daily.busy = false;
+    const errs = {}, other = [];
+    for (const x of err.errors || []) { if (/^items\.\d+\./.test(x.field)) errs[x.field] = x.message; else other.push(x.message); }
+    daily.errors = errs; renderDaily();
+    dailyMsg("error", other.length ? other.join("; ") : Object.keys(errs).length ? "Server menolak data. Perbaiki isian yang ditandai." : err.message);
+  }
+}
+
+$(".side-nav").addEventListener("click", (e) => { if (e.target.closest('[data-page="dailyPage"]')) openDailyPage(); });
+$("#btnAddBlock").onclick = () => {
+  daily.blocks.push(newBlock());
+  renderDaily();
+  const sel = $(`#d-project-${daily.blocks.length - 1}`); if (sel) sel.focus();
+};
+$("#btnDailyReset").onclick = () => {
+  const adaIsi = daily.blocks.some((b) => b.projectId || b.aktivitas || b.kendala || b.nextAction);
+  if (!daily.locked && adaIsi && !confirm("Kosongkan semua isian form ini?")) return;
+  resetDaily();
+};
+$("#btnDailySubmit").onclick = submitDaily;
+async function copyToClipboard(text) {
+  try {
+    await navigator.clipboard.writeText(text);
+    return true;
+  } catch {
+    // Cadangan untuk browser yang hanya mengizinkan cara lama
+    const t = document.createElement("textarea");
+    t.value = text; t.style.position = "fixed"; t.style.opacity = "0";
+    document.body.appendChild(t); t.select();
+    let ok = false;
+    try { ok = document.execCommand("copy"); } catch {}
+    t.remove();
+    return ok;
+  }
+}
+function waStatus(html, ok = true) {
+  const el = $("#waStatus");
+  el.className = "hint " + (ok ? "ok-t" : "bad-t");
+  el.innerHTML = html;
+}
+$("#btnCopyClip").onclick = async () => {
+  if (!daily.text) return;
+  const ok = await copyToClipboard(daily.text);
+  waStatus(ok ? "Teks berhasil disalin. Tempelkan ke chat WhatsApp." : "Browser tidak mengizinkan clipboard. Pilih dan salin teks dari preview.", ok);
+};
+$("#btnCopyOpen").onclick = async () => {
+  if (!daily.text) return;
+  const ok = await copyToClipboard(daily.text);
+  const encoded = encodeURIComponent(daily.text);
+  // Coba WhatsApp Desktop dulu; teks langsung terisi di kolom chat, kontak atau grup dipilih sendiri
+  window.location.href = "whatsapp://send?text=" + encoded;
+  const web = "https://web.whatsapp.com/send?text=" + encoded;
+  waStatus(
+    `${ok ? "Teks disalin. " : ""}Permintaan membuka WhatsApp Desktop sudah dikirim; pilih kontak atau grup tujuan. Jika aplikasi tidak terbuka, <a href="${web}" target="_blank" rel="noopener noreferrer">buka WhatsApp Web</a>.${encoded.length > 4000 ? " Teks cukup panjang: kalau terpotong di WhatsApp, tempel dari clipboard." : ""}`,
+    ok
+  );
+};
+$("#historySelect").addEventListener("change", (e) => {
+  daily.historyId = e.target.value;
+  loadDailyHistory();
+});
+$("#dailyBlocks").addEventListener("input", (e) => {
+  const k = e.target.dataset.d;
+  if (k === undefined || k === "projectId") return;
+  daily.blocks[e.target.dataset.i][k] = e.target.value;
+  const key = e.target.dataset.ek;
+  if (daily.errors[key]) {
+    delete daily.errors[key]; e.target.classList.remove("invalid");
+    const el = $(`[data-derr="${key}"]`); if (el) el.textContent = "";
+  }
+});
+$("#dailyBlocks").addEventListener("change", (e) => {
+  const k = e.target.dataset.d;
+  if (k === undefined) return;
+  if (k !== "projectId") { daily.blocks[e.target.dataset.i][k] = e.target.value; return; }
+  const i = Number(e.target.dataset.i), b = daily.blocks[i], p = projectOf(e.target.value);
+  b.projectId = e.target.value;
+  b.status = p ? p.status : "";
+  delete daily.errors[`items.${i}.projectId`];
+  if (b.projectId) { // tabel riwayat ikut berpindah ke project yang baru dipilih
+    daily.historyId = b.projectId;
+    $("#historySelect").value = b.projectId;
+    loadDailyHistory();
+  }
+  renderDaily();
+  const sel = $(`#d-project-${i}`); if (sel) sel.focus();
+});
+$("#dailyBlocks").addEventListener("click", (e) => {
+  const rm = e.target.closest("[data-dremove]");
+  if (!rm) return;
+  daily.blocks.splice(Number(rm.dataset.dremove), 1);
+  daily.errors = {};
+  renderDaily();
 });
 
 async function loadMaster() {
