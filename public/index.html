@@ -650,7 +650,31 @@ function editMasterSelect(name, label, choices, selected) {
   return `<div><label for="edit-${name}">${label}</label><select id="edit-${name}" name="${name}" required>${optionsHtml}</select></div>`;
 }
 
+let editStageInitial = {};
+
+function editStageCard(t, s) {
+  const opts = Object.entries(STATUS_TAHAP_LABEL).map(([v, l]) => `<option value="${v}"${v === s.status ? " selected" : ""}>${l}</option>`).join("");
+  const f = (field) => `data-es="${t}" data-esf="${field}"`;
+  return `<div class="stage"><h3>${TAHAP_LABEL[t]}</h3>
+    <div><label for="es-${t}-tanggalRencana">Tanggal rencana</label><input id="es-${t}-tanggalRencana" type="date" ${f("tanggalRencana")} value="${esc(s.tanggalRencana)}"><div class="err" data-eserr="${t}.tanggalRencana"></div></div>
+    <div><label for="es-${t}-status">Status</label><select id="es-${t}-status" ${f("status")}>${opts}</select><div class="err" data-eserr="${t}.status"></div></div>
+    <div><label for="es-${t}-catatan">Catatan</label><textarea id="es-${t}-catatan" maxlength="500" ${f("catatan")}>${esc(s.catatan)}</textarea><div class="err" data-eserr="${t}.catatan"></div></div>
+  </div>`;
+}
+
 function renderEditForm(p) {
+  // Nilai awal tahapan, untuk mengetahui mana yang berubah. Project lama tanpa baris tahapan memakai nilai bawaan.
+  const byTahap = {};
+  (Array.isArray(p.stages) ? p.stages : []).forEach((x) => { byTahap[x.tahap] = x; });
+  editStageInitial = {};
+  TAHAP_ORDER.forEach((t) => {
+    const x = byTahap[t];
+    editStageInitial[t] = {
+      tanggalRencana: x && x.tanggalRencana ? String(x.tanggalRencana).slice(0, 10) : "",
+      status: x ? x.status : "PLANNED",
+      catatan: x && x.catatan ? x.catatan : "",
+    };
+  });
   const date = (value) => value ? esc(String(value).slice(0, 10)) : "";
   $("#editProjectDialog").innerHTML = `<form id="editProjectForm">
     <div class="head"><h2 id="editProjectTitle">Edit project</h2><button type="button" data-close-edit aria-label="Tutup">Tutup</button></div>
@@ -668,7 +692,9 @@ function renderEditForm(p) {
       <div><label for="edit-tanggalProject">Tanggal project</label><input id="edit-tanggalProject" name="tanggalProject" type="date" value="${date(p.tanggalProject)}" required></div>
       <div><label for="edit-targetGoLive">Target go live</label><input id="edit-targetGoLive" name="targetGoLive" type="date" value="${date(p.targetGoLive)}"></div>
     </div>
-    <p class="hint">Status, catatan progress, dan dokumen dikelola lewat menu Update progress.</p>
+    <h3 style="margin:18px 0 8px">Tahapan komite</h3>
+    <div class="stages">${TAHAP_ORDER.map((t) => editStageCard(t, editStageInitial[t])).join("")}</div>
+    <p class="hint">Status project, catatan progress, dan dokumen dikelola lewat menu Update progress.</p>
     <div id="editProjectError" class="alert error" role="alert" hidden></div>
     <div class="dialog-actions"><button type="button" data-close-edit>Batal</button><button type="submit" class="primary">Simpan perubahan</button></div>
   </form>`;
@@ -712,21 +738,55 @@ $("#editProjectDialog").addEventListener("submit", async (e) => {
     tanggalProject: data.get("tanggalProject"),
     targetGoLive: data.get("targetGoLive") || null,
   };
+  // Hanya tahapan yang berubah yang dikirim
+  const changes = [];
+  TAHAP_ORDER.forEach((t) => {
+    const ini = editStageInitial[t], cur = {}, diff = {};
+    form.querySelectorAll(`[data-es="${t}"]`).forEach((el) => { cur[el.dataset.esf] = el.value; });
+    if (cur.tanggalRencana !== ini.tanggalRencana) diff.tanggalRencana = cur.tanggalRencana || null;
+    if (cur.status !== ini.status) diff.status = cur.status;
+    if (cur.catatan.trim() !== ini.catatan.trim()) diff.catatan = cur.catatan.trim() || null;
+    if (Object.keys(diff).length) changes.push({ tahap: t, ...diff });
+  });
+  form.querySelectorAll("[data-eserr]").forEach((el) => { el.textContent = ""; });
+  form.querySelectorAll("[data-es].invalid").forEach((el) => el.classList.remove("invalid"));
   submitButton.disabled = true;
   submitButton.textContent = "Menyimpan...";
   error.hidden = true;
+  const saved = () => form.dataset.saved === "1";
   try {
-    await api(`/projects/${form.dataset.projectId}`, {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload),
-    });
+    // Data project disimpan sekali saja; kalau tahapan gagal, percobaan ulang hanya mengirim tahapan
+    if (!saved()) {
+      await api(`/projects/${form.dataset.projectId}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+      form.dataset.saved = "1";
+    }
+    if (changes.length) {
+      await api(`/projects/${form.dataset.projectId}/stages`, jsonOpts("PUT", { stages: changes }));
+    }
     $("#editProjectDialog").close();
-    $("#projectsMessage").innerHTML = `<div class="alert ok">Perubahan project berhasil disimpan.</div>`;
+    $("#projectsMessage").innerHTML = `<div class="alert ok">Perubahan project berhasil disimpan${changes.length ? `, ${changes.length} tahapan komite diperbarui` : ""}.</div>`;
     await loadProjects();
   } catch (err) {
-    error.textContent = err.message;
+    // Nomor urut di pesan server mengikuti daftar tahapan yang dikirim, jadi dipetakan balik ke tahapannya
+    const fieldErrs = (err.errors || []).filter((x) => /^stages\.\d+\./.test(x.field));
+    fieldErrs.forEach((x) => {
+      const [, k, field] = x.field.match(/^stages\.(\d+)\.(.+)$/);
+      const ch = changes[Number(k)];
+      if (!ch) return;
+      const out = form.querySelector(`[data-eserr="${ch.tahap}.${field}"]`);
+      const inp = form.querySelector(`[data-es="${ch.tahap}"][data-esf="${field}"]`);
+      if (out) out.textContent = x.message;
+      if (inp) inp.classList.add("invalid");
+    });
+    error.textContent = saved()
+      ? `Data project sudah tersimpan, tetapi tahapan komite belum tersimpan: ${fieldErrs.length ? "periksa isian yang ditandai" : err.message}. Perbaiki lalu klik Simpan lagi; hanya tahapan yang akan dikirim ulang.`
+      : err.message;
     error.hidden = false;
+    if (saved()) loadProjects();
   } finally {
     submitButton.disabled = false;
     submitButton.textContent = "Simpan perubahan";
