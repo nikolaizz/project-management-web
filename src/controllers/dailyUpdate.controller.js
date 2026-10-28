@@ -27,6 +27,8 @@ function composeText(items, byId, tanggal, { placeholder = false } = {}) {
       const p = byId.get(it.projectId);
       return {
         nama: p.nama,
+        kode: p.kodeProject,
+        kategori: p.kategori, 
         status: it.status ?? p.status,
         prioritas: p.prioritas,
         pmNama: p.pm.nama,

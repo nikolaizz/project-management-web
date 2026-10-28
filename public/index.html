@@ -228,7 +228,7 @@ button.wa-copy{background:#1f8a4c;border-color:#1f8a4c;color:#fff}
       </div>
       <div class="card" style="margin-top:20px">
         <div class="head">
-          <h2 id="historyTitle">Historical aktivitas &amp; updates</h2>
+          <h2 id="historyTitle">Riwayat Update</h2>
           <div class="history-pick"><label for="historySelect">Project</label><select id="historySelect"></select></div>
         </div>
         <div id="dailyHistory" class="tablewrap"><p class="empty">Pilih project untuk melihat riwayat.</p></div>
@@ -623,7 +623,7 @@ function renderProjectDetail(p) {
     <dt>Target go live</dt><dd>${date(p.targetGoLive)}</dd>
     <dt>Dibuat</dt><dd>${fmtDateTime(p.createdAt)}</dd>
     <dt>Terakhir diperbarui</dt><dd>${fmtDateTime(p.updatedAt)}</dd>
-  </dl><h3>Tahapan</h3>${stages}<h3>Dokumen</h3>${docs}<h3>Riwayat update</h3>${updates}</div>`;
+  </dl><h3>Tahapan</h3>${stages}<h3>Dokumen</h3>${docs}<h3>Riwayat Update</h3>${updates}</div>`;
 }
 
 function renderProjects(list, total) {
