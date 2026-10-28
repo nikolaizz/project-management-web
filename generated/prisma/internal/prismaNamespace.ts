@@ -404,8 +404,7 @@ export const ModelName = {
   Project: 'Project',
   Document: 'Document',
   ProjectUpdate: 'ProjectUpdate',
-  ProjectStage: 'ProjectStage',
-  DailyUpdate: 'DailyUpdate'
+  ProjectStage: 'ProjectStage'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -421,7 +420,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "projectManager" | "businessPartner" | "unit" | "user" | "project" | "document" | "projectUpdate" | "projectStage" | "dailyUpdate"
+    modelProps: "projectManager" | "businessPartner" | "unit" | "user" | "project" | "document" | "projectUpdate" | "projectStage"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -1017,80 +1016,6 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
-    DailyUpdate: {
-      payload: Prisma.$DailyUpdatePayload<ExtArgs>
-      fields: Prisma.DailyUpdateFieldRefs
-      operations: {
-        findUnique: {
-          args: Prisma.DailyUpdateFindUniqueArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$DailyUpdatePayload> | null
-        }
-        findUniqueOrThrow: {
-          args: Prisma.DailyUpdateFindUniqueOrThrowArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$DailyUpdatePayload>
-        }
-        findFirst: {
-          args: Prisma.DailyUpdateFindFirstArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$DailyUpdatePayload> | null
-        }
-        findFirstOrThrow: {
-          args: Prisma.DailyUpdateFindFirstOrThrowArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$DailyUpdatePayload>
-        }
-        findMany: {
-          args: Prisma.DailyUpdateFindManyArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$DailyUpdatePayload>[]
-        }
-        create: {
-          args: Prisma.DailyUpdateCreateArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$DailyUpdatePayload>
-        }
-        createMany: {
-          args: Prisma.DailyUpdateCreateManyArgs<ExtArgs>
-          result: BatchPayload
-        }
-        createManyAndReturn: {
-          args: Prisma.DailyUpdateCreateManyAndReturnArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$DailyUpdatePayload>[]
-        }
-        delete: {
-          args: Prisma.DailyUpdateDeleteArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$DailyUpdatePayload>
-        }
-        update: {
-          args: Prisma.DailyUpdateUpdateArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$DailyUpdatePayload>
-        }
-        deleteMany: {
-          args: Prisma.DailyUpdateDeleteManyArgs<ExtArgs>
-          result: BatchPayload
-        }
-        updateMany: {
-          args: Prisma.DailyUpdateUpdateManyArgs<ExtArgs>
-          result: BatchPayload
-        }
-        updateManyAndReturn: {
-          args: Prisma.DailyUpdateUpdateManyAndReturnArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$DailyUpdatePayload>[]
-        }
-        upsert: {
-          args: Prisma.DailyUpdateUpsertArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$DailyUpdatePayload>
-        }
-        aggregate: {
-          args: Prisma.DailyUpdateAggregateArgs<ExtArgs>
-          result: runtime.Types.Utils.Optional<Prisma.AggregateDailyUpdate>
-        }
-        groupBy: {
-          args: Prisma.DailyUpdateGroupByArgs<ExtArgs>
-          result: runtime.Types.Utils.Optional<Prisma.DailyUpdateGroupByOutputType>[]
-        }
-        count: {
-          args: Prisma.DailyUpdateCountArgs<ExtArgs>
-          result: runtime.Types.Utils.Optional<Prisma.DailyUpdateCountAggregateOutputType> | number
-        }
-      }
-    }
   }
 } & {
   other: {
@@ -1204,6 +1129,7 @@ export type DocumentScalarFieldEnum = (typeof DocumentScalarFieldEnum)[keyof typ
 export const ProjectUpdateScalarFieldEnum = {
   id: 'id',
   projectId: 'projectId',
+  tanggal: 'tanggal',
   tanggalInput: 'tanggalInput',
   status: 'status',
   aktivitas: 'aktivitas',
@@ -1225,21 +1151,6 @@ export const ProjectStageScalarFieldEnum = {
 } as const
 
 export type ProjectStageScalarFieldEnum = (typeof ProjectStageScalarFieldEnum)[keyof typeof ProjectStageScalarFieldEnum]
-
-
-export const DailyUpdateScalarFieldEnum = {
-  id: 'id',
-  projectId: 'projectId',
-  tanggal: 'tanggal',
-  createdAt: 'createdAt',
-  status: 'status',
-  aktivitas: 'aktivitas',
-  kendala: 'kendala',
-  nextAction: 'nextAction',
-  updatedById: 'updatedById'
-} as const
-
-export type DailyUpdateScalarFieldEnum = (typeof DailyUpdateScalarFieldEnum)[keyof typeof DailyUpdateScalarFieldEnum]
 
 
 export const SortOrder = {
@@ -1584,7 +1495,6 @@ export type GlobalOmitConfig = {
   document?: Prisma.DocumentOmit
   projectUpdate?: Prisma.ProjectUpdateOmit
   projectStage?: Prisma.ProjectStageOmit
-  dailyUpdate?: Prisma.DailyUpdateOmit
 }
 
 /* Types for Logging */

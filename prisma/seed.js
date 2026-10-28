@@ -12,7 +12,6 @@ async function main() {
   await prisma.businessPartner.deleteMany();
   await prisma.unit.deleteMany();
   await prisma.user.deleteMany();
-  await prisma.dailyUpdate.deleteMany();
 
   // Buat satu user contoh. Hash ini hanya data dummy untuk pengembangan.
   await prisma.user.create({
@@ -128,7 +127,8 @@ async function main() {
     data: [
       {
         projectId: hcms.id,
-        tanggalInput: new Date("2026-10-13"),
+        tanggal: new Date("2026-10-12"),
+        tanggalInput: new Date("2026-10-13T10:30:00+07:00"),
         status: "ON_PROGRESS",
         aktivitas: "Analisa data tenaga kerja",
         kendala: null,
@@ -137,7 +137,8 @@ async function main() {
       },
       {
         projectId: hcms.id,
-        tanggalInput: new Date("2026-10-14"),
+        tanggal: new Date("2026-10-13"),
+        tanggalInput: new Date("2026-10-14T11:00:00+07:00"),
         status: "ON_PROGRESS",
         aktivitas: "Refine benefit assumption",
         kendala: "Menunggu masukan dari tim Finance",

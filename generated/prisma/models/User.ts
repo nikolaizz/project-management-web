@@ -191,7 +191,6 @@ export type UserWhereInput = {
   role?: Prisma.EnumRoleFilter<"User"> | $Enums.Role
   createdAt?: Prisma.DateTimeFilter<"User"> | Date | string
   projectUpdates?: Prisma.ProjectUpdateListRelationFilter
-  dailyUpdates?: Prisma.DailyUpdateListRelationFilter
 }
 
 export type UserOrderByWithRelationInput = {
@@ -202,7 +201,6 @@ export type UserOrderByWithRelationInput = {
   role?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   projectUpdates?: Prisma.ProjectUpdateOrderByRelationAggregateInput
-  dailyUpdates?: Prisma.DailyUpdateOrderByRelationAggregateInput
 }
 
 export type UserWhereUniqueInput = Prisma.AtLeast<{
@@ -216,7 +214,6 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
   role?: Prisma.EnumRoleFilter<"User"> | $Enums.Role
   createdAt?: Prisma.DateTimeFilter<"User"> | Date | string
   projectUpdates?: Prisma.ProjectUpdateListRelationFilter
-  dailyUpdates?: Prisma.DailyUpdateListRelationFilter
 }, "id" | "email">
 
 export type UserOrderByWithAggregationInput = {
@@ -251,7 +248,6 @@ export type UserCreateInput = {
   role?: $Enums.Role
   createdAt?: Date | string
   projectUpdates?: Prisma.ProjectUpdateCreateNestedManyWithoutModifiedByInput
-  dailyUpdates?: Prisma.DailyUpdateCreateNestedManyWithoutUpdatedByInput
 }
 
 export type UserUncheckedCreateInput = {
@@ -262,7 +258,6 @@ export type UserUncheckedCreateInput = {
   role?: $Enums.Role
   createdAt?: Date | string
   projectUpdates?: Prisma.ProjectUpdateUncheckedCreateNestedManyWithoutModifiedByInput
-  dailyUpdates?: Prisma.DailyUpdateUncheckedCreateNestedManyWithoutUpdatedByInput
 }
 
 export type UserUpdateInput = {
@@ -273,7 +268,6 @@ export type UserUpdateInput = {
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   projectUpdates?: Prisma.ProjectUpdateUpdateManyWithoutModifiedByNestedInput
-  dailyUpdates?: Prisma.DailyUpdateUpdateManyWithoutUpdatedByNestedInput
 }
 
 export type UserUncheckedUpdateInput = {
@@ -284,7 +278,6 @@ export type UserUncheckedUpdateInput = {
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   projectUpdates?: Prisma.ProjectUpdateUncheckedUpdateManyWithoutModifiedByNestedInput
-  dailyUpdates?: Prisma.DailyUpdateUncheckedUpdateManyWithoutUpdatedByNestedInput
 }
 
 export type UserCreateManyInput = {
@@ -370,22 +363,6 @@ export type UserUpdateOneWithoutProjectUpdatesNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutProjectUpdatesInput, Prisma.UserUpdateWithoutProjectUpdatesInput>, Prisma.UserUncheckedUpdateWithoutProjectUpdatesInput>
 }
 
-export type UserCreateNestedOneWithoutDailyUpdatesInput = {
-  create?: Prisma.XOR<Prisma.UserCreateWithoutDailyUpdatesInput, Prisma.UserUncheckedCreateWithoutDailyUpdatesInput>
-  connectOrCreate?: Prisma.UserCreateOrConnectWithoutDailyUpdatesInput
-  connect?: Prisma.UserWhereUniqueInput
-}
-
-export type UserUpdateOneWithoutDailyUpdatesNestedInput = {
-  create?: Prisma.XOR<Prisma.UserCreateWithoutDailyUpdatesInput, Prisma.UserUncheckedCreateWithoutDailyUpdatesInput>
-  connectOrCreate?: Prisma.UserCreateOrConnectWithoutDailyUpdatesInput
-  upsert?: Prisma.UserUpsertWithoutDailyUpdatesInput
-  disconnect?: Prisma.UserWhereInput | boolean
-  delete?: Prisma.UserWhereInput | boolean
-  connect?: Prisma.UserWhereUniqueInput
-  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutDailyUpdatesInput, Prisma.UserUpdateWithoutDailyUpdatesInput>, Prisma.UserUncheckedUpdateWithoutDailyUpdatesInput>
-}
-
 export type UserCreateWithoutProjectUpdatesInput = {
   id: string
   nama: string
@@ -393,7 +370,6 @@ export type UserCreateWithoutProjectUpdatesInput = {
   passwordHash: string
   role?: $Enums.Role
   createdAt?: Date | string
-  dailyUpdates?: Prisma.DailyUpdateCreateNestedManyWithoutUpdatedByInput
 }
 
 export type UserUncheckedCreateWithoutProjectUpdatesInput = {
@@ -403,7 +379,6 @@ export type UserUncheckedCreateWithoutProjectUpdatesInput = {
   passwordHash: string
   role?: $Enums.Role
   createdAt?: Date | string
-  dailyUpdates?: Prisma.DailyUpdateUncheckedCreateNestedManyWithoutUpdatedByInput
 }
 
 export type UserCreateOrConnectWithoutProjectUpdatesInput = {
@@ -429,7 +404,6 @@ export type UserUpdateWithoutProjectUpdatesInput = {
   passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  dailyUpdates?: Prisma.DailyUpdateUpdateManyWithoutUpdatedByNestedInput
 }
 
 export type UserUncheckedUpdateWithoutProjectUpdatesInput = {
@@ -439,63 +413,6 @@ export type UserUncheckedUpdateWithoutProjectUpdatesInput = {
   passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  dailyUpdates?: Prisma.DailyUpdateUncheckedUpdateManyWithoutUpdatedByNestedInput
-}
-
-export type UserCreateWithoutDailyUpdatesInput = {
-  id: string
-  nama: string
-  email: string
-  passwordHash: string
-  role?: $Enums.Role
-  createdAt?: Date | string
-  projectUpdates?: Prisma.ProjectUpdateCreateNestedManyWithoutModifiedByInput
-}
-
-export type UserUncheckedCreateWithoutDailyUpdatesInput = {
-  id: string
-  nama: string
-  email: string
-  passwordHash: string
-  role?: $Enums.Role
-  createdAt?: Date | string
-  projectUpdates?: Prisma.ProjectUpdateUncheckedCreateNestedManyWithoutModifiedByInput
-}
-
-export type UserCreateOrConnectWithoutDailyUpdatesInput = {
-  where: Prisma.UserWhereUniqueInput
-  create: Prisma.XOR<Prisma.UserCreateWithoutDailyUpdatesInput, Prisma.UserUncheckedCreateWithoutDailyUpdatesInput>
-}
-
-export type UserUpsertWithoutDailyUpdatesInput = {
-  update: Prisma.XOR<Prisma.UserUpdateWithoutDailyUpdatesInput, Prisma.UserUncheckedUpdateWithoutDailyUpdatesInput>
-  create: Prisma.XOR<Prisma.UserCreateWithoutDailyUpdatesInput, Prisma.UserUncheckedCreateWithoutDailyUpdatesInput>
-  where?: Prisma.UserWhereInput
-}
-
-export type UserUpdateToOneWithWhereWithoutDailyUpdatesInput = {
-  where?: Prisma.UserWhereInput
-  data: Prisma.XOR<Prisma.UserUpdateWithoutDailyUpdatesInput, Prisma.UserUncheckedUpdateWithoutDailyUpdatesInput>
-}
-
-export type UserUpdateWithoutDailyUpdatesInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string
-  nama?: Prisma.StringFieldUpdateOperationsInput | string
-  email?: Prisma.StringFieldUpdateOperationsInput | string
-  passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
-  role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  projectUpdates?: Prisma.ProjectUpdateUpdateManyWithoutModifiedByNestedInput
-}
-
-export type UserUncheckedUpdateWithoutDailyUpdatesInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string
-  nama?: Prisma.StringFieldUpdateOperationsInput | string
-  email?: Prisma.StringFieldUpdateOperationsInput | string
-  passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
-  role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  projectUpdates?: Prisma.ProjectUpdateUncheckedUpdateManyWithoutModifiedByNestedInput
 }
 
 
@@ -505,12 +422,10 @@ export type UserUncheckedUpdateWithoutDailyUpdatesInput = {
 
 export type UserCountOutputType = {
   projectUpdates: number
-  dailyUpdates: number
 }
 
 export type UserCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   projectUpdates?: boolean | UserCountOutputTypeCountProjectUpdatesArgs
-  dailyUpdates?: boolean | UserCountOutputTypeCountDailyUpdatesArgs
 }
 
 /**
@@ -530,13 +445,6 @@ export type UserCountOutputTypeCountProjectUpdatesArgs<ExtArgs extends runtime.T
   where?: Prisma.ProjectUpdateWhereInput
 }
 
-/**
- * UserCountOutputType without action
- */
-export type UserCountOutputTypeCountDailyUpdatesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  where?: Prisma.DailyUpdateWhereInput
-}
-
 
 export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -546,7 +454,6 @@ export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   role?: boolean
   createdAt?: boolean
   projectUpdates?: boolean | Prisma.User$projectUpdatesArgs<ExtArgs>
-  dailyUpdates?: boolean | Prisma.User$dailyUpdatesArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["user"]>
 
@@ -580,7 +487,6 @@ export type UserSelectScalar = {
 export type UserOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "nama" | "email" | "passwordHash" | "role" | "createdAt", ExtArgs["result"]["user"]>
 export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   projectUpdates?: boolean | Prisma.User$projectUpdatesArgs<ExtArgs>
-  dailyUpdates?: boolean | Prisma.User$dailyUpdatesArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type UserIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
@@ -590,7 +496,6 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
   name: "User"
   objects: {
     projectUpdates: Prisma.$ProjectUpdatePayload<ExtArgs>[]
-    dailyUpdates: Prisma.$DailyUpdatePayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -994,7 +899,6 @@ readonly fields: UserFieldRefs;
 export interface Prisma__UserClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
   projectUpdates<T extends Prisma.User$projectUpdatesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$projectUpdatesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ProjectUpdatePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
-  dailyUpdates<T extends Prisma.User$dailyUpdatesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$dailyUpdatesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$DailyUpdatePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1444,30 +1348,6 @@ export type User$projectUpdatesArgs<ExtArgs extends runtime.Types.Extensions.Int
   take?: number
   skip?: number
   distinct?: Prisma.ProjectUpdateScalarFieldEnum | Prisma.ProjectUpdateScalarFieldEnum[]
-}
-
-/**
- * User.dailyUpdates
- */
-export type User$dailyUpdatesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  /**
-   * Select specific fields to fetch from the DailyUpdate
-   */
-  select?: Prisma.DailyUpdateSelect<ExtArgs> | null
-  /**
-   * Omit specific fields from the DailyUpdate
-   */
-  omit?: Prisma.DailyUpdateOmit<ExtArgs> | null
-  /**
-   * Choose, which related nodes to fetch as well
-   */
-  include?: Prisma.DailyUpdateInclude<ExtArgs> | null
-  where?: Prisma.DailyUpdateWhereInput
-  orderBy?: Prisma.DailyUpdateOrderByWithRelationInput | Prisma.DailyUpdateOrderByWithRelationInput[]
-  cursor?: Prisma.DailyUpdateWhereUniqueInput
-  take?: number
-  skip?: number
-  distinct?: Prisma.DailyUpdateScalarFieldEnum | Prisma.DailyUpdateScalarFieldEnum[]
 }
 
 /**

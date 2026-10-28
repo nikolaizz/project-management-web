@@ -122,7 +122,12 @@ export async function getProjectById(req, res, next) {
         ...projectInclude,
         // Pada tampilan detail, ambil seluruh dokumen dan riwayat update terbaru dahulu.
         documents: { orderBy: { uploadedAt: "desc" } },
-        updates: { orderBy: { tanggalInput: "desc" }, include : { modifiedBy: { select: { id: true, nama: true } } } },
+        updates: {
+          orderBy: { tanggalInput: "desc" },
+          take: 20,
+          include: { modifiedBy: { select: { id: true, nama: true } } },
+        },
+        _count: { select: { updates: true } },
       },
     });
 
@@ -197,7 +202,7 @@ export async function updateProject(req, res, next) {
       return res.status(400).json({ success: false, message: "ID project tidak valid" });
     }
 
-    const d = req.body; // sudah divalidasi (semua field opsional)
+    const d = req.body; // sudah divalidasi
     if (Object.keys(d).length === 0) {
       return res.status(400).json({ success: false, message: "Tidak ada data yang diubah" });
     }
@@ -207,7 +212,6 @@ export async function updateProject(req, res, next) {
       return res.status(404).json({ success: false, message: "Project tidak ditemukan" });
     }
 
-    // Hitung nilai akhir untuk aturan bisnis
     const jenis = d.jenis ?? existing.jenis;
     const kode = "kodeProject" in d ? d.kodeProject || null : existing.kodeProject;
 
@@ -218,15 +222,10 @@ export async function updateProject(req, res, next) {
         errors: [{ field: "kodeProject", message: "Kode project wajib diisi untuk jenis Addendum" }],
       });
     }
-
-    // Kode harus unik (selain milik project ini sendiri)
     if (kode && kode !== existing.kodeProject) {
       const dup = await prisma.project.findUnique({ where: { kodeProject: kode } });
       if (dup) {
-        return res.status(409).json({
-          success: false,
-          message: `Kode project ${kode} sudah digunakan`,
-        });
+        return res.status(409).json({ success: false, message: `Kode project ${kode} sudah digunakan` });
       }
     }
 
@@ -238,32 +237,8 @@ export async function updateProject(req, res, next) {
     if ("kodeProject" in d) data.kodeProject = kode;
     if ("tanggalProject" in d) data.tanggalProject = new Date(d.tanggalProject);
     if ("targetGoLive" in d) data.targetGoLive = d.targetGoLive ? new Date(d.targetGoLive) : null;
-    if ("status" in d) data.status = d.status;
 
-    const statusChanged = d.status !== undefined && d.status !== existing.status;
-    const adaCatatan = Boolean(d.aktivitas && d.nextAction);
-    const project = await prisma.$transaction(async (tx) => {
-      const updated = await tx.project.update({
-        where: { id },
-        data: { ...data, ...(statusChanged ? { status: d.status } : {}) },
-        include: projectInclude,
-      });
-
-      if (statusChanged || adaCatatan) {
-        await tx.projectUpdate.create({
-          data: {
-            projectId: id,
-            status: updated.status,
-            aktivitas: d.aktivitas,
-            kendala: d.kendala || null,
-            nextAction: d.nextAction,
-            modifiedById: req.user?.id ?? null, // middleware auth menambahkan req.user
-          },
-        });
-      }
-
-      return updated;
-    });
+    const project = await prisma.project.update({ where: { id }, data, include: projectInclude });
 
     res.json({ success: true, message: "Project berhasil diperbarui", data: project });
   } catch (err) {

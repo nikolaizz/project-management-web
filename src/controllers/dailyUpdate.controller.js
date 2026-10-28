@@ -82,12 +82,13 @@ export async function createDailyUpdates(req, res, next) {
         const status = it.status ?? p.status;
 
         // Status project ikut diperbarui kalau diubah di sini
-        if (status !== p.status) {
-          await tx.project.update({ where: { id: p.id }, data: { status } });
-        }
+        await tx.project.update({
+          where: { id: p.id },
+          data: { ...(status !== p.status ? { status } : {}), updatedAt: new Date() },
+        });
 
         created.push(
-          await tx.dailyUpdate.create({
+          await tx.projectUpdate.create({
             data: {
               projectId: p.id,
               tanggal: new Date(tanggal),
@@ -95,7 +96,7 @@ export async function createDailyUpdates(req, res, next) {
               aktivitas: it.aktivitas,
               kendala: it.kendala || null,
               nextAction: it.nextAction,
-              updatedById: req.user?.id ?? null, // terisi setelah login ada
+              modifiedById: req.user?.id ?? null, // terisi setelah login ada
             },
           })
         );
@@ -123,11 +124,11 @@ export async function listDailyUpdates(req, res, next) {
     }
     const limit = Math.min(Math.max(parseInt(req.query.limit) || 10, 1), 100);
 
-    const data = await prisma.dailyUpdate.findMany({
+    const data = await prisma.projectUpdate.findMany({
       where: { projectId },
-      orderBy: { createdAt: "desc" },
+      orderBy: { tanggalInput: "desc" },
       take: limit,
-      include: { updatedBy: { select: { id: true, nama: true } } },
+      include: { modifiedBy: { select: { id: true, nama: true } } },
     });
 
     res.json({ success: true, data });

@@ -228,7 +228,7 @@ button.wa-copy{background:#1f8a4c;border-color:#1f8a4c;color:#fff}
       </div>
       <div class="card" style="margin-top:20px">
         <div class="head">
-          <h2 id="historyTitle">Riwayat Generate Format WhatsApp</h2>
+          <h2 id="historyTitle">Historical aktivitas &amp; updates</h2>
           <div class="history-pick"><label for="historySelect">Project</label><select id="historySelect"></select></div>
         </div>
         <div id="dailyHistory" class="tablewrap"><p class="empty">Pilih project untuk melihat riwayat.</p></div>
@@ -587,18 +587,24 @@ function fmtDateTime(value) {
   return `${esc(tgl)}, <strong>${esc(jam)}</strong>`;
 }
 
+// Tabel riwayat update: dipakai di Lihat Detail dan di menu Update progress (satu sumber data)
+function updatesTable(list) {
+  return `<table class="history"><thead><tr><th>Tanggal &amp; jam</th><th>Status</th><th>Aktivitas / Progress</th><th>Kendala</th><th>Next Action</th><th>Updated by</th></tr></thead><tbody>${list.map((u) => `<tr>
+    <td class="nowrap">${fmtDateTime(u.tanggalInput)}</td>
+    <td><span class="badge b-${esc(u.status)}">${esc(STATUS_LABEL[u.status] || u.status)}</span></td>
+    <td class="pre">${esc(u.aktivitas)}</td><td class="pre">${esc(u.kendala || "-")}</td><td class="pre">${esc(u.nextAction)}</td>
+    <td class="nowrap">${esc(u.modifiedBy ? u.modifiedBy.nama : "-")}</td></tr>`).join("")}</tbody></table>`;
+}
+
 function renderProjectDetail(p) {
   const date = (value) => value ? esc(String(value).slice(0, 10)) : "-";
   const docs = p.documents.length
     ? `<ul>${p.documents.map((d) => `<li><a href="${API}/documents/${d.id}/download">${esc(d.namaFile)}</a> <small>(${fmtSize(d.ukuran)})</small></li>`).join("")}</ul>`
     : `<p class="hint">Belum ada dokumen.</p>`;
+  const totalUpdates = p._count ? p._count.updates : p.updates.length;
   const updates = p.updates.length
-    ? `<div class="tablewrap"><table class="history"><thead><tr><th>Tanggal &amp; jam</th><th>Status</th><th>Aktivitas</th><th>Kendala</th><th>Next action</th><th>Diubah oleh</th></tr></thead><tbody>${p.updates.map((u) => `<tr>
-        <td class="nowrap">${fmtDateTime(u.tanggalInput)}</td>
-        <td><span class="badge b-${esc(u.status)}">${esc(STATUS_LABEL[u.status] || u.status)}</span></td>
-        <td>${esc(u.aktivitas)}</td><td>${esc(u.kendala || "-")}</td><td>${esc(u.nextAction)}</td>
-        <td class="nowrap">${esc(u.modifiedBy ? u.modifiedBy.nama : "-")}</td></tr>`).join("")}</tbody></table></div>`
-    : `<p class="hint">Belum ada riwayat update.</p>`;
+    ? `<div class="tablewrap">${updatesTable(p.updates)}</div><p class="hint">Menampilkan ${p.updates.length} dari ${totalUpdates} update terakhir.</p>`
+    : `<p class="hint">Belum ada riwayat update. Catat lewat menu Update progress.</p>`;
   const stageList = Array.isArray(p.stages) ? p.stages : [];
   const stages = stageList.length
     ? `<div class="tablewrap"><table><thead><tr><th>Tahapan</th><th>Tanggal rencana</th><th>Status</th><th>Catatan</th></tr></thead><tbody>${stageList.map((x) => `<tr><td>${esc(TAHAP_LABEL[x.tahap] || x.tahap)}</td><td>${date(x.tanggalRencana)}</td><td>${esc(STATUS_TAHAP_LABEL[x.status] || x.status)}</td><td>${esc(x.catatan || "-")}</td></tr>`).join("")}</tbody></table></div>`
@@ -644,35 +650,6 @@ function editMasterSelect(name, label, choices, selected) {
   return `<div><label for="edit-${name}">${label}</label><select id="edit-${name}" name="${name}" required>${optionsHtml}</select></div>`;
 }
 
-let editFiles = [];
-
-function editDocsListHtml(list) {
-  if (!list.length) return `<p class="hint">Belum ada dokumen.</p>`;
-  return `<ul class="files">${list.map((d) => `<li><span class="nm"><a href="${API}/documents/${d.id}/download">${esc(d.namaFile)}</a> <small>(${fmtSize(d.ukuran)})</small></span><button type="button" class="small danger" data-editdeldoc="${d.id}">Hapus</button></li>`).join("")}</ul>`;
-}
-
-function renderEditNewFiles() {
-  const box = $("#editNewFiles");
-  if (!box) return;
-  box.innerHTML = editFiles.map((f, i) => `<li><span class="nm">${esc(f.name)} <small>(${fmtSize(f.size)}) · akan ditambahkan</small></span><button type="button" class="small danger" data-editrm="${i}">Batal</button></li>`).join("");
-}
-
-function addEditFiles(list) {
-  const bad = [];
-  for (const f of list) {
-    const ext = (f.name.match(/\.[^.]+$/) || [""])[0].toLowerCase();
-    if (!ALLOWED.includes(ext)) { bad.push(`${f.name}: tipe file tidak diizinkan`); continue; }
-    if (f.size > MAX_SIZE) { bad.push(`${f.name}: lebih dari 10 MB`); continue; }
-    if (editFiles.some((x) => x.name === f.name && x.size === f.size)) continue;
-    if (editFiles.length >= MAX_FILES) { bad.push(`${f.name}: maksimal ${MAX_FILES} file sekali tambah`); continue; }
-    editFiles.push(f);
-  }
-  renderEditNewFiles();
-  const warn = $("#editFileWarn");
-  warn.textContent = bad.length ? "Sebagian file ditolak. " + bad.join("; ") : "";
-  warn.hidden = !bad.length;
-}
-
 function renderEditForm(p) {
   const date = (value) => value ? esc(String(value).slice(0, 10)) : "";
   $("#editProjectDialog").innerHTML = `<form id="editProjectForm">
@@ -681,62 +658,26 @@ function renderEditForm(p) {
       ${editSelect("kategori", "Kategori", master.enums.kategori, p.kategori, KATEGORI_LABEL)}
       <div><label for="edit-kodeProject">Kode project</label><input id="edit-kodeProject" name="kodeProject" value="${esc(p.kodeProject || "")}"></div>
       ${editSelect("jenis", "Jenis project", Object.keys(JENIS_LABEL), p.jenis, JENIS_LABEL)}
-      ${editSelect("status", "Status", master.enums.status, p.status, STATUS_LABEL)}
       ${editSelect("prioritas", "Prioritas", Object.keys(PRIORITAS_LABEL), p.prioritas, PRIORITAS_LABEL)}
       ${editMasterSelect("pmId", "Project manager", master.pm, p.pmId)}
+      ${editMasterSelect("bpId", "Business partner", master.bp, p.bpId)}
       <div class="full"><label for="edit-nama">Nama project</label><input id="edit-nama" name="nama" value="${esc(p.nama)}" required></div>
       <div class="full"><label for="edit-deskripsi">Deskripsi</label><textarea id="edit-deskripsi" name="deskripsi" required>${esc(p.deskripsi)}</textarea></div>
-      ${editMasterSelect("bpId", "Business partner", master.bp, p.bpId)}
       ${editMasterSelect("unitId", "Unit pengusul", master.units, p.unitId)}
       <div><label for="edit-ownerPic">Owner / PIC</label><input id="edit-ownerPic" name="ownerPic" value="${esc(p.ownerPic)}" required></div>
       <div><label for="edit-tanggalProject">Tanggal project</label><input id="edit-tanggalProject" name="tanggalProject" type="date" value="${date(p.tanggalProject)}" required></div>
       <div><label for="edit-targetGoLive">Target go live</label><input id="edit-targetGoLive" name="targetGoLive" type="date" value="${date(p.targetGoLive)}"></div>
-      <div id="statusUpdateFields" class="full">
-        <h3>Catatan update</h3>
-        <p class="hint" id="noteHint"></p>
-        <div class="grid">
-          <div class="full"><label for="edit-aktivitas">Aktivitas / progress / outcome</label><textarea id="edit-aktivitas" name="aktivitas"></textarea></div>
-          <div><label for="edit-kendala">Kendala / issue (opsional)</label><textarea id="edit-kendala" name="kendala"></textarea></div>
-          <div><label for="edit-nextAction">Next action</label><textarea id="edit-nextAction" name="nextAction"></textarea></div>
-        </div>
-      </div>
-      <div class="full" id="editDocsSection">
-        <h3>Dokumen pendukung</h3>
-        <div id="editExistingDocs">${editDocsListHtml(p.documents || [])}</div>
-        <label class="drop" id="editDrop" style="margin-top:12px"><input type="file" id="editFileInput" multiple accept="${ALLOWED.join(",")}" hidden>
-          Klik atau seret file ke sini untuk menambah dokumen
-          <small>PDF, DOC, DOCX, XLS, XLSX, JPG, PNG. Maksimal 10 MB per file, 10 file sekali tambah.</small>
-        </label>
-        <ul class="files" id="editNewFiles"></ul>
-      </div>
     </div>
-    <div id="editFileWarn" class="alert warn" role="status" hidden></div>
+    <p class="hint">Status, catatan progress, dan dokumen dikelola lewat menu Update progress.</p>
     <div id="editProjectError" class="alert error" role="alert" hidden></div>
     <div class="dialog-actions"><button type="button" data-close-edit>Batal</button><button type="submit" class="primary">Simpan perubahan</button></div>
   </form>`;
 }
 
-function updateStatusFields() {
-  const form = $("#editProjectForm");
-  if (!form) return;
-  const changed = form.elements.status.value !== form.dataset.originalStatus;
-  const hasNote = ["aktivitas", "kendala", "nextAction"].some((n) => form.elements[n].value.trim() !== "");
-  // Catatan wajib jika status berubah, atau jika salah satu kolom catatan sudah diisi
-  const needed = changed || hasNote;
-  form.elements.aktivitas.required = needed;
-  form.elements.nextAction.required = needed;
-  $("#noteHint").textContent = changed
-    ? "Status berubah, jadi aktivitas dan next action wajib diisi."
-    : "Status tidak berubah. Isi aktivitas dan next action jika ingin mencatat update tanpa mengubah status.";
-}
-
 async function openEditProject(id) {
   const r = await api(`/projects/${id}`);
-  editFiles = [];
   renderEditForm(r.data);
   $("#editProjectForm").dataset.projectId = id;
-  $("#editProjectForm").dataset.originalStatus = r.data.status;
-  updateStatusFields();
   $("#editProjectDialog").showModal();
 }
 
@@ -751,33 +692,6 @@ $("#btnRefresh").onclick = loadProjects;
 $("#editProjectDialog").addEventListener("click", (e) => {
   if (e.target.closest("[data-close-edit]")) $("#editProjectDialog").close();
 });
-$("#editProjectDialog").addEventListener("change", (e) => {
-  if (e.target.name === "status") updateStatusFields();
-});
-$("#editProjectDialog").addEventListener("change", (e) => {
-  if (e.target.id === "editFileInput") { addEditFiles([...e.target.files]); e.target.value = ""; }
-});
-$("#editProjectDialog").addEventListener("dragover", (e) => { const d = e.target.closest("#editDrop"); if (d) { e.preventDefault(); d.classList.add("over"); } });
-$("#editProjectDialog").addEventListener("dragleave", (e) => { const d = e.target.closest("#editDrop"); if (d) d.classList.remove("over"); });
-$("#editProjectDialog").addEventListener("drop", (e) => { const d = e.target.closest("#editDrop"); if (d) { e.preventDefault(); d.classList.remove("over"); addEditFiles([...e.dataTransfer.files]); } });
-$("#editProjectDialog").addEventListener("click", async (e) => {
-  const rm = e.target.closest("[data-editrm]");
-  if (rm) { editFiles.splice(Number(rm.dataset.editrm), 1); renderEditNewFiles(); return; }
-  const del = e.target.closest("[data-editdeldoc]");
-  if (!del) return;
-  if (!confirm("Hapus dokumen ini? Penghapusan langsung berlaku, tanpa menunggu tombol Simpan.")) return;
-  const error = $("#editProjectError");
-  error.hidden = true;
-  try {
-    await api(`/documents/${del.dataset.editdeldoc}`, { method: "DELETE" });
-    const r = await api(`/projects/${$("#editProjectForm").dataset.projectId}/documents`);
-    $("#editExistingDocs").innerHTML = editDocsListHtml(r.data);
-    loadProjects();
-  } catch (err) { error.textContent = err.message; error.hidden = false; }
-});
-$("#editProjectDialog").addEventListener("input", (e) => {
-  if (["aktivitas", "kendala", "nextAction"].includes(e.target.name)) updateStatusFields();
-});
 $("#editProjectDialog").addEventListener("submit", async (e) => {
   if (e.target.id !== "editProjectForm") return;
   e.preventDefault();
@@ -787,7 +701,6 @@ $("#editProjectDialog").addEventListener("submit", async (e) => {
   const payload = {
     kategori: data.get("kategori"),
     jenis: data.get("jenis"),
-    status: data.get("status"),
     prioritas: data.get("prioritas"),
     kodeProject: String(data.get("kodeProject")).trim() || null,
     nama: String(data.get("nama")).trim(),
@@ -799,46 +712,21 @@ $("#editProjectDialog").addEventListener("submit", async (e) => {
     tanggalProject: data.get("tanggalProject"),
     targetGoLive: data.get("targetGoLive") || null,
   };
-  const statusChanged = payload.status !== form.dataset.originalStatus;
-  const aktivitas = String(data.get("aktivitas")).trim();
-  const kendala = String(data.get("kendala")).trim();
-  const nextAction = String(data.get("nextAction")).trim();
-  if (!statusChanged) delete payload.status;
-  if (statusChanged || aktivitas || kendala || nextAction) {
-    payload.aktivitas = aktivitas;
-    payload.kendala = kendala || null;
-    payload.nextAction = nextAction;
-  }
   submitButton.disabled = true;
   submitButton.textContent = "Menyimpan...";
   error.hidden = true;
-  const saved = () => form.dataset.saved === "1";
   try {
-    // Data project disimpan sekali saja; kalau unggah dokumen gagal, percobaan ulang hanya mengirim dokumen
-    if (!saved()) {
-      await api(`/projects/${form.dataset.projectId}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
-      form.dataset.saved = "1";
-    }
-    const jumlah = editFiles.length;
-    if (jumlah) {
-      const fd = new FormData();
-      editFiles.forEach((f) => fd.append("files", f));
-      await api(`/projects/${form.dataset.projectId}/documents`, { method: "POST", body: fd });
-      editFiles = [];
-    }
+    await api(`/projects/${form.dataset.projectId}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    });
     $("#editProjectDialog").close();
-    $("#projectsMessage").innerHTML = `<div class="alert ok">Perubahan project berhasil disimpan${jumlah ? `, ${jumlah} dokumen ditambahkan` : ""}.</div>`;
+    $("#projectsMessage").innerHTML = `<div class="alert ok">Perubahan project berhasil disimpan.</div>`;
     await loadProjects();
   } catch (err) {
-    error.textContent = saved()
-      ? `Perubahan data project sudah tersimpan, tetapi dokumen gagal diunggah: ${err.message}. Periksa file lalu klik Simpan lagi; hanya dokumen yang akan dikirim ulang.`
-      : err.message;
+    error.textContent = err.message;
     error.hidden = false;
-    if (saved()) loadProjects();
   } finally {
     submitButton.disabled = false;
     submitButton.textContent = "Simpan perubahan";
@@ -908,10 +796,10 @@ async function openDeleteProject(id) {
       <dt>Nama</dt><dd>${esc(p.nama)}</dd>
       <dt>Kode project</dt><dd>${esc(p.kodeProject || "-")}</dd>
       <dt>Status saat ini</dt><dd><span class="badge b-${esc(p.status)}">${esc(label)}</span></dd>
-      <dt>Isi project</dt><dd>${p.documents.length} dokumen, ${p.updates.length} riwayat update, ${Array.isArray(p.stages) ? p.stages.length : 0} tahapan</dd>
+      <dt>Isi project</dt><dd>${p.documents.length} dokumen, ${p._count ? p._count.updates : p.updates.length} riwayat update, ${Array.isArray(p.stages) ? p.stages.length : 0} tahapan</dd>
     </dl>
     ${ACTIVE_STATUS.includes(p.status) ? `<div class="alert warn">Project ini masih aktif (status ${esc(label)}). Pastikan memang perlu dihapus.</div>` : ""}
-    <div class="alert error">Tindakan ini permanen. Project beserta tahapan, dokumen (termasuk filenya), riwayat update, dan daily update akan terhapus dan tidak bisa dikembalikan.</div>
+    <div class="alert error">Tindakan ini permanen. Project beserta tahapan, dokumen (termasuk filenya), dan riwayat update akan terhapus dan tidak bisa dikembalikan.</div>
     <label class="check"><input type="checkbox" id="deleteConfirmCheck"> Saya mengerti dan ingin menghapus project ini</label>
     <div id="deleteProjectError" class="alert error" role="alert" hidden></div>
     <div class="dialog-actions"><button type="button" data-close-delete>Batal</button><button type="button" class="danger-solid" id="btnConfirmDelete" disabled>Hapus permanen</button></div>`;
@@ -1045,10 +933,11 @@ $("#configBody").addEventListener("keydown", (e) => {
 });
 
 // ---------- Update progress harian ----------
-const newBlock = () => ({ projectId: "", status: "", aktivitas: "", kendala: "", nextAction: "" });
-const daily = { projects: [], historyId: "", latestId: "", blocks: [newBlock()], locked: false, busy: false, previewing: false, text: "", previewText: "", stale: false, errors: {} };
+const newBlock = () => ({ projectId: "", status: "", aktivitas: "", kendala: "", nextAction: "", docs: [], files: [] });
+const daily = { projects: [], savedCount: 0, historyId: "", latestId: "", blocks: [newBlock()], locked: false, busy: false, previewing: false, text: "", previewText: "", stale: false, errors: {} };
 const fmtTodayWIB = () => new Intl.DateTimeFormat("id-ID", { timeZone: "Asia/Jakarta", weekday: "long", day: "numeric", month: "long", year: "numeric" }).format(new Date());
 const dailyMsg = (type, msg) => { $("#dailyMessage").innerHTML = msg ? `<div class="alert ${type}">${esc(msg)}</div>` : ""; };
+const bytes = (n) => fmtSize(n);
 const projectOf = (id) => daily.projects.find((x) => String(x.id) === String(id));
 
 function dailyBlockHtml(i) {
@@ -1075,8 +964,79 @@ function dailyBlockHtml(i) {
       ${ta("aktivitas", "Aktivitas / Progress")}
       ${ta("kendala", "Kendala / Isu (opsional)")}
       ${ta("nextAction", "Next Action")}
+      ${blockDocsHtml(i, b, p, dis)}
     </div>
   </div>`;
+}
+
+// Dokumen pendukung per blok: daftar yang sudah ada + tambah file baru
+function blockDocsHtml(i, b, p, dis) {
+  const head = `<div style="font-weight:600;font-size:13px;margin-bottom:4px">Dokumen pendukung</div>`;
+  if (!p) return `<div class="full">${head}<p class="hint">Pilih project untuk melihat dan menambah dokumen.</p></div>`;
+  const existing = b.docs.length
+    ? `<ul class="files">${b.docs.map((d) => `<li><span class="nm"><a href="${API}/documents/${d.id}/download">${esc(d.namaFile)}</a> <small>(${bytes(d.ukuran)})</small></span><button type="button" class="small danger" data-dfdel="${d.id}" data-i="${i}"${dis}>Hapus</button></li>`).join("")}</ul>`
+    : `<p class="hint">Belum ada dokumen.</p>`;
+  const staged = b.files.length
+    ? `<ul class="files">${b.files.map((f, j) => `<li><span class="nm">${esc(f.name)} <small>(${bytes(f.size)}) · akan ditambahkan</small></span><button type="button" class="small danger" data-dfrm="${i}:${j}"${dis}>Batal</button></li>`).join("")}</ul>`
+    : "";
+  return `<div class="full">${head}${existing}
+    <label class="drop" data-ddrop="${i}" style="margin-top:10px"><input type="file" data-dfile="${i}" multiple accept="${ALLOWED.join(",")}" hidden${dis}>
+      Klik atau seret file ke sini untuk menambah dokumen
+      <small>PDF, DOC, DOCX, XLS, XLSX, JPG, PNG. Maksimal 10 MB per file, 10 file.</small>
+    </label>${staged}</div>`;
+}
+
+async function loadBlockDocs(i) {
+  const b = daily.blocks[i];
+  if (!b || !b.projectId) return;
+  const id = b.projectId;
+  try {
+    const r = await api(`/projects/${id}/documents`);
+    if (!daily.blocks[i] || daily.blocks[i].projectId !== id) return; // pilihan sudah berganti
+    daily.blocks[i].docs = r.data;
+    renderDaily();
+  } catch (e) { dailyMsg("error", e.message); }
+}
+
+function addBlockFiles(i, list) {
+  const b = daily.blocks[i], bad = [];
+  for (const f of list) {
+    const ext = (f.name.match(/\.[^.]+$/) || [""])[0].toLowerCase();
+    if (!ALLOWED.includes(ext)) { bad.push(`${f.name}: tipe file tidak diizinkan`); continue; }
+    if (f.size > MAX_SIZE) { bad.push(`${f.name}: lebih dari 10 MB`); continue; }
+    if (b.files.some((x) => x.name === f.name && x.size === f.size)) continue;
+    if (b.files.length >= MAX_FILES) { bad.push(`${f.name}: maksimal ${MAX_FILES} file`); continue; }
+    b.files.push(f);
+  }
+  renderDaily();
+  if (bad.length) dailyMsg("warn", "Sebagian file ditolak. " + bad.join("; "));
+}
+
+// Unggah file yang menunggu di setiap blok; mengembalikan daftar kegagalan
+async function uploadBlockFiles() {
+  const failed = [];
+  for (const b of daily.blocks) {
+    if (!b.files.length) continue;
+    try {
+      const fd = new FormData();
+      b.files.forEach((f) => fd.append("files", f));
+      await api(`/projects/${b.projectId}/documents`, { method: "POST", body: fd });
+      b.files = [];
+    } catch (err) {
+      const p = projectOf(b.projectId);
+      failed.push(`${p ? p.nama : b.projectId}: ${err.message}`);
+    }
+  }
+  return failed;
+}
+
+function reportAfterSave(staged, failed) {
+  const sisa = daily.blocks.reduce((n, b) => n + b.files.length, 0);
+  const terunggah = staged - sisa;
+  if (!failed.length) {
+    return dailyMsg("ok", `${daily.savedCount} update${terunggah ? ` dan ${terunggah} dokumen` : ""} tersimpan. Teks WhatsApp siap disalin.`);
+  }
+  $("#dailyMessage").innerHTML = `<div class="alert warn">${daily.savedCount} update tersimpan, tetapi sebagian dokumen gagal diunggah: ${esc(failed.join("; "))}. <button type="button" class="small" id="btnRetryDocs">Coba unggah ulang dokumen</button></div>`;
 }
 
 // Tampilan preview: teks *tebal* ala WhatsApp ditampilkan sebagai huruf tebal.
@@ -1175,10 +1135,7 @@ async function loadDailyHistory() {
     const r = await api(`/daily-updates?projectId=${encodeURIComponent(p.id)}&limit=10`);
     if (daily.historyId !== id) return; // pilihan sudah berganti selama menunggu
     box.innerHTML = r.data.length
-      ? `<table><thead><tr><th>Tanggal &amp; jam</th><th>Aktivitas / Progress</th><th>Kendala</th><th>Next action</th><th>Updated by</th></tr></thead><tbody>${r.data.map((u) => `<tr>
-          <td class="nowrap">${fmtDateTime(u.createdAt)}</td><td class="pre">${esc(u.aktivitas)}</td><td class="pre">${esc(u.kendala || "-")}</td>
-          <td class="pre">${esc(u.nextAction)}</td><td class="nowrap">${esc(u.updatedBy ? u.updatedBy.nama : "-")}</td></tr>`).join("")}</tbody></table>
-        <p class="hint">Menampilkan ${r.data.length} update terakhir dari ${esc(p.nama)}.</p>`
+      ? `${updatesTable(r.data)}<p class="hint">Menampilkan ${r.data.length} update terakhir dari ${esc(p.nama)}.</p>`
       : `<p class="empty">Belum ada update untuk ${esc(p.nama)}.</p>`;
   } catch (e) { box.innerHTML = `<p class="empty">${esc(e.message)}</p>`; }
 }
@@ -1220,9 +1177,13 @@ async function submitDaily() {
   daily.busy = true; renderDaily();
   try {
     const r = await api("/daily-updates", jsonOpts("POST", { items: dailyItems() }));
-    daily.text = r.text; daily.locked = true; daily.busy = false;
+    daily.text = r.text; daily.locked = true; daily.savedCount = r.data.length;
+    // Update sudah tersimpan; dokumen diunggah sesudahnya, dan bisa diulang sendiri kalau gagal
+    const staged = daily.blocks.reduce((n, b) => n + b.files.length, 0);
+    const failed = await uploadBlockFiles();
+    daily.busy = false;
     renderDaily();
-    dailyMsg("ok", `${r.data.length} update tersimpan. Teks WhatsApp siap disalin.`);
+    reportAfterSave(staged, failed);
     loadDailyHistory();
   } catch (err) {
     daily.busy = false;
@@ -1306,6 +1267,7 @@ $("#dailyBlocks").addEventListener("change", (e) => {
   const i = Number(e.target.dataset.i), b = daily.blocks[i], p = projectOf(e.target.value);
   b.projectId = e.target.value;
   b.status = p ? p.status : "";
+  b.docs = []; b.files = []; // dokumen terikat ke project, jadi file yang menunggu dikosongkan
   markStale();
   delete daily.errors[`items.${i}.projectId`];
   if (b.projectId) { // tabel riwayat ikut berpindah ke project yang baru dipilih
@@ -1314,6 +1276,7 @@ $("#dailyBlocks").addEventListener("change", (e) => {
     loadDailyHistory();
   }
   renderDaily();
+  if (b.projectId) loadBlockDocs(i);
   const sel = $(`#d-project-${i}`); if (sel) sel.focus();
 });
 $("#dailyBlocks").addEventListener("click", (e) => {
@@ -1323,6 +1286,43 @@ $("#dailyBlocks").addEventListener("click", (e) => {
   daily.errors = {};
   markStale();
   renderDaily();
+});
+
+$("#dailyBlocks").addEventListener("change", (e) => {
+  if (e.target.dataset.dfile === undefined) return;
+  addBlockFiles(Number(e.target.dataset.dfile), [...e.target.files]);
+});
+$("#dailyBlocks").addEventListener("dragover", (e) => { const d = e.target.closest("[data-ddrop]"); if (d) { e.preventDefault(); d.classList.add("over"); } });
+$("#dailyBlocks").addEventListener("dragleave", (e) => { const d = e.target.closest("[data-ddrop]"); if (d) d.classList.remove("over"); });
+$("#dailyBlocks").addEventListener("drop", (e) => {
+  const d = e.target.closest("[data-ddrop]");
+  if (d) { e.preventDefault(); d.classList.remove("over"); addBlockFiles(Number(d.dataset.ddrop), [...e.dataTransfer.files]); }
+});
+$("#dailyBlocks").addEventListener("click", async (e) => {
+  const rm = e.target.closest("[data-dfrm]");
+  if (rm) {
+    const [i, j] = rm.dataset.dfrm.split(":").map(Number);
+    daily.blocks[i].files.splice(j, 1);
+    renderDaily();
+    return;
+  }
+  const del = e.target.closest("[data-dfdel]");
+  if (del) {
+    if (!confirm("Hapus dokumen ini? Penghapusan langsung berlaku.")) return;
+    try {
+      await api(`/documents/${del.dataset.dfdel}`, { method: "DELETE" });
+      await loadBlockDocs(Number(del.dataset.i));
+    } catch (err) { dailyMsg("error", err.message); }
+  }
+});
+$("#dailyMessage").addEventListener("click", async (e) => {
+  const btn = e.target.closest("#btnRetryDocs");
+  if (!btn) return;
+  btn.disabled = true; btn.textContent = "Mengunggah...";
+  const staged = daily.blocks.reduce((n, b) => n + b.files.length, 0);
+  const failed = await uploadBlockFiles();
+  renderDaily();
+  reportAfterSave(staged, failed);
 });
 
 async function loadMaster() {

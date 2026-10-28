@@ -89,7 +89,6 @@ model User {
   createdAt    DateTime @default(now())
 
   projectUpdates ProjectUpdate[]
-  dailyUpdates   DailyUpdate[]
 
 }
 
@@ -118,7 +117,6 @@ model Project {
   documents     Document[]
   updates       ProjectUpdate[]
   stages        ProjectStage[]
-  dailyUpdates  DailyUpdate[]
 
   @@index([status])
   @@index([nama])
@@ -141,13 +139,14 @@ model ProjectUpdate {
   id           Int           @id @default(autoincrement())
   projectId    Int
   project      Project       @relation(fields: [projectId], references: [id], onDelete: Cascade)
-  tanggalInput DateTime      @default(now())
+  tanggal      DateTime      @db.Date            // tanggal update menurut WIB
+  tanggalInput DateTime      @default(now())     // tanggal dan jam
   status       ProjectStatus
-  aktivitas    String        // Aktivitas / Progress / Outcome
-  kendala      String?       // Kendala / Issue
+  aktivitas    String
+  kendala      String?
   nextAction   String
   modifiedById String?
-  modifiedBy   User?  @relation(fields: [modifiedById], references: [id], onDelete: SetNull)
+  modifiedBy   User?         @relation(fields: [modifiedById], references: [id], onDelete: SetNull)
 
   @@index([projectId, tanggalInput])
 }
@@ -162,20 +161,4 @@ model ProjectStage {
   catatan        String?
 
   @@unique([projectId, tahap])
-}
-
-model DailyUpdate {
-  id          Int           @id @default(autoincrement())
-  projectId   Int
-  project     Project       @relation(fields: [projectId], references: [id], onDelete: Cascade)
-  tanggal     DateTime      @db.Date
-  createdAt   DateTime      @default(now())
-  status      ProjectStatus
-  aktivitas   String
-  kendala     String?
-  nextAction  String
-  updatedById String?
-  updatedBy   User?         @relation(fields: [updatedById], references: [id], onDelete: SetNull)
-
-  @@index([projectId, createdAt])
 }

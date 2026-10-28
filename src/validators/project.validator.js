@@ -57,23 +57,7 @@ export const createProjectSchema = z
   });
 
 // PUT: semua field opsional; perubahan status wajib disertai catatan riwayat.
-export const updateProjectSchema = z
-  .object({
-    ...projectFields,
-    status: z.enum(STATUS, "Status tidak valid").optional(),
-    aktivitas: z.string().trim().min(1, "Aktivitas wajib diisi").optional(),
-    kendala: z.string().trim().nullish(),
-    nextAction: z.string().trim().min(1, "Next action wajib diisi").optional(),
-  })
-  .partial()
-  .refine(
-    (d) => {
-      const adaCatatan = d.aktivitas || d.kendala || d.nextAction;
-      const perluCatatan = d.status !== undefined || adaCatatan;
-      return !perluCatatan || (d.aktivitas && d.nextAction);
-    },
-    { message: "Aktivitas dan next action wajib diisi untuk mencatat update", path: ["aktivitas"] }
-  );
+export const updateProjectSchema = z.object(projectFields).partial();
   
   // PUT /projects/:id/stages: kirim hanya tahapan yang berubah
 export const updateStagesSchema = z.object({
