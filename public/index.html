@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Project Hub - Upload Project</title>
+<title>Project Hub</title>
 <style>
 :root{--navy:#10285c;--blue:#1b5fd6;--blue-soft:#e8f0fd;--bg:#f3f5fa;--card:#fff;--line:#d9dfec;--text:#18233d;--muted:#5d6b88;--ok:#157347;--ok-bg:#e4f4ea;--bad:#b3261e;--bad-bg:#fdeceb;--warn:#8a5a00;--warn-bg:#fff3d6}
 *{box-sizing:border-box}
@@ -138,7 +138,7 @@ button.wa-copy{background:#1f8a4c;border-color:#1f8a4c;color:#fff}
 </head>
 <body>
 <header class="top">
-  <div class="brand"><strong>Project Hub</strong><span>Manajemen project</span></div>
+  <div class="brand"><strong>Project Hub</strong><span>Project Tracking Tools</span></div>
   <span id="apiStatus" class="pill">Memeriksa server...</span>
 </header>
 
@@ -147,15 +147,15 @@ button.wa-copy{background:#1f8a4c;border-color:#1f8a4c;color:#fff}
     <p class="side-title">Menu utama</p>
     <nav class="side-nav" aria-label="Navigasi project">
       <button type="button" class="side-link active" data-page="uploadPage" aria-current="page">
-        Upload project
+        Upload Project
         <span>Tambah project baru</span>
       </button>
       <button type="button" class="side-link" data-page="dailyPage">
-        Update progress
+        Update Progress
         <span>Catat progress harian</span>
       </button>
       <button type="button" class="side-link" data-page="projectsPage">
-        Daftar project
+        Daftar Project
         <span>Lihat project tersimpan</span>
       </button>
       <button type="button" class="side-link" data-page="configPage">
@@ -168,7 +168,7 @@ button.wa-copy{background:#1f8a4c;border-color:#1f8a4c;color:#fff}
   <div class="content">
     <section class="page" id="uploadPage" aria-labelledby="wizTitle">
       <div class="card">
-        <h1 id="wizTitle">Upload project</h1>
+        <h1 id="wizTitle">Upload Project</h1>
         <ol class="steps" id="steps"></ol>
         <div id="panel"></div>
         <div id="alert" role="alert"></div>
@@ -182,7 +182,7 @@ button.wa-copy{background:#1f8a4c;border-color:#1f8a4c;color:#fff}
     <section class="page" id="projectsPage" aria-labelledby="listTitle" hidden>
       <div class="card">
         <div class="head">
-          <h1 id="listTitle">Daftar project</h1>
+          <h1 id="listTitle">Daftar Project</h1>
           <button type="button" id="btnRefresh">Muat ulang</button>
         </div>
         <div id="projectsMessage" aria-live="polite"></div>
@@ -192,7 +192,7 @@ button.wa-copy{background:#1f8a4c;border-color:#1f8a4c;color:#fff}
 
     <section class="page" id="configPage" aria-labelledby="configTitle" hidden>
       <div class="card">
-        <div class="head"><h1 id="configTitle">Konfigurasi data dropdown</h1></div>
+        <div class="head"><h1 id="configTitle">Konfigurasi Data Dropdown</h1></div>
         <div class="tabs" id="configTabs" role="tablist" aria-label="Jenis data"></div>
         <div id="configMessage" aria-live="polite"></div>
         <div id="configBody"><p class="empty">Memuat...</p></div>
@@ -202,7 +202,7 @@ button.wa-copy{background:#1f8a4c;border-color:#1f8a4c;color:#fff}
     <section class="page" id="dailyPage" aria-labelledby="dailyTitle" hidden>
       <div class="daily-layout">
         <div class="card">
-          <div class="head"><h1 id="dailyTitle">Update progress project</h1></div>
+          <div class="head"><h1 id="dailyTitle">Update Progress Project</h1></div>
           <p class="hint" id="dailyDate"></p>
           <div id="dailyBlocks"></div>
           <div id="dailyMessage" aria-live="polite"></div>
@@ -218,7 +218,6 @@ button.wa-copy{background:#1f8a4c;border-color:#1f8a4c;color:#fff}
           <h2>Preview format WhatsApp</h2>
           <div id="waState" class="wa-state" hidden></div>
           <div id="waPreview" class="wa-bubble"></div>
-          <p class="hint" style="margin-top:8px">Tanda * pada teks yang disalin otomatis menjadi huruf tebal di WhatsApp.</p>
           <div class="wa-actions">
             <button type="button" id="btnCopyClip" disabled>Copy to clipboard</button>
             <button type="button" class="wa-copy" id="btnCopyOpen" disabled>Copy &amp; buka WhatsApp</button>
@@ -245,7 +244,7 @@ const API = location.protocol === "file:" ? "http://localhost:3000" : "";
 const MAX_SIZE = 10 * 1024 * 1024;
 const MAX_FILES = 10;
 const ALLOWED = [".pdf", ".doc", ".docx", ".xls", ".xlsx", ".jpg", ".jpeg", ".png"];
-const STEPS = ["Jenis project", "Informasi project", "Tahapan & dokumen", "Review"];
+const STEPS = ["Jenis Project", "Informasi Project", "Tahapan & Dokumen", "Review"];
 const STATUS_LABEL = { DRAFT: "Draft", INISIASI: "Inisiasi", ON_PROGRESS: "On progress", PENDING: "Pending", ON_HOLD: "On hold", SELESAI: "Selesai" };
 const KATEGORI_LABEL = { FS: "FS", CR_FORM: "CR Form", AIR_FORM: "AIR Form", IC_FORM: "IC Form", SC_FORM: "SC Form" };
 const JENIS_LABEL = { NEW: "Project baru", ADDENDUM: "Addendum" };
@@ -314,9 +313,9 @@ function fld(name, label, control, cls = "") {
 
 function stepJenis() {
   const c = (v, title, desc) => `<button type="button" class="choice ${state.jenis === v ? "on" : ""}" data-jenis="${v}"><strong>${title}</strong><span>${desc}</span></button>`;
-  return `<h2>Pilih jenis project</h2><div class="choices">
-    ${c("NEW", "Project baru", "Belum punya kode project. Kode boleh dikosongkan.")}
-    ${c("ADDENDUM", "Addendum (project existing)", "Sudah punya kode project. Kode wajib diisi.")}
+  return `<h2>Pilih Jenis Project</h2><div class="choices">
+    ${c("NEW", "Project Baru", "Belum punya kode project. Kode boleh dikosongkan.")}
+    ${c("ADDENDUM", "Addendum (Existing Project)", "Sudah punya kode project. Kode wajib diisi.")}
   </div>`;
 }
 
@@ -326,19 +325,19 @@ function stepInfo() {
   const prio = `<select id="f-prioritas" data-f="prioritas">${Object.entries(PRIORITAS_LABEL).map(([v, l]) => `<option value="${v}">${l}</option>`).join("")}</select>`;
   const hint = state.jenis === "ADDENDUM" ? "Wajib diisi untuk Addendum." : "Boleh dikosongkan untuk project baru.";
   const kode = `<div class="row"><input id="f-kodeProject" data-f="kodeProject" autocomplete="off"><button type="button" id="btnCheck">Cek kode</button></div><div class="hint" id="codeResult">${hint}</div>`;
-  return `<h2>Informasi project</h2><div class="grid">
+  return `<h2>Informasi Project</h2><div class="grid">
     ${fld("kategori", "Kategori", kat)}
-    ${fld("kodeProject", "Kode project", kode)}
-    ${fld("nama", "Nama project", `<input id="f-nama" data-f="nama">`, "full")}
+    ${fld("kodeProject", "Kode Project", kode)}
+    ${fld("nama", "Nama Project", `<input id="f-nama" data-f="nama">`, "full")}
     ${fld("deskripsi", "Deskripsi", `<textarea id="f-deskripsi" data-f="deskripsi"></textarea>`, "full")}
-    ${fld("pmId", "Project manager", `<select id="f-pmId" data-f="pmId">${options(master.pm, "Pilih PM")}</select>`)}
-    ${fld("bpId", "Business partner", `<select id="f-bpId" data-f="bpId">${options(master.bp, "Pilih BP")}</select>`)}
-    ${fld("unitId", "Unit pengusul", `<select id="f-unitId" data-f="unitId">${options(master.units, "Pilih unit")}</select>`)}
+    ${fld("pmId", "Project Manager", `<select id="f-pmId" data-f="pmId">${options(master.pm, "Pilih PM")}</select>`)}
+    ${fld("bpId", "Business Partner", `<select id="f-bpId" data-f="bpId">${options(master.bp, "Pilih BP")}</select>`)}
+    ${fld("unitId", "Unit Pengusul", `<select id="f-unitId" data-f="unitId">${options(master.units, "Pilih unit")}</select>`)}
     ${fld("prioritas", "Prioritas", prio)}
     ${fld("ownerPic", "Owner / PIC", `<input id="f-ownerPic" data-f="ownerPic">`)}
-    ${fld("tanggalProject", "Tanggal project", `<input id="f-tanggalProject" data-f="tanggalProject" type="date">`)}
-    ${fld("targetGoLive", "Target go live", `<input id="f-targetGoLive" data-f="targetGoLive" type="date">`)}
-    ${fld("status", "Status awal", status)}
+    ${fld("tanggalProject", "Tanggal Project", `<input id="f-tanggalProject" data-f="tanggalProject" type="date">`)}
+    ${fld("targetGoLive", "Target Go Live", `<input id="f-targetGoLive" data-f="targetGoLive" type="date">`)}
+    ${fld("status", "Status Awal", status)}
   </div>`;
 }
 
@@ -346,7 +345,7 @@ function stageCard(t, i) {
   const k = (f) => `stages.${i}.${f}`;
   const opts = Object.entries(STATUS_TAHAP_LABEL).map(([v, l]) => `<option value="${v}">${l}</option>`).join("");
   return `<div class="stage"><h3>${TAHAP_LABEL[t]}</h3>
-    <div><label for="s-${t}-tanggalRencana">Tanggal rencana</label><input id="s-${t}-tanggalRencana" type="date" data-stage="${t}" data-sf="tanggalRencana" data-ekey="${k("tanggalRencana")}"><div class="err" data-err="${k("tanggalRencana")}"></div></div>
+    <div><label for="s-${t}-tanggalRencana">Tanggal Rencana</label><input id="s-${t}-tanggalRencana" type="date" data-stage="${t}" data-sf="tanggalRencana" data-ekey="${k("tanggalRencana")}"><div class="err" data-err="${k("tanggalRencana")}"></div></div>
     <div><label for="s-${t}-status">Status</label><select id="s-${t}-status" data-stage="${t}" data-sf="status" data-ekey="${k("status")}">${opts}</select><div class="err" data-err="${k("status")}"></div></div>
     <div><label for="s-${t}-catatan">Catatan</label><textarea id="s-${t}-catatan" maxlength="500" data-stage="${t}" data-sf="catatan" data-ekey="${k("catatan")}"></textarea><div class="err" data-err="${k("catatan")}"></div></div>
   </div>`;
@@ -354,8 +353,8 @@ function stageCard(t, i) {
 
 function stepDocs() {
   const list = state.files.map((f, i) => `<li><span class="nm">${esc(f.name)} <small>(${fmtSize(f.size)})</small></span><button type="button" class="small danger" data-rm="${i}">Hapus</button></li>`).join("");
-  return `<h2>Informasi tahapan</h2><div class="stages">${TAHAP_ORDER.map(stageCard).join("")}</div>
-    <h2 style="margin-top:24px">Dokumen pendukung <small style="font-weight:400;color:var(--muted)">(opsional)</small></h2>
+  return `<h2>Informasi Tahapan Komite</h2><div class="stages">${TAHAP_ORDER.map(stageCard).join("")}</div>
+    <h2 style="margin-top:24px">Dokumen Pendukung <small style="font-weight:400;color:var(--muted)">(opsional)</small></h2>
     <label class="drop" id="drop"><input type="file" id="fileInput" multiple accept="${ALLOWED.join(",")}" hidden>
       Klik atau seret file ke sini
       <small>PDF, DOC, DOCX, XLS, XLSX, JPG, PNG. Maksimal 10 MB per file, 10 file.</small>
@@ -367,10 +366,10 @@ function stepReview() {
   const f = state.form;
   const rows = [
     ["Jenis", JENIS_LABEL[state.jenis]], ["Kategori", KATEGORI_LABEL[f.kategori] || f.kategori],
-    ["Kode project", f.kodeProject.trim() || "-"], ["Nama", f.nama], ["Deskripsi", f.deskripsi],
-    ["PM", nameOf(master.pm, f.pmId)], ["BP", nameOf(master.bp, f.bpId)], ["Unit pengusul", nameOf(master.units, f.unitId)],
-    ["Owner / PIC", f.ownerPic], ["Tanggal project", f.tanggalProject], ["Target go live", f.targetGoLive || "-"],
-    ["Status awal", STATUS_LABEL[f.status] || f.status],
+    ["Kode Project", f.kodeProject.trim() || "-"], ["Nama", f.nama], ["Deskripsi", f.deskripsi],
+    ["PM", nameOf(master.pm, f.pmId)], ["BP", nameOf(master.bp, f.bpId)], ["Unit Pengusul", nameOf(master.units, f.unitId)],
+    ["Owner / PIC", f.ownerPic], ["Tanggal Project", f.tanggalProject], ["Target Go Live", f.targetGoLive || "-"],
+    ["Status Awal", STATUS_LABEL[f.status] || f.status],
     ["Prioritas", PRIORITAS_LABEL[f.prioritas] || f.prioritas],
     ["Dokumen", state.files.length ? state.files.map((x) => x.name).join(", ") : "Tidak ada"],
   ];
@@ -378,9 +377,9 @@ function stepReview() {
     const x = state.stages[t];
     return `<tr><td>${TAHAP_LABEL[t]}</td><td>${esc(x.tanggalRencana || "-")}</td><td>${esc(STATUS_TAHAP_LABEL[x.status] || x.status)}</td><td>${esc(x.catatan.trim() || "-")}</td></tr>`;
   }).join("");
-  return `<h2>Review data</h2><dl class="rev">${rows.map(([k, v]) => `<dt>${k}</dt><dd>${esc(v)}</dd>`).join("")}</dl>
+  return `<h2>Review Data</h2><dl class="rev">${rows.map(([k, v]) => `<dt>${k}</dt><dd>${esc(v)}</dd>`).join("")}</dl>
     <h3 style="margin:20px 0 8px;font-size:15px">Tahapan</h3>
-    <div class="tablewrap"><table><thead><tr><th>Tahapan</th><th>Tanggal rencana</th><th>Status</th><th>Catatan</th></tr></thead><tbody>${stageRows}</tbody></table></div>`;
+    <div class="tablewrap"><table><thead><tr><th>Tahapan</th><th>Tanggal Rencana</th><th>Status</th><th>Catatan</th></tr></thead><tbody>${stageRows}</tbody></table></div>`;
 }
 
 function successHtml() {
@@ -607,7 +606,7 @@ function renderProjectDetail(p) {
     : `<p class="hint">Belum ada riwayat update. Catat lewat menu Update progress.</p>`;
   const stageList = Array.isArray(p.stages) ? p.stages : [];
   const stages = stageList.length
-    ? `<div class="tablewrap"><table><thead><tr><th>Tahapan</th><th>Tanggal rencana</th><th>Status</th><th>Catatan</th></tr></thead><tbody>${stageList.map((x) => `<tr><td>${esc(TAHAP_LABEL[x.tahap] || x.tahap)}</td><td>${date(x.tanggalRencana)}</td><td>${esc(STATUS_TAHAP_LABEL[x.status] || x.status)}</td><td>${esc(x.catatan || "-")}</td></tr>`).join("")}</tbody></table></div>`
+    ? `<div class="tablewrap"><table><thead><tr><th>Tahapan</th><th>Tanggal Rencana</th><th>Status</th><th>Catatan</th></tr></thead><tbody>${stageList.map((x) => `<tr><td>${esc(TAHAP_LABEL[x.tahap] || x.tahap)}</td><td>${date(x.tanggalRencana)}</td><td>${esc(STATUS_TAHAP_LABEL[x.status] || x.status)}</td><td>${esc(x.catatan || "-")}</td></tr>`).join("")}</tbody></table></div>`
     : `<p class="hint">Belum ada data tahapan.</p>`;
   return `<div class="project-detail"><dl>
     <dt>Kategori</dt><dd>${esc(KATEGORI_LABEL[p.kategori] || p.kategori)}</dd>
@@ -656,7 +655,7 @@ function editStageCard(t, s) {
   const opts = Object.entries(STATUS_TAHAP_LABEL).map(([v, l]) => `<option value="${v}"${v === s.status ? " selected" : ""}>${l}</option>`).join("");
   const f = (field) => `data-es="${t}" data-esf="${field}"`;
   return `<div class="stage"><h3>${TAHAP_LABEL[t]}</h3>
-    <div><label for="es-${t}-tanggalRencana">Tanggal rencana</label><input id="es-${t}-tanggalRencana" type="date" ${f("tanggalRencana")} value="${esc(s.tanggalRencana)}"><div class="err" data-eserr="${t}.tanggalRencana"></div></div>
+    <div><label for="es-${t}-tanggalRencana">Tanggal Rencana</label><input id="es-${t}-tanggalRencana" type="date" ${f("tanggalRencana")} value="${esc(s.tanggalRencana)}"><div class="err" data-eserr="${t}.tanggalRencana"></div></div>
     <div><label for="es-${t}-status">Status</label><select id="es-${t}-status" ${f("status")}>${opts}</select><div class="err" data-eserr="${t}.status"></div></div>
     <div><label for="es-${t}-catatan">Catatan</label><textarea id="es-${t}-catatan" maxlength="500" ${f("catatan")}>${esc(s.catatan)}</textarea><div class="err" data-eserr="${t}.catatan"></div></div>
   </div>`;
@@ -891,7 +890,7 @@ $("#deleteProjectDialog").addEventListener("click", async (e) => {
 const MASTER_TYPES = {
   pm: { label: "Project Manager", path: "/master/pm", singular: "PM" },
   bp: { label: "Business Partner", path: "/master/bp", singular: "BP" },
-  units: { label: "Unit pengusul", path: "/master/units", singular: "unit" },
+  units: { label: "Unit Pengusul", path: "/master/units", singular: "unit" },
 };
 const cfg = { type: "pm", rows: [], editingId: null };
 const jsonOpts = (method, body) => ({ method, headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
@@ -1017,10 +1016,10 @@ function dailyBlockHtml(i) {
       <div class="full"><label for="d-project-${i}">Project</label><select id="d-project-${i}" data-d="projectId" data-i="${i}" data-ek="items.${i}.projectId"${dis}>${projOpts}</select><div class="err" data-derr="items.${i}.projectId"></div></div>
       <div><label for="d-status-${i}">Status</label><select id="d-status-${i}" data-d="status" data-i="${i}" data-ek="items.${i}.status"${dis}${p ? "" : " disabled"}>${statusOpts}</select><div class="err" data-derr="items.${i}.status"></div></div>
       ${ro("PIC", p && p.ownerPic)}
-      ${ro("Target penyelesaian", target)}
+      ${ro("Target Penyelesaian", target)}
       ${ro("Prioritas", p && (PRIORITAS_LABEL[p.prioritas] || p.prioritas))}
-      ${ro("Project manager", p && p.pm && p.pm.nama)}
-      ${ro("Business partner", p && p.bp && p.bp.nama)}
+      ${ro("Project Manager", p && p.pm && p.pm.nama)}
+      ${ro("Business Partner", p && p.bp && p.bp.nama)}
       ${ta("aktivitas", "Aktivitas / Progress")}
       ${ta("kendala", "Kendala / Isu (opsional)")}
       ${ta("nextAction", "Next Action")}
@@ -1031,7 +1030,7 @@ function dailyBlockHtml(i) {
 
 // Dokumen pendukung per blok: daftar yang sudah ada + tambah file baru
 function blockDocsHtml(i, b, p, dis) {
-  const head = `<div style="font-weight:600;font-size:13px;margin-bottom:4px">Dokumen pendukung</div>`;
+  const head = `<div style="font-weight:600;font-size:13px;margin-bottom:4px">Dokumen Pendukung</div>`;
   if (!p) return `<div class="full">${head}<p class="hint">Pilih project untuk melihat dan menambah dokumen.</p></div>`;
   const existing = b.docs.length
     ? `<ul class="files">${b.docs.map((d) => `<li><span class="nm"><a href="${API}/documents/${d.id}/download">${esc(d.namaFile)}</a> <small>(${bytes(d.ukuran)})</small></span><button type="button" class="small danger" data-dfdel="${d.id}" data-i="${i}"${dis}>Hapus</button></li>`).join("")}</ul>`
@@ -1201,7 +1200,7 @@ async function loadDailyHistory() {
 }
 
 async function openDailyPage() {
-  $("#dailyDate").textContent = `Tanggal: ${fmtTodayWIB()} (hari ini, otomatis)`;
+  $("#dailyDate").textContent = `Tanggal: ${fmtTodayWIB()}`;
   await loadDailyProjects();
   if (!projectOf(daily.historyId)) daily.historyId = daily.latestId; // tabel langsung terisi
   renderHistorySelect();
