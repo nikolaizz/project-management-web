@@ -628,7 +628,7 @@ function renderProjectDetail(p) {
 function renderProjects(list, total) {
   const box = $("#projects");
   if (!list.length) { box.innerHTML = `<p class="empty">Belum ada project.</p>`; return; }
-  box.innerHTML = `<table><thead><tr><th>Kode</th><th>Nama</th><th>Kategori</th><th>Jenis</th><th>Status</th><th>Prioritas</th><th>PM</th><th>Unit pengusul</th><th>Dokumen</th><th>Aksi</th></tr></thead><tbody>${list.map((p) => `<tr>
+  box.innerHTML = `<table><thead><tr><th>Kode</th><th>Nama</th><th>Kategori</th><th>Jenis</th><th>Status</th><th>Prioritas</th><th>PM</th><th>Unit Pengusul</th><th>Dokumen</th><th>Aksi</th></tr></thead><tbody>${list.map((p) => `<tr>
     <td>${esc(p.kodeProject || "-")}</td><td>${esc(p.nama)}</td><td>${esc(KATEGORI_LABEL[p.kategori] || p.kategori)}</td>
     <td>${esc(JENIS_LABEL[p.jenis] || p.jenis)}</td><td><span class="badge b-${esc(p.status)}">${esc(STATUS_LABEL[p.status] || p.status)}</span></td><td><span class="badge b-${esc(p.prioritas)}">${esc(PRIORITAS_LABEL[p.prioritas] || p.prioritas || "-")}</span></td>
     <td>${esc(p.pm ? p.pm.nama : "-")}</td><td>${esc(p.unitPengusul ? p.unitPengusul.nama : "-")}</td>
