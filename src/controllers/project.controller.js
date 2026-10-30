@@ -127,7 +127,12 @@ export async function getProjectById(req, res, next) {
           take: 20,
           include: { modifiedBy: { select: { id: true, nama: true } } },
         },
-        _count: { select: { updates: true } },
+        stageHistory: {
+          orderBy: { changedAt: "desc" },
+          take: 20,
+          include: { modifiedBy: { select: { id: true, nama: true } } },
+        },
+        _count: { select: { updates: true, stageHistory: true } },
       },
     });
 
@@ -279,9 +284,11 @@ export async function updateStages(req, res, next) {
     const projectId = Number(req.params.id);
     const { stages } = req.body; // sudah divalidasi
 
-    // Semua tahapan diperbarui, atau tidak sama sekali
-    await prisma.$transaction(
-      stages.map((s) => {
+    const result = await prisma.$transaction(async (tx) => {
+      const date = (value) => value ? new Date(value).toISOString().slice(0, 10) : null;
+      for (const s of stages) {
+        const where = { projectId_tahap: { projectId, tahap: s.tahap } };
+        const existing = await tx.projectStage.findUnique({ where });
         // Hanya ubah field yang memang dikirim
         const data = {};
         if (s.tanggalRencana !== undefined) {
@@ -290,10 +297,8 @@ export async function updateStages(req, res, next) {
         if (s.status !== undefined) data.status = s.status;
         if (s.catatan !== undefined) data.catatan = s.catatan || null;
 
-        // upsert: ubah kalau barisnya ada, buat kalau belum
-        // (berguna untuk project lama yang dibuat sebelum fitur ini)
-        return prisma.projectStage.upsert({
-          where: { projectId_tahap: { projectId, tahap: s.tahap } },
+        const saved = await tx.projectStage.upsert({
+          where,
           update: data,
           create: {
             projectId,
@@ -303,12 +308,29 @@ export async function updateStages(req, res, next) {
             catatan: data.catatan ?? null,
           },
         });
-      })
-    );
+        const changed = !existing ||
+          (s.tanggalRencana !== undefined && date(existing.tanggalRencana) !== date(saved.tanggalRencana)) ||
+          (s.status !== undefined && existing.status !== saved.status) ||
+          (s.catatan !== undefined && existing.catatan !== saved.catatan);
 
-    const result = await prisma.projectStage.findMany({
-      where: { projectId },
-      orderBy: { tahap: "asc" },
+        if (changed) {
+          await tx.projectStageHistory.create({
+            data: {
+              projectId,
+              tahap: saved.tahap,
+              tanggalRencana: saved.tanggalRencana,
+              status: saved.status,
+              catatan: saved.catatan,
+              modifiedById: req.user?.id ?? null,
+            },
+          });
+        }
+      }
+
+      return tx.projectStage.findMany({
+        where: { projectId },
+        orderBy: { tahap: "asc" },
+      });
     });
 
     res.json({ success: true, message: "Tahapan berhasil diperbarui", data: result });

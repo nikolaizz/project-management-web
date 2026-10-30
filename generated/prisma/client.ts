@@ -81,3 +81,8 @@ export type ProjectUpdate = Prisma.ProjectUpdateModel
  * 
  */
 export type ProjectStage = Prisma.ProjectStageModel
+/**
+ * Model ProjectStageHistory
+ * 
+ */
+export type ProjectStageHistory = Prisma.ProjectStageHistoryModel

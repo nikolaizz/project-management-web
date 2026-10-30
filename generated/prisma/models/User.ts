@@ -191,6 +191,7 @@ export type UserWhereInput = {
   role?: Prisma.EnumRoleFilter<"User"> | $Enums.Role
   createdAt?: Prisma.DateTimeFilter<"User"> | Date | string
   projectUpdates?: Prisma.ProjectUpdateListRelationFilter
+  stageHistoryChanges?: Prisma.ProjectStageHistoryListRelationFilter
 }
 
 export type UserOrderByWithRelationInput = {
@@ -201,6 +202,7 @@ export type UserOrderByWithRelationInput = {
   role?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   projectUpdates?: Prisma.ProjectUpdateOrderByRelationAggregateInput
+  stageHistoryChanges?: Prisma.ProjectStageHistoryOrderByRelationAggregateInput
 }
 
 export type UserWhereUniqueInput = Prisma.AtLeast<{
@@ -214,6 +216,7 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
   role?: Prisma.EnumRoleFilter<"User"> | $Enums.Role
   createdAt?: Prisma.DateTimeFilter<"User"> | Date | string
   projectUpdates?: Prisma.ProjectUpdateListRelationFilter
+  stageHistoryChanges?: Prisma.ProjectStageHistoryListRelationFilter
 }, "id" | "email">
 
 export type UserOrderByWithAggregationInput = {
@@ -248,6 +251,7 @@ export type UserCreateInput = {
   role?: $Enums.Role
   createdAt?: Date | string
   projectUpdates?: Prisma.ProjectUpdateCreateNestedManyWithoutModifiedByInput
+  stageHistoryChanges?: Prisma.ProjectStageHistoryCreateNestedManyWithoutModifiedByInput
 }
 
 export type UserUncheckedCreateInput = {
@@ -258,6 +262,7 @@ export type UserUncheckedCreateInput = {
   role?: $Enums.Role
   createdAt?: Date | string
   projectUpdates?: Prisma.ProjectUpdateUncheckedCreateNestedManyWithoutModifiedByInput
+  stageHistoryChanges?: Prisma.ProjectStageHistoryUncheckedCreateNestedManyWithoutModifiedByInput
 }
 
 export type UserUpdateInput = {
@@ -268,6 +273,7 @@ export type UserUpdateInput = {
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   projectUpdates?: Prisma.ProjectUpdateUpdateManyWithoutModifiedByNestedInput
+  stageHistoryChanges?: Prisma.ProjectStageHistoryUpdateManyWithoutModifiedByNestedInput
 }
 
 export type UserUncheckedUpdateInput = {
@@ -278,6 +284,7 @@ export type UserUncheckedUpdateInput = {
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   projectUpdates?: Prisma.ProjectUpdateUncheckedUpdateManyWithoutModifiedByNestedInput
+  stageHistoryChanges?: Prisma.ProjectStageHistoryUncheckedUpdateManyWithoutModifiedByNestedInput
 }
 
 export type UserCreateManyInput = {
@@ -363,6 +370,22 @@ export type UserUpdateOneWithoutProjectUpdatesNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutProjectUpdatesInput, Prisma.UserUpdateWithoutProjectUpdatesInput>, Prisma.UserUncheckedUpdateWithoutProjectUpdatesInput>
 }
 
+export type UserCreateNestedOneWithoutStageHistoryChangesInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutStageHistoryChangesInput, Prisma.UserUncheckedCreateWithoutStageHistoryChangesInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutStageHistoryChangesInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserUpdateOneWithoutStageHistoryChangesNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutStageHistoryChangesInput, Prisma.UserUncheckedCreateWithoutStageHistoryChangesInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutStageHistoryChangesInput
+  upsert?: Prisma.UserUpsertWithoutStageHistoryChangesInput
+  disconnect?: Prisma.UserWhereInput | boolean
+  delete?: Prisma.UserWhereInput | boolean
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutStageHistoryChangesInput, Prisma.UserUpdateWithoutStageHistoryChangesInput>, Prisma.UserUncheckedUpdateWithoutStageHistoryChangesInput>
+}
+
 export type UserCreateWithoutProjectUpdatesInput = {
   id: string
   nama: string
@@ -370,6 +393,7 @@ export type UserCreateWithoutProjectUpdatesInput = {
   passwordHash: string
   role?: $Enums.Role
   createdAt?: Date | string
+  stageHistoryChanges?: Prisma.ProjectStageHistoryCreateNestedManyWithoutModifiedByInput
 }
 
 export type UserUncheckedCreateWithoutProjectUpdatesInput = {
@@ -379,6 +403,7 @@ export type UserUncheckedCreateWithoutProjectUpdatesInput = {
   passwordHash: string
   role?: $Enums.Role
   createdAt?: Date | string
+  stageHistoryChanges?: Prisma.ProjectStageHistoryUncheckedCreateNestedManyWithoutModifiedByInput
 }
 
 export type UserCreateOrConnectWithoutProjectUpdatesInput = {
@@ -404,6 +429,7 @@ export type UserUpdateWithoutProjectUpdatesInput = {
   passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  stageHistoryChanges?: Prisma.ProjectStageHistoryUpdateManyWithoutModifiedByNestedInput
 }
 
 export type UserUncheckedUpdateWithoutProjectUpdatesInput = {
@@ -413,6 +439,63 @@ export type UserUncheckedUpdateWithoutProjectUpdatesInput = {
   passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  stageHistoryChanges?: Prisma.ProjectStageHistoryUncheckedUpdateManyWithoutModifiedByNestedInput
+}
+
+export type UserCreateWithoutStageHistoryChangesInput = {
+  id: string
+  nama: string
+  email: string
+  passwordHash: string
+  role?: $Enums.Role
+  createdAt?: Date | string
+  projectUpdates?: Prisma.ProjectUpdateCreateNestedManyWithoutModifiedByInput
+}
+
+export type UserUncheckedCreateWithoutStageHistoryChangesInput = {
+  id: string
+  nama: string
+  email: string
+  passwordHash: string
+  role?: $Enums.Role
+  createdAt?: Date | string
+  projectUpdates?: Prisma.ProjectUpdateUncheckedCreateNestedManyWithoutModifiedByInput
+}
+
+export type UserCreateOrConnectWithoutStageHistoryChangesInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutStageHistoryChangesInput, Prisma.UserUncheckedCreateWithoutStageHistoryChangesInput>
+}
+
+export type UserUpsertWithoutStageHistoryChangesInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutStageHistoryChangesInput, Prisma.UserUncheckedUpdateWithoutStageHistoryChangesInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutStageHistoryChangesInput, Prisma.UserUncheckedCreateWithoutStageHistoryChangesInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutStageHistoryChangesInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutStageHistoryChangesInput, Prisma.UserUncheckedUpdateWithoutStageHistoryChangesInput>
+}
+
+export type UserUpdateWithoutStageHistoryChangesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  nama?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  projectUpdates?: Prisma.ProjectUpdateUpdateManyWithoutModifiedByNestedInput
+}
+
+export type UserUncheckedUpdateWithoutStageHistoryChangesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  nama?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  projectUpdates?: Prisma.ProjectUpdateUncheckedUpdateManyWithoutModifiedByNestedInput
 }
 
 
@@ -422,10 +505,12 @@ export type UserUncheckedUpdateWithoutProjectUpdatesInput = {
 
 export type UserCountOutputType = {
   projectUpdates: number
+  stageHistoryChanges: number
 }
 
 export type UserCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   projectUpdates?: boolean | UserCountOutputTypeCountProjectUpdatesArgs
+  stageHistoryChanges?: boolean | UserCountOutputTypeCountStageHistoryChangesArgs
 }
 
 /**
@@ -445,6 +530,13 @@ export type UserCountOutputTypeCountProjectUpdatesArgs<ExtArgs extends runtime.T
   where?: Prisma.ProjectUpdateWhereInput
 }
 
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountStageHistoryChangesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.ProjectStageHistoryWhereInput
+}
+
 
 export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -454,6 +546,7 @@ export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   role?: boolean
   createdAt?: boolean
   projectUpdates?: boolean | Prisma.User$projectUpdatesArgs<ExtArgs>
+  stageHistoryChanges?: boolean | Prisma.User$stageHistoryChangesArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["user"]>
 
@@ -487,6 +580,7 @@ export type UserSelectScalar = {
 export type UserOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "nama" | "email" | "passwordHash" | "role" | "createdAt", ExtArgs["result"]["user"]>
 export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   projectUpdates?: boolean | Prisma.User$projectUpdatesArgs<ExtArgs>
+  stageHistoryChanges?: boolean | Prisma.User$stageHistoryChangesArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type UserIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
@@ -496,6 +590,7 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
   name: "User"
   objects: {
     projectUpdates: Prisma.$ProjectUpdatePayload<ExtArgs>[]
+    stageHistoryChanges: Prisma.$ProjectStageHistoryPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -899,6 +994,7 @@ readonly fields: UserFieldRefs;
 export interface Prisma__UserClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
   projectUpdates<T extends Prisma.User$projectUpdatesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$projectUpdatesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ProjectUpdatePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  stageHistoryChanges<T extends Prisma.User$stageHistoryChangesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$stageHistoryChangesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ProjectStageHistoryPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1348,6 +1444,30 @@ export type User$projectUpdatesArgs<ExtArgs extends runtime.Types.Extensions.Int
   take?: number
   skip?: number
   distinct?: Prisma.ProjectUpdateScalarFieldEnum | Prisma.ProjectUpdateScalarFieldEnum[]
+}
+
+/**
+ * User.stageHistoryChanges
+ */
+export type User$stageHistoryChangesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the ProjectStageHistory
+   */
+  select?: Prisma.ProjectStageHistorySelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the ProjectStageHistory
+   */
+  omit?: Prisma.ProjectStageHistoryOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ProjectStageHistoryInclude<ExtArgs> | null
+  where?: Prisma.ProjectStageHistoryWhereInput
+  orderBy?: Prisma.ProjectStageHistoryOrderByWithRelationInput | Prisma.ProjectStageHistoryOrderByWithRelationInput[]
+  cursor?: Prisma.ProjectStageHistoryWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.ProjectStageHistoryScalarFieldEnum | Prisma.ProjectStageHistoryScalarFieldEnum[]
 }
 
 /**

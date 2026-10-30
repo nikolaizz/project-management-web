@@ -595,6 +595,14 @@ function updatesTable(list) {
     <td class="nowrap">${esc(u.modifiedBy ? u.modifiedBy.nama : "-")}</td></tr>`).join("")}</tbody></table>`;
 }
 
+function stageHistoryTable(list) {
+  return `<table class="history"><thead><tr><th>Tanggal &amp; jam</th><th>Tahapan</th><th>Tanggal Rencana</th><th>Status</th><th>Catatan</th><th>Updated by</th></tr></thead><tbody>${list.map((h) => `<tr>
+    <td class="nowrap">${fmtDateTime(h.changedAt)}</td><td>${esc(TAHAP_LABEL[h.tahap] || h.tahap)}</td>
+    <td>${h.tanggalRencana ? esc(String(h.tanggalRencana).slice(0, 10)) : "-"}</td>
+    <td>${esc(STATUS_TAHAP_LABEL[h.status] || h.status)}</td><td class="pre">${esc(h.catatan || "-")}</td>
+    <td class="nowrap">${esc(h.modifiedBy ? h.modifiedBy.nama : "-")}</td></tr>`).join("")}</tbody></table>`;
+}
+
 function renderProjectDetail(p) {
   const date = (value) => value ? esc(String(value).slice(0, 10)) : "-";
   const docs = p.documents.length
@@ -608,6 +616,11 @@ function renderProjectDetail(p) {
   const stages = stageList.length
     ? `<div class="tablewrap"><table><thead><tr><th>Tahapan</th><th>Tanggal Rencana</th><th>Status</th><th>Catatan</th></tr></thead><tbody>${stageList.map((x) => `<tr><td>${esc(TAHAP_LABEL[x.tahap] || x.tahap)}</td><td>${date(x.tanggalRencana)}</td><td>${esc(STATUS_TAHAP_LABEL[x.status] || x.status)}</td><td>${esc(x.catatan || "-")}</td></tr>`).join("")}</tbody></table></div>`
     : `<p class="hint">Belum ada data tahapan.</p>`;
+  const stageHistory = Array.isArray(p.stageHistory) ? p.stageHistory : [];
+  const totalStageHistory = p._count ? p._count.stageHistory : stageHistory.length;
+  const stageHistoryView = stageHistory.length
+    ? `<div class="tablewrap">${stageHistoryTable(stageHistory)}</div><p class="hint">Menampilkan ${stageHistory.length} dari ${totalStageHistory} perubahan tahapan terbaru.</p>`
+    : `<p class="hint">Belum ada riwayat perubahan tahapan.</p>`;
   return `<div class="project-detail"><dl>
     <dt>Kategori</dt><dd>${esc(KATEGORI_LABEL[p.kategori] || p.kategori)}</dd>
     <dt>Jenis</dt><dd>${esc(JENIS_LABEL[p.jenis] || p.jenis)}</dd>
@@ -622,7 +635,7 @@ function renderProjectDetail(p) {
     <dt>Target go live</dt><dd>${date(p.targetGoLive)}</dd>
     <dt>Dibuat</dt><dd>${fmtDateTime(p.createdAt)}</dd>
     <dt>Terakhir diperbarui</dt><dd>${fmtDateTime(p.updatedAt)}</dd>
-  </dl><h3>Tahapan</h3>${stages}<h3>Dokumen</h3>${docs}<h3>Riwayat Update</h3>${updates}</div>`;
+  </dl><h3>Tahapan</h3>${stages}<h3>Riwayat Perubahan Tahapan</h3>${stageHistoryView}<h3>Dokumen</h3>${docs}<h3>Riwayat Update</h3>${updates}</div>`;
 }
 
 function renderProjects(list, total) {

@@ -89,6 +89,7 @@ model User {
   createdAt    DateTime @default(now())
 
   projectUpdates ProjectUpdate[]
+  stageHistoryChanges ProjectStageHistory[]
 
 }
 
@@ -117,6 +118,7 @@ model Project {
   documents     Document[]
   updates       ProjectUpdate[]
   stages        ProjectStage[]
+  stageHistory  ProjectStageHistory[]
 
   @@index([status])
   @@index([nama])
@@ -161,4 +163,19 @@ model ProjectStage {
   catatan        String?
 
   @@unique([projectId, tahap])
+}
+
+model ProjectStageHistory {
+  id             Int           @id @default(autoincrement())
+  projectId      Int
+  project        Project       @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  tahap          TahapKomite
+  tanggalRencana DateTime?     @db.Date
+  status         StatusTahapan
+  catatan        String?
+  changedAt      DateTime      @default(now())
+  modifiedById   String?
+  modifiedBy     User?         @relation(fields: [modifiedById], references: [id], onDelete: SetNull)
+
+  @@index([projectId, changedAt])
 }

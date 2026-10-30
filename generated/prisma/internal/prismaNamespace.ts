@@ -404,7 +404,8 @@ export const ModelName = {
   Project: 'Project',
   Document: 'Document',
   ProjectUpdate: 'ProjectUpdate',
-  ProjectStage: 'ProjectStage'
+  ProjectStage: 'ProjectStage',
+  ProjectStageHistory: 'ProjectStageHistory'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -420,7 +421,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "projectManager" | "businessPartner" | "unit" | "user" | "project" | "document" | "projectUpdate" | "projectStage"
+    modelProps: "projectManager" | "businessPartner" | "unit" | "user" | "project" | "document" | "projectUpdate" | "projectStage" | "projectStageHistory"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -1016,6 +1017,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    ProjectStageHistory: {
+      payload: Prisma.$ProjectStageHistoryPayload<ExtArgs>
+      fields: Prisma.ProjectStageHistoryFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.ProjectStageHistoryFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProjectStageHistoryPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.ProjectStageHistoryFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProjectStageHistoryPayload>
+        }
+        findFirst: {
+          args: Prisma.ProjectStageHistoryFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProjectStageHistoryPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.ProjectStageHistoryFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProjectStageHistoryPayload>
+        }
+        findMany: {
+          args: Prisma.ProjectStageHistoryFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProjectStageHistoryPayload>[]
+        }
+        create: {
+          args: Prisma.ProjectStageHistoryCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProjectStageHistoryPayload>
+        }
+        createMany: {
+          args: Prisma.ProjectStageHistoryCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.ProjectStageHistoryCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProjectStageHistoryPayload>[]
+        }
+        delete: {
+          args: Prisma.ProjectStageHistoryDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProjectStageHistoryPayload>
+        }
+        update: {
+          args: Prisma.ProjectStageHistoryUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProjectStageHistoryPayload>
+        }
+        deleteMany: {
+          args: Prisma.ProjectStageHistoryDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.ProjectStageHistoryUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.ProjectStageHistoryUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProjectStageHistoryPayload>[]
+        }
+        upsert: {
+          args: Prisma.ProjectStageHistoryUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProjectStageHistoryPayload>
+        }
+        aggregate: {
+          args: Prisma.ProjectStageHistoryAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateProjectStageHistory>
+        }
+        groupBy: {
+          args: Prisma.ProjectStageHistoryGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ProjectStageHistoryGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.ProjectStageHistoryCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ProjectStageHistoryCountAggregateOutputType> | number
+        }
+      }
+    }
   }
 } & {
   other: {
@@ -1151,6 +1226,20 @@ export const ProjectStageScalarFieldEnum = {
 } as const
 
 export type ProjectStageScalarFieldEnum = (typeof ProjectStageScalarFieldEnum)[keyof typeof ProjectStageScalarFieldEnum]
+
+
+export const ProjectStageHistoryScalarFieldEnum = {
+  id: 'id',
+  projectId: 'projectId',
+  tahap: 'tahap',
+  tanggalRencana: 'tanggalRencana',
+  status: 'status',
+  catatan: 'catatan',
+  changedAt: 'changedAt',
+  modifiedById: 'modifiedById'
+} as const
+
+export type ProjectStageHistoryScalarFieldEnum = (typeof ProjectStageHistoryScalarFieldEnum)[keyof typeof ProjectStageHistoryScalarFieldEnum]
 
 
 export const SortOrder = {
@@ -1495,6 +1584,7 @@ export type GlobalOmitConfig = {
   document?: Prisma.DocumentOmit
   projectUpdate?: Prisma.ProjectUpdateOmit
   projectStage?: Prisma.ProjectStageOmit
+  projectStageHistory?: Prisma.ProjectStageHistoryOmit
 }
 
 /* Types for Logging */
