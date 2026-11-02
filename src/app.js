@@ -6,6 +6,7 @@ import documentRoutes from "./routes/document.routes.js";
 import masterRoutes from "./routes/master.routes.js";
 import { notFound, errorHandler } from "./middlewares/error.js";
 import dailyUpdateRoutes from "./routes/dailyUpdate.routes.js";
+import dashboardRoutes from "./routes/dashboard.routes.js";
 
 const app = express();
 
@@ -21,6 +22,7 @@ app.use("/projects", projectRoutes);
 app.use("/documents", documentRoutes);
 app.use("/master", masterRoutes);
 app.use("/daily-updates", dailyUpdateRoutes);
+app.use("/dashboard", dashboardRoutes);
 
 app.use(notFound);
 app.use(errorHandler);

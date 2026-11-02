@@ -134,6 +134,40 @@ button.wa-copy{background:#1f8a4c;border-color:#1f8a4c;color:#fff}
 .history-pick{display:flex;align-items:center;gap:8px;min-width:0;flex:1;max-width:460px}
 .history-pick label{margin:0;white-space:nowrap}
 .pre{white-space:pre-wrap}
+.dashboard-stack{display:grid;gap:20px}
+.dashboard-summary{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:12px}
+.dashboard-kpi{border:1px solid var(--line);border-radius:10px;padding:14px;min-width:0}
+.dashboard-kpi span{display:block;color:var(--muted);font-size:13px}
+.dashboard-kpi strong{display:block;font-size:25px;line-height:1.25;margin-top:5px}
+.dashboard-charts{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.2fr) minmax(0,1fr);gap:12px}
+.dashboard-panel{border:1px solid var(--line);border-radius:10px;padding:14px;min-width:0}
+.dashboard-panel h2{font-size:15px}
+.donut-layout{display:flex;align-items:center;gap:18px;flex-wrap:wrap;justify-content:center}
+.donut{width:170px;height:170px;border-radius:50%;display:grid;place-items:center;flex:none}
+.donut-hole{width:112px;height:112px;border-radius:50%;background:#fff;display:grid;align-content:center;justify-items:center}
+.donut-hole strong{font-size:24px;line-height:1.2}
+.donut-hole span{font-size:12px;color:var(--muted)}
+.chart-legend{display:grid;gap:6px;margin:0;padding:0;list-style:none;font-size:12.5px}
+.chart-legend li{display:flex;align-items:center;gap:7px}
+.legend-dot{width:10px;height:10px;border-radius:50%;flex:none}
+.stage-chart{display:grid;gap:13px}
+.stage-chart-row{display:grid;grid-template-columns:100px minmax(0,1fr) 30px;gap:8px;align-items:center;font-size:12px}
+.stage-chart-name{font-weight:600}
+.stage-bar{height:20px;background:#eef1f7;border-radius:4px;display:flex;overflow:hidden}
+.stage-segment{height:100%;min-width:0}
+.priority-list{margin:0;padding-left:22px;display:grid;gap:11px}
+.priority-list li{padding-left:2px}
+.priority-name{display:block;font-weight:600;overflow-wrap:anywhere}
+.priority-meta{display:flex;align-items:center;gap:7px;flex-wrap:wrap;margin-top:3px}
+.dashboard-filters{display:grid;grid-template-columns:repeat(5,minmax(130px,1fr));gap:10px;align-items:end}
+.dashboard-filter-actions{display:flex;gap:8px;grid-column:1/-1;justify-content:flex-end}
+.dashboard-table table{min-width:760px}
+.dashboard-pagination{display:flex;align-items:center;justify-content:flex-end;gap:8px;margin-top:12px}
+.dashboard-pagination span{margin-right:auto;color:var(--muted);font-size:12.5px}
+.stale-age{display:block;color:var(--muted);font-size:12px}
+@media(max-width:1150px){.dashboard-charts{grid-template-columns:repeat(2,minmax(0,1fr))}.dashboard-panel:last-child{grid-column:1/-1}}
+@media(max-width:850px){.dashboard-summary{grid-template-columns:repeat(3,minmax(0,1fr))}.dashboard-filters{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:620px){.dashboard-summary{grid-template-columns:repeat(2,minmax(0,1fr))}.dashboard-charts{grid-template-columns:minmax(0,1fr)}.dashboard-panel:last-child{grid-column:auto}.dashboard-filter-actions{justify-content:stretch}.dashboard-filter-actions button{flex:1}.stage-chart-row{grid-template-columns:84px minmax(0,1fr) 24px}}
 </style>
 </head>
 <body>
@@ -146,7 +180,11 @@ button.wa-copy{background:#1f8a4c;border-color:#1f8a4c;color:#fff}
   <aside class="sidebar" aria-label="Menu utama">
     <p class="side-title">Menu utama</p>
     <nav class="side-nav" aria-label="Navigasi project">
-      <button type="button" class="side-link active" data-page="uploadPage" aria-current="page">
+      <button type="button" class="side-link active" data-page="dashboardPage" aria-current="page">
+        Dashboard
+        <span>Ringkasan dan monitoring project</span>
+      </button>
+      <button type="button" class="side-link" data-page="uploadPage">
         Upload Project
         <span>Tambah project baru</span>
       </button>
@@ -166,7 +204,44 @@ button.wa-copy{background:#1f8a4c;border-color:#1f8a4c;color:#fff}
   </aside>
 
   <div class="content">
-    <section class="page" id="uploadPage" aria-labelledby="wizTitle">
+    <section class="page" id="dashboardPage" aria-labelledby="dashboardTitle">
+      <div class="dashboard-stack">
+        <div class="card">
+          <div class="head">
+            <div><h1 id="dashboardTitle">Dashboard Monitoring</h1><p class="hint">Ringkasan status project dan tahapan komite.</p></div>
+            <button type="button" id="btnDashboardRefresh">Muat ulang</button>
+          </div>
+          <div id="dashboardMessage" aria-live="polite"></div>
+          <div id="dashboardSummary" class="dashboard-summary"><p class="empty">Memuat ringkasan...</p></div>
+          <div class="dashboard-charts" style="margin-top:14px">
+            <section class="dashboard-panel" aria-labelledby="statusChartTitle"><h2 id="statusChartTitle">Status Project</h2><div id="dashboardStatusChart"><p class="empty">Memuat grafik...</p></div></section>
+            <section class="dashboard-panel" aria-labelledby="stageChartTitle"><h2 id="stageChartTitle">Tahapan Komite</h2><div id="dashboardStageChart"><p class="empty">Memuat grafik...</p></div></section>
+            <section class="dashboard-panel" aria-labelledby="priorityTitle"><h2 id="priorityTitle">5 Project Prioritas Tertinggi</h2><div id="dashboardPriorities"><p class="empty">Memuat project...</p></div></section>
+          </div>
+        </div>
+
+        <section class="card" aria-labelledby="dashboardFilterTitle">
+          <h2 id="dashboardFilterTitle">Filter &amp; Pencarian Project</h2>
+          <form id="dashboardFilterForm" class="dashboard-filters">
+            <div><label for="dashboardSearch">Nama atau kode project</label><input id="dashboardSearch" name="search" type="search" placeholder="Cari project"></div>
+            <div><label for="dashboardStatus">Status Project</label><select id="dashboardStatus" name="status"></select></div>
+            <div><label for="dashboardStage">Tahapan Komite</label><select id="dashboardStage" name="tahap"></select></div>
+            <div><label for="dashboardUnit">Unit Pengusul</label><select id="dashboardUnit" name="unitId"></select></div>
+            <div><label for="dashboardYear">Tahun Project</label><input id="dashboardYear" name="tahun" type="number" min="1900" max="9999" inputmode="numeric" placeholder="Semua tahun"></div>
+            <div class="dashboard-filter-actions"><button type="button" id="btnDashboardClear">Hapus filter</button><button type="submit" class="primary">Cari project</button></div>
+          </form>
+          <div id="dashboardProjects" class="dashboard-table tablewrap" style="margin-top:14px" aria-live="polite"><p class="empty">Memuat project...</p></div>
+        </section>
+
+        <section class="card" aria-labelledby="staleTitle">
+          <h2 id="staleTitle">Project Belum Diupdate</h2>
+          <p class="hint">Project aktif tanpa update progress selama 24 jam atau lebih. Project Draft dan Selesai tidak ditampilkan.</p>
+          <div id="dashboardStaleProjects" class="tablewrap"><p class="empty">Memuat project...</p></div>
+        </section>
+      </div>
+    </section>
+
+    <section class="page" id="uploadPage" aria-labelledby="wizTitle" hidden>
       <div class="card">
         <h1 id="wizTitle">Upload Project</h1>
         <ol class="steps" id="steps"></ol>
@@ -252,6 +327,7 @@ const PRIORITAS_LABEL = { LOW: "Low", MEDIUM: "Medium", HIGH: "High" };
 const TAHAP_LABEL = { PRA_KOMITE: "Pra Komite", KOMITE_TI_B: "Komite TI B", KOMITE_TI_A: "Komite TI A" };
 const TAHAP_ORDER = Object.keys(TAHAP_LABEL);
 const STATUS_TAHAP_LABEL = { PLANNED: "Planned", ON_PROGRESS: "On Progress", SELESAI: "Selesai" };
+const STATUS_TAHAPAN = Object.keys(STATUS_TAHAP_LABEL);
 function newStages() {
   const o = {};
   TAHAP_ORDER.forEach((t) => { o[t] = { tanggalRencana: "", status: "PLANNED", catatan: "" }; });
@@ -270,6 +346,7 @@ const FIELDS = Object.keys(newForm());
 
 let master = { pm: [], bp: [], units: [], enums: { kategori: [], status: [] } };
 let busy = false;
+const dashboardState = { page: 1, limit: 10 };
 const state = { step: 0, jenis: null, form: newForm(), stages: newStages(), files: [], errors: {}, createdId: null, createdNama: "", done: false };
 
 // Tampilkan satu halaman menu dan tandai pilihan aktif pada sidebar.
@@ -586,6 +663,133 @@ function fmtDateTime(value) {
   return `${esc(tgl)}, <strong>${esc(jam)}</strong>`;
 }
 
+const DASHBOARD_STATUS_COLORS = { DRAFT: "#778198", INISIASI: "#a2aabe", ON_PROGRESS: "#1b5fd6", PENDING: "#d18b00", ON_HOLD: "#c43d32", SELESAI: "#157347" };
+const STAGE_STATUS_COLORS = { PLANNED: "#778198", ON_PROGRESS: "#1b5fd6", SELESAI: "#157347" };
+const DASHBOARD_STAGE_STATUS_LABEL = { PLANNED: "Belum Dimulai", ON_PROGRESS: "On Progress", SELESAI: "Selesai" };
+const currentCommitteeStage = (project) => {
+  const stages = Object.fromEntries((project.stages || []).map((stage) => [stage.tahap, stage]));
+  const current = TAHAP_ORDER.find((tahap) => stages[tahap]?.status !== "SELESAI");
+  return current ? TAHAP_LABEL[current] : "SELESAI";
+};
+
+function dashboardFiltersInit() {
+  $("#dashboardStatus").innerHTML = `<option value="">Semua status</option>${Object.entries(STATUS_LABEL).map(([value, label]) => `<option value="${value}">${esc(label)}</option>`).join("")}`;
+  $("#dashboardStage").innerHTML = `<option value="">Semua tahapan</option>${TAHAP_ORDER.map((value) => `<option value="${value}">${esc(TAHAP_LABEL[value])}</option>`).join("")}<option value="SELESAI">Selesai</option>`;
+  dashboardUnitsRefresh();
+}
+
+function dashboardUnitsRefresh() {
+  const select = $("#dashboardUnit"), selected = select.value;
+  select.innerHTML = `<option value="">Semua unit</option>${master.units.map((unit) => `<option value="${unit.id}">${esc(unit.nama)}</option>`).join("")}`;
+  select.value = selected;
+}
+
+function renderDashboard(data) {
+  const counts = data.statusCounts;
+  const cards = [
+    ["Total Project", data.totalProjects, null],
+    ["On Progress", counts.ON_PROGRESS, data.totalProjects],
+    ["Selesai", counts.SELESAI, data.totalProjects],
+    ["Pending", counts.PENDING, data.totalProjects],
+    ["On Hold", counts.ON_HOLD, data.totalProjects],
+  ];
+  $("#dashboardSummary").innerHTML = cards.map(([label, count, total]) => `<div class="dashboard-kpi"><span>${label}</span><strong>${count}</strong>${total === null ? "" : `<span>${total ? Math.round(count / total * 100) : 0}% dari total</span>`}</div>`).join("");
+
+  const statusTotal = Object.values(counts).reduce((sum, count) => sum + count, 0);
+  let position = 0;
+  const stops = Object.keys(STATUS_LABEL).map((status) => {
+    const end = position + (statusTotal ? counts[status] / statusTotal * 100 : 0);
+    const stop = `${DASHBOARD_STATUS_COLORS[status]} ${position}% ${end}%`;
+    position = end;
+    return stop;
+  }).join(",");
+  const legend = Object.entries(STATUS_LABEL).map(([status, label]) => {
+    const percent = statusTotal ? Math.round(counts[status] / statusTotal * 100) : 0;
+    return `<li><span class="legend-dot" style="background:${DASHBOARD_STATUS_COLORS[status]}"></span>${esc(label)} <strong>${counts[status]} (${percent}%)</strong></li>`;
+  }).join("");
+  $("#dashboardStatusChart").innerHTML = `<div class="donut-layout"><div class="donut" role="img" aria-label="Distribusi status dari ${statusTotal} project" style="background:${statusTotal ? `conic-gradient(${stops})` : "#e9ebf2"}"><div class="donut-hole"><strong>${data.totalProjects}</strong><span>Total Project</span></div></div><ul class="chart-legend">${legend}</ul></div>`;
+
+  const totals = TAHAP_ORDER.map((tahap) => STATUS_TAHAPAN.reduce((sum, status) => sum + data.stageCounts[tahap][status], 0));
+  const maxTotal = Math.max(1, ...totals);
+  const stageRows = TAHAP_ORDER.map((tahap, i) => {
+    const segments = STATUS_TAHAPAN.map((status) => {
+      const count = data.stageCounts[tahap][status];
+      const width = count / maxTotal * 100;
+      return `<span class="stage-segment" title="${esc(DASHBOARD_STAGE_STATUS_LABEL[status])}: ${count}" aria-label="${esc(DASHBOARD_STAGE_STATUS_LABEL[status])}: ${count}" style="width:${width}%;background:${STAGE_STATUS_COLORS[status]}"></span>`;
+    }).join("");
+    return `<div class="stage-chart-row"><span class="stage-chart-name">${esc(TAHAP_LABEL[tahap])}</span><div class="stage-bar" role="img" aria-label="${esc(TAHAP_LABEL[tahap])}: ${totals[i]} project">${segments}</div><strong>${totals[i]}</strong></div>`;
+  }).join("");
+  const stageLegend = STATUS_TAHAPAN.map((status) => `<li><span class="legend-dot" style="background:${STAGE_STATUS_COLORS[status]}"></span>${esc(DASHBOARD_STAGE_STATUS_LABEL[status])}</li>`).join("");
+  $("#dashboardStageChart").innerHTML = `<div class="stage-chart">${stageRows}</div><ul class="chart-legend" style="display:flex;gap:12px;flex-wrap:wrap;margin-top:12px">${stageLegend}</ul>`;
+
+  $("#dashboardPriorities").innerHTML = data.priorities.length
+    ? `<ol class="priority-list">${data.priorities.map((project) => `<li><span class="priority-name">${esc(project.nama)}</span><span class="priority-meta">${esc(project.kodeProject || "Tanpa kode")} <span class="badge b-${esc(project.prioritas)}">${esc(PRIORITAS_LABEL[project.prioritas] || project.prioritas)}</span><span class="hint">${esc(currentCommitteeStage(project))}</span></span></li>`).join("")}</ol>`
+    : `<p class="empty">Belum ada project.</p>`;
+
+  $("#dashboardStaleProjects").innerHTML = data.staleProjects.length
+    ? `<table><thead><tr><th>Nama Project</th><th>Kode Project</th><th>Status</th><th>PIC</th><th>Update Progress Terakhir</th></tr></thead><tbody>${data.staleProjects.map((project) => {
+      const hours = project.hoursWithoutUpdate;
+      const age = `${Math.floor(hours / 24)} hari`;
+      const updated = project.lastProgressAt ? fmtDateTime(project.lastProgressAt) : `Belum pernah<br><small>Dibuat ${fmtDateTime(project.createdAt)}</small>`;
+      return `<tr><td>${esc(project.nama)}</td><td>${esc(project.kodeProject || "-")}</td><td><span class="badge b-${esc(project.status)}">${esc(STATUS_LABEL[project.status] || project.status)}</span></td><td>${esc(project.ownerPic || "-")}</td><td>${updated}<span class="stale-age">${age} tanpa update</span></td></tr>`;
+    }).join("")}</tbody></table>`
+    : `<p class="empty">Tidak ada project aktif yang melewati batas 24 jam tanpa update progress.</p>`;
+}
+
+function renderDashboardProjects(data, pagination) {
+  const box = $("#dashboardProjects");
+  if (!data.length) {
+    box.innerHTML = `<p class="empty">Tidak ada project yang cocok dengan filter.</p>`;
+    return;
+  }
+  const offset = (pagination.page - 1) * pagination.limit;
+  box.innerHTML = `<table><thead><tr><th>No.</th><th>Nama Project</th><th>Kode Project</th><th>Status</th><th>Tahapan Komite</th><th>PIC</th><th>Tanggal Update</th></tr></thead><tbody>${data.map((project, i) => `<tr>
+    <td>${offset + i + 1}</td><td>${esc(project.nama)}</td><td>${esc(project.kodeProject || "-")}</td>
+    <td><span class="badge b-${esc(project.status)}">${esc(STATUS_LABEL[project.status] || project.status)}</span></td>
+    <td>${esc(currentCommitteeStage(project))}</td><td>${esc(project.ownerPic || "-")}</td>
+    <td>${project.updates[0] ? fmtDateTime(project.updates[0].tanggalInput) : "Belum pernah"}</td></tr>`).join("")}</tbody></table>
+    <div class="dashboard-pagination"><span>Menampilkan ${offset + 1}–${offset + data.length} dari ${pagination.total} project</span><button type="button" data-dashboard-page="${pagination.page - 1}"${pagination.page <= 1 ? " disabled" : ""}>Sebelumnya</button><span>Halaman ${pagination.page} dari ${Math.max(pagination.totalPages, 1)}</span><button type="button" data-dashboard-page="${pagination.page + 1}"${pagination.page >= pagination.totalPages ? " disabled" : ""}>Berikutnya</button></div>`;
+}
+
+async function loadDashboardProjects() {
+  const box = $("#dashboardProjects");
+  box.innerHTML = `<p class="empty">Memuat project...</p>`;
+  const params = new URLSearchParams({ page: dashboardState.page, limit: dashboardState.limit });
+  const form = new FormData($("#dashboardFilterForm"));
+  for (const key of ["search", "status", "tahap", "unitId", "tahun"]) {
+    const value = String(form.get(key) || "").trim();
+    if (value) params.set(key, value);
+  }
+  try {
+    const result = await api(`/projects?${params}`);
+    renderDashboardProjects(result.data, result.pagination);
+  } catch (err) {
+    box.innerHTML = `<p class="empty">${esc(err.message)} Periksa koneksi server lalu muat ulang.</p>`;
+  }
+}
+
+async function loadDashboard() {
+  dashboardUnitsRefresh();
+  $("#dashboardMessage").innerHTML = "";
+  $("#dashboardSummary").innerHTML = `<p class="empty">Memuat ringkasan...</p>`;
+  $("#dashboardStatusChart").innerHTML = `<p class="empty">Memuat grafik...</p>`;
+  $("#dashboardStageChart").innerHTML = `<p class="empty">Memuat grafik...</p>`;
+  $("#dashboardPriorities").innerHTML = `<p class="empty">Memuat project...</p>`;
+  $("#dashboardStaleProjects").innerHTML = `<p class="empty">Memuat project...</p>`;
+  try {
+    const result = await api("/dashboard");
+    renderDashboard(result.data);
+  } catch (err) {
+    $("#dashboardMessage").innerHTML = `<div class="alert error" role="alert">${esc(err.message)} Periksa koneksi server lalu muat ulang.</div>`;
+    $("#dashboardSummary").innerHTML = `<p class="empty">Ringkasan tidak dapat dimuat.</p>`;
+    $("#dashboardStatusChart").innerHTML = `<p class="empty">Grafik status tidak dapat dimuat.</p>`;
+    $("#dashboardStageChart").innerHTML = `<p class="empty">Grafik tahapan tidak dapat dimuat.</p>`;
+    $("#dashboardPriorities").innerHTML = `<p class="empty">Daftar prioritas tidak dapat dimuat.</p>`;
+    $("#dashboardStaleProjects").innerHTML = `<p class="empty">Daftar project belum diupdate tidak dapat dimuat.</p>`;
+  }
+  await loadDashboardProjects();
+}
+
 // Tabel riwayat update: dipakai di Lihat Detail dan di menu Update progress (satu sumber data)
 function updatesTable(list) {
   return `<table class="history"><thead><tr><th>Tanggal &amp; jam</th><th>Status</th><th>Aktivitas / Progress</th><th>Kendala</th><th>Next Action</th><th>Updated by</th></tr></thead><tbody>${list.map((u) => `<tr>
@@ -725,6 +929,27 @@ async function loadProjects() {
     renderProjects(r.data, r.pagination.total);
   } catch (e) { $("#projects").innerHTML = `<p class="empty">${esc(e.message)}</p>`; }
 }
+
+$("#btnDashboardRefresh").onclick = loadDashboard;
+$("#dashboardFilterForm").addEventListener("submit", (e) => {
+  e.preventDefault();
+  dashboardState.page = 1;
+  loadDashboardProjects();
+});
+$("#btnDashboardClear").onclick = () => {
+  $("#dashboardFilterForm").reset();
+  dashboardState.page = 1;
+  loadDashboardProjects();
+};
+$("#dashboardProjects").addEventListener("click", (e) => {
+  const button = e.target.closest("[data-dashboard-page]");
+  if (!button || button.disabled) return;
+  dashboardState.page = Number(button.dataset.dashboardPage);
+  loadDashboardProjects();
+});
+$(".side-nav").addEventListener("click", (e) => {
+  if (e.target.closest('[data-page="dashboardPage"]')) loadDashboard();
+});
 
 $("#btnRefresh").onclick = loadProjects;
 $("#editProjectDialog").addEventListener("click", (e) => {
@@ -1412,8 +1637,10 @@ async function init() {
     setPill("down", "Server tidak terjangkau");
     setAlert("error", e.message);
   }
+  dashboardFiltersInit();
   render();
   loadProjects();
+  loadDashboard();
 }
 init();
 </script>

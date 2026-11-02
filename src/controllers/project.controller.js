@@ -1,5 +1,5 @@
 import prisma from "../lib/prisma.js";
-import { STATUS, KATEGORI, PRIORITAS} from "../constants/enums.js";
+import { STATUS, KATEGORI, PRIORITAS, TAHAP } from "../constants/enums.js";
 import { removeFiles } from "../lib/files.js";
 import { buildStages } from "../lib/stages.js";
 
@@ -11,13 +11,24 @@ const projectInclude = {
   stages: { orderBy: { tahap: "asc" } },
 };
 
+function currentStageFilter(tahap) {
+  if (tahap === "SELESAI") {
+    return TAHAP.map((stage) => ({ stages: { some: { tahap: stage, status: "SELESAI" } } }));
+  }
+  const index = TAHAP.indexOf(tahap);
+  return [
+    ...TAHAP.slice(0, index).map((stage) => ({ stages: { some: { tahap: stage, status: "SELESAI" } } })),
+    { stages: { none: { tahap, status: "SELESAI" } } },
+  ];
+}
+
 // ---------- GET /projects ----------
 export async function getProjects(req, res, next) {
   try {
     // Ambil filter dan pagination dari query URL; batasi jumlah hasil maksimal 100.
     const page = Math.max(parseInt(req.query.page) || 1, 1);
     const limit = Math.min(parseInt(req.query.limit) || 10, 100);
-    const { search, status, kategori, unitId, prioritas } = req.query;
+    const { search, status, kategori, unitId, prioritas, tahap, tahun } = req.query;
 
     // Tolak filter yang tidak termasuk pilihan resmi sebelum menjalankan query database.
     if (status && !STATUS.includes(status)) {
@@ -39,6 +50,12 @@ export async function getProjects(req, res, next) {
         message: `Prioritas tidak valid. Pilihan: ${PRIORITAS.join(", ")}`,
       });
     }
+    if (tahap && ![...TAHAP, "SELESAI"].includes(tahap)) {
+      return res.status(400).json({ success: false, message: "Tahapan komite tidak valid" });
+    }
+    if (tahun && (!/^\d{4}$/.test(tahun) || Number(tahun) < 1900)) {
+      return res.status(400).json({ success: false, message: "Tahun harus berformat YYYY" });
+    }
 
     // Bangun kondisi pencarian hanya dari filter yang benar-benar dikirim pemanggil.
     const where = {};
@@ -46,6 +63,11 @@ export async function getProjects(req, res, next) {
     if (kategori) where.kategori = kategori;
     if (prioritas) where.prioritas = prioritas; // BARU: filter prioritas
     if (unitId) where.unitId = parseInt(unitId);
+    if (tahun) {
+      const year = Number(tahun);
+      where.tanggalProject = { gte: new Date(Date.UTC(year, 0, 1)), lt: new Date(Date.UTC(year + 1, 0, 1)) };
+    }
+    if (tahap) where.AND = currentStageFilter(tahap);
     if (search) {
       where.OR = [
         { nama: { contains: search, mode: "insensitive" } },
