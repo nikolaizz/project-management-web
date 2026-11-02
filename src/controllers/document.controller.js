@@ -2,6 +2,7 @@ import path from "node:path";
 import { existsSync } from "node:fs";
 import prisma from "../lib/prisma.js";
 import { UPLOAD_DIR, removeFiles } from "../lib/files.js";
+import { canEditProject } from "../middlewares/auth.js";
 
 // ---------- POST /projects/:id/documents ----------
 export async function uploadDocuments(req, res, next) {
@@ -49,6 +50,7 @@ export async function listDocuments(req, res, next) {
     const data = await prisma.document.findMany({
       where: { projectId: Number(req.params.id) },
       orderBy: { uploadedAt: "desc" },
+      include: { project: { select: { pmId: true, bpId: true } } },
     });
     res.json({ success: true, data });
   } catch (err) {
@@ -68,7 +70,6 @@ export async function downloadDocument(req, res, next) {
     if (!doc) {
       return res.status(404).json({ success: false, message: "Dokumen tidak ditemukan" });
     }
-
     const fullPath = path.join(UPLOAD_DIR, doc.pathFile);
     if (!existsSync(fullPath)) {
       return res.status(404).json({ success: false, message: "File fisik tidak ditemukan di server" });
@@ -88,10 +89,11 @@ export async function deleteDocument(req, res, next) {
       return res.status(400).json({ success: false, message: "ID dokumen tidak valid" });
     }
 
-    const doc = await prisma.document.findUnique({ where: { id } });
+    const doc = await prisma.document.findUnique({ where: { id }, include: { project: { select: { pmId: true, bpId: true } } } });
     if (!doc) {
       return res.status(404).json({ success: false, message: "Dokumen tidak ditemukan" });
     }
+    if (!canEditProject(req.user, doc.project)) return res.status(403).json({ success: false, message: "Anda tidak dapat menghapus dokumen project ini" });
 
     await prisma.document.delete({ where: { id } });
     await removeFiles([doc.pathFile]);

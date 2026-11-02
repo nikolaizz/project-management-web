@@ -64,12 +64,14 @@ model ProjectManager {
   id       String    @id 
   nama     String    @unique
   projects Project[]
+  user     User?     @relation("ProjectManagerAccount")
 }
 
 model BusinessPartner {
   id       String    @id 
   nama     String    @unique
   projects Project[]
+  user     User?     @relation("BusinessPartnerAccount")
 }
 
 model Unit {
@@ -84,8 +86,15 @@ model User {
   id           String   @id
   nama         String
   email        String   @unique
-  passwordHash String
-  role         Role     @default(PROJECT_MANAGER)
+  passwordHash String?
+  role         Role     @default(VIEWER)
+  authVersion Int      @default(0)
+  activationTokenHash String?
+  activationExpiresAt DateTime?
+  projectManagerId String? @unique
+  projectManager ProjectManager? @relation("ProjectManagerAccount", fields: [projectManagerId], references: [id], onDelete: SetNull)
+  businessPartnerId String? @unique
+  businessPartner BusinessPartner? @relation("BusinessPartnerAccount", fields: [businessPartnerId], references: [id], onDelete: SetNull)
   createdAt    DateTime @default(now())
 
   projectUpdates ProjectUpdate[]

@@ -1,6 +1,7 @@
 import prisma from "../lib/prisma.js";
 import { buildWhatsAppText } from "../lib/whatsapp.js";
 import { todayWIB } from "../lib/dates.js";
+import { canEditProject } from "../middlewares/auth.js";
 
 const projectInclude = {
   pm: { select: { nama: true } },
@@ -56,6 +57,8 @@ export async function previewDailyUpdates(req, res, next) {
     const { items } = req.body;
     const { byId, hilang } = await loadProjects(items);
     if (hilang.length) return tidakDitemukan(res, hilang);
+    const denied = [...byId.values()].filter((p) => !canEditProject(req.user, p));
+    if (denied.length) return res.status(403).json({ success: false, message: "Tidak dapat memperbarui project yang tidak ditugaskan kepada Anda" });
 
     res.json({
       success: true,
@@ -73,6 +76,8 @@ export async function createDailyUpdates(req, res, next) {
 
     const { byId, hilang } = await loadProjects(items);
     if (hilang.length) return tidakDitemukan(res, hilang);
+    const denied = [...byId.values()].filter((p) => !canEditProject(req.user, p));
+    if (denied.length) return res.status(403).json({ success: false, message: "Tidak dapat memperbarui project yang tidak ditugaskan kepada Anda" });
 
     const tanggal = todayWIB(); // "YYYY-MM-DD" menurut WIB
 

@@ -159,12 +159,14 @@ export type ProjectManagerWhereInput = {
   id?: Prisma.StringFilter<"ProjectManager"> | string
   nama?: Prisma.StringFilter<"ProjectManager"> | string
   projects?: Prisma.ProjectListRelationFilter
+  user?: Prisma.XOR<Prisma.UserNullableScalarRelationFilter, Prisma.UserWhereInput> | null
 }
 
 export type ProjectManagerOrderByWithRelationInput = {
   id?: Prisma.SortOrder
   nama?: Prisma.SortOrder
   projects?: Prisma.ProjectOrderByRelationAggregateInput
+  user?: Prisma.UserOrderByWithRelationInput
 }
 
 export type ProjectManagerWhereUniqueInput = Prisma.AtLeast<{
@@ -174,6 +176,7 @@ export type ProjectManagerWhereUniqueInput = Prisma.AtLeast<{
   OR?: Prisma.ProjectManagerWhereInput[]
   NOT?: Prisma.ProjectManagerWhereInput | Prisma.ProjectManagerWhereInput[]
   projects?: Prisma.ProjectListRelationFilter
+  user?: Prisma.XOR<Prisma.UserNullableScalarRelationFilter, Prisma.UserWhereInput> | null
 }, "id" | "nama">
 
 export type ProjectManagerOrderByWithAggregationInput = {
@@ -196,24 +199,28 @@ export type ProjectManagerCreateInput = {
   id: string
   nama: string
   projects?: Prisma.ProjectCreateNestedManyWithoutPmInput
+  user?: Prisma.UserCreateNestedOneWithoutProjectManagerInput
 }
 
 export type ProjectManagerUncheckedCreateInput = {
   id: string
   nama: string
   projects?: Prisma.ProjectUncheckedCreateNestedManyWithoutPmInput
+  user?: Prisma.UserUncheckedCreateNestedOneWithoutProjectManagerInput
 }
 
 export type ProjectManagerUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   nama?: Prisma.StringFieldUpdateOperationsInput | string
   projects?: Prisma.ProjectUpdateManyWithoutPmNestedInput
+  user?: Prisma.UserUpdateOneWithoutProjectManagerNestedInput
 }
 
 export type ProjectManagerUncheckedUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   nama?: Prisma.StringFieldUpdateOperationsInput | string
   projects?: Prisma.ProjectUncheckedUpdateManyWithoutPmNestedInput
+  user?: Prisma.UserUncheckedUpdateOneWithoutProjectManagerNestedInput
 }
 
 export type ProjectManagerCreateManyInput = {
@@ -246,6 +253,11 @@ export type ProjectManagerMinOrderByAggregateInput = {
   nama?: Prisma.SortOrder
 }
 
+export type ProjectManagerNullableScalarRelationFilter = {
+  is?: Prisma.ProjectManagerWhereInput | null
+  isNot?: Prisma.ProjectManagerWhereInput | null
+}
+
 export type ProjectManagerScalarRelationFilter = {
   is?: Prisma.ProjectManagerWhereInput
   isNot?: Prisma.ProjectManagerWhereInput
@@ -253,6 +265,22 @@ export type ProjectManagerScalarRelationFilter = {
 
 export type StringFieldUpdateOperationsInput = {
   set?: string
+}
+
+export type ProjectManagerCreateNestedOneWithoutUserInput = {
+  create?: Prisma.XOR<Prisma.ProjectManagerCreateWithoutUserInput, Prisma.ProjectManagerUncheckedCreateWithoutUserInput>
+  connectOrCreate?: Prisma.ProjectManagerCreateOrConnectWithoutUserInput
+  connect?: Prisma.ProjectManagerWhereUniqueInput
+}
+
+export type ProjectManagerUpdateOneWithoutUserNestedInput = {
+  create?: Prisma.XOR<Prisma.ProjectManagerCreateWithoutUserInput, Prisma.ProjectManagerUncheckedCreateWithoutUserInput>
+  connectOrCreate?: Prisma.ProjectManagerCreateOrConnectWithoutUserInput
+  upsert?: Prisma.ProjectManagerUpsertWithoutUserInput
+  disconnect?: Prisma.ProjectManagerWhereInput | boolean
+  delete?: Prisma.ProjectManagerWhereInput | boolean
+  connect?: Prisma.ProjectManagerWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.ProjectManagerUpdateToOneWithWhereWithoutUserInput, Prisma.ProjectManagerUpdateWithoutUserInput>, Prisma.ProjectManagerUncheckedUpdateWithoutUserInput>
 }
 
 export type ProjectManagerCreateNestedOneWithoutProjectsInput = {
@@ -269,14 +297,56 @@ export type ProjectManagerUpdateOneRequiredWithoutProjectsNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.ProjectManagerUpdateToOneWithWhereWithoutProjectsInput, Prisma.ProjectManagerUpdateWithoutProjectsInput>, Prisma.ProjectManagerUncheckedUpdateWithoutProjectsInput>
 }
 
+export type ProjectManagerCreateWithoutUserInput = {
+  id: string
+  nama: string
+  projects?: Prisma.ProjectCreateNestedManyWithoutPmInput
+}
+
+export type ProjectManagerUncheckedCreateWithoutUserInput = {
+  id: string
+  nama: string
+  projects?: Prisma.ProjectUncheckedCreateNestedManyWithoutPmInput
+}
+
+export type ProjectManagerCreateOrConnectWithoutUserInput = {
+  where: Prisma.ProjectManagerWhereUniqueInput
+  create: Prisma.XOR<Prisma.ProjectManagerCreateWithoutUserInput, Prisma.ProjectManagerUncheckedCreateWithoutUserInput>
+}
+
+export type ProjectManagerUpsertWithoutUserInput = {
+  update: Prisma.XOR<Prisma.ProjectManagerUpdateWithoutUserInput, Prisma.ProjectManagerUncheckedUpdateWithoutUserInput>
+  create: Prisma.XOR<Prisma.ProjectManagerCreateWithoutUserInput, Prisma.ProjectManagerUncheckedCreateWithoutUserInput>
+  where?: Prisma.ProjectManagerWhereInput
+}
+
+export type ProjectManagerUpdateToOneWithWhereWithoutUserInput = {
+  where?: Prisma.ProjectManagerWhereInput
+  data: Prisma.XOR<Prisma.ProjectManagerUpdateWithoutUserInput, Prisma.ProjectManagerUncheckedUpdateWithoutUserInput>
+}
+
+export type ProjectManagerUpdateWithoutUserInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  nama?: Prisma.StringFieldUpdateOperationsInput | string
+  projects?: Prisma.ProjectUpdateManyWithoutPmNestedInput
+}
+
+export type ProjectManagerUncheckedUpdateWithoutUserInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  nama?: Prisma.StringFieldUpdateOperationsInput | string
+  projects?: Prisma.ProjectUncheckedUpdateManyWithoutPmNestedInput
+}
+
 export type ProjectManagerCreateWithoutProjectsInput = {
   id: string
   nama: string
+  user?: Prisma.UserCreateNestedOneWithoutProjectManagerInput
 }
 
 export type ProjectManagerUncheckedCreateWithoutProjectsInput = {
   id: string
   nama: string
+  user?: Prisma.UserUncheckedCreateNestedOneWithoutProjectManagerInput
 }
 
 export type ProjectManagerCreateOrConnectWithoutProjectsInput = {
@@ -298,11 +368,13 @@ export type ProjectManagerUpdateToOneWithWhereWithoutProjectsInput = {
 export type ProjectManagerUpdateWithoutProjectsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   nama?: Prisma.StringFieldUpdateOperationsInput | string
+  user?: Prisma.UserUpdateOneWithoutProjectManagerNestedInput
 }
 
 export type ProjectManagerUncheckedUpdateWithoutProjectsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   nama?: Prisma.StringFieldUpdateOperationsInput | string
+  user?: Prisma.UserUncheckedUpdateOneWithoutProjectManagerNestedInput
 }
 
 
@@ -340,6 +412,7 @@ export type ProjectManagerSelect<ExtArgs extends runtime.Types.Extensions.Intern
   id?: boolean
   nama?: boolean
   projects?: boolean | Prisma.ProjectManager$projectsArgs<ExtArgs>
+  user?: boolean | Prisma.ProjectManager$userArgs<ExtArgs>
   _count?: boolean | Prisma.ProjectManagerCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["projectManager"]>
 
@@ -361,6 +434,7 @@ export type ProjectManagerSelectScalar = {
 export type ProjectManagerOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "nama", ExtArgs["result"]["projectManager"]>
 export type ProjectManagerInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   projects?: boolean | Prisma.ProjectManager$projectsArgs<ExtArgs>
+  user?: boolean | Prisma.ProjectManager$userArgs<ExtArgs>
   _count?: boolean | Prisma.ProjectManagerCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type ProjectManagerIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
@@ -370,6 +444,7 @@ export type $ProjectManagerPayload<ExtArgs extends runtime.Types.Extensions.Inte
   name: "ProjectManager"
   objects: {
     projects: Prisma.$ProjectPayload<ExtArgs>[]
+    user: Prisma.$UserPayload<ExtArgs> | null
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -769,6 +844,7 @@ readonly fields: ProjectManagerFieldRefs;
 export interface Prisma__ProjectManagerClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
   projects<T extends Prisma.ProjectManager$projectsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.ProjectManager$projectsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ProjectPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  user<T extends Prisma.ProjectManager$userArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.ProjectManager$userArgs<ExtArgs>>): Prisma.Prisma__UserClient<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1214,6 +1290,25 @@ export type ProjectManager$projectsArgs<ExtArgs extends runtime.Types.Extensions
   take?: number
   skip?: number
   distinct?: Prisma.ProjectScalarFieldEnum | Prisma.ProjectScalarFieldEnum[]
+}
+
+/**
+ * ProjectManager.user
+ */
+export type ProjectManager$userArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the User
+   */
+  select?: Prisma.UserSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the User
+   */
+  omit?: Prisma.UserOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.UserInclude<ExtArgs> | null
+  where?: Prisma.UserWhereInput
 }
 
 /**

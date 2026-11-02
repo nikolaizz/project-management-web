@@ -13,17 +13,6 @@ async function main() {
   await prisma.unit.deleteMany();
   await prisma.user.deleteMany();
 
-  // Buat satu user contoh. Hash ini hanya data dummy untuk pengembangan.
-  await prisma.user.create({
-    data: {
-      nama: "Riswan Saputra",
-      id: "USER-001",
-      email: "riswan@example.com",
-      passwordHash: "dummy-nanti-diganti-hash",
-      role: "PROJECT_MANAGER",
-    },
-  });
-
   // Buat data master yang akan direferensikan oleh contoh project di bawah.
   const [budi, dewi] = await Promise.all([
     prisma.projectManager.create({ data: { id: "PM-001", nama: "Budi Santoso" } }),

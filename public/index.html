@@ -6,6 +6,7 @@
 <title>Project Hub</title>
 <style>
 :root{--navy:#10285c;--blue:#1b5fd6;--blue-soft:#e8f0fd;--bg:#f3f5fa;--card:#fff;--line:#d9dfec;--text:#18233d;--muted:#5d6b88;--ok:#157347;--ok-bg:#e4f4ea;--bad:#b3261e;--bad-bg:#fdeceb;--warn:#8a5a00;--warn-bg:#fff3d6}
+[hidden]{display:none!important}
 *{box-sizing:border-box}
 [hidden]{display:none!important}
 body{margin:0;background:var(--bg);color:var(--text);font:15px/1.5 "Segoe UI",system-ui,-apple-system,Roboto,sans-serif}
@@ -165,6 +166,7 @@ button.wa-copy{background:#1f8a4c;border-color:#1f8a4c;color:#fff}
 .dashboard-pagination{display:flex;align-items:center;justify-content:flex-end;gap:8px;margin-top:12px}
 .dashboard-pagination span{margin-right:auto;color:var(--muted);font-size:12.5px}
 .stale-age{display:block;color:var(--muted);font-size:12px}
+.login-wrap{max-width:420px;margin:10vh auto;padding:24px}
 @media(max-width:1150px){.dashboard-charts{grid-template-columns:repeat(2,minmax(0,1fr))}.dashboard-panel:last-child{grid-column:1/-1}}
 @media(max-width:850px){.dashboard-summary{grid-template-columns:repeat(3,minmax(0,1fr))}.dashboard-filters{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:620px){.dashboard-summary{grid-template-columns:repeat(2,minmax(0,1fr))}.dashboard-charts{grid-template-columns:minmax(0,1fr)}.dashboard-panel:last-child{grid-column:auto}.dashboard-filter-actions{justify-content:stretch}.dashboard-filter-actions button{flex:1}.stage-chart-row{grid-template-columns:84px minmax(0,1fr) 24px}}
@@ -173,10 +175,26 @@ button.wa-copy{background:#1f8a4c;border-color:#1f8a4c;color:#fff}
 <body>
 <header class="top">
   <div class="brand"><strong>Project Hub</strong><span>Project Tracking Tools</span></div>
-  <span id="apiStatus" class="pill">Memeriksa server...</span>
+  <div><span id="accountName"></span> <button id="btnChangePassword" type="button" hidden>Ganti password</button> <button id="btnLogout" type="button" hidden>Keluar</button> <span id="apiStatus" class="pill">Memeriksa server...</span></div>
 </header>
 
-<main class="layout">
+<section id="loginPage" class="card login-wrap" aria-labelledby="loginTitle">
+  <h1 id="loginTitle">Login Project Hub</h1>
+  <form id="loginForm"><label for="loginEmail">Email</label><input id="loginEmail" type="email" autocomplete="username" required>
+    <label for="loginPassword">Password</label><input id="loginPassword" type="password" autocomplete="current-password" required>
+    <div id="loginMessage" role="alert" aria-live="polite"></div><button class="primary" type="submit">Masuk</button>
+  </form>
+  <button type="button" id="btnShowActivation" style="margin-top:12px">Aktivasi akun baru</button>
+  <form id="activationForm" hidden style="margin-top:16px">
+    <h2>Aktivasi akun</h2><label for="activationEmail">Email</label><input id="activationEmail" type="email" required>
+    <label for="activationToken">Kode aktivasi</label><input id="activationToken" autocomplete="one-time-code" required minlength="64" maxlength="64">
+    <label for="activationPassword">Buat password (min. 8 karakter)</label><input id="activationPassword" type="password" autocomplete="new-password" required minlength="8" maxlength="72">
+    <label for="activationPasswordConfirm">Ulangi password</label><input id="activationPasswordConfirm" type="password" autocomplete="new-password" required minlength="8" maxlength="72">
+    <div id="activationMessage" role="alert" aria-live="polite"></div><button class="primary" type="submit">Aktifkan akun</button> <button type="button" id="btnBackLogin">Kembali ke login</button>
+  </form>
+</section>
+
+<main class="layout" id="appLayout" hidden>
   <aside class="sidebar" aria-label="Menu utama">
     <p class="side-title">Menu utama</p>
     <nav class="side-nav" aria-label="Navigasi project">
@@ -313,9 +331,18 @@ button.wa-copy{background:#1f8a4c;border-color:#1f8a4c;color:#fff}
 
 <dialog id="editProjectDialog" aria-labelledby="editProjectTitle"></dialog>
 <dialog id="deleteProjectDialog" aria-labelledby="deleteProjectTitle"></dialog>
+<dialog id="changePasswordDialog" aria-labelledby="changePasswordTitle">
+  <form id="changePasswordForm"><h2 id="changePasswordTitle">Ganti password</h2>
+    <label for="currentPassword">Password saat ini</label><input id="currentPassword" type="password" autocomplete="current-password" required>
+    <label for="newPassword">Password baru (min. 8 karakter)</label><input id="newPassword" type="password" autocomplete="new-password" required minlength="8" maxlength="72">
+    <label for="newPasswordConfirm">Ulangi password baru</label><input id="newPasswordConfirm" type="password" autocomplete="new-password" required minlength="8" maxlength="72">
+    <div id="changePasswordMessage" role="alert"></div><div class="dialog-actions"><button type="button" id="btnCancelPassword">Batal</button><button class="primary" type="submit">Simpan password</button></div>
+  </form>
+</dialog>
 
 <script>
 const API = location.protocol === "file:" ? "http://localhost:3000" : "";
+let authState = { token: sessionStorage.getItem("token"), user: null };
 const MAX_SIZE = 10 * 1024 * 1024;
 const MAX_FILES = 10;
 const ALLOWED = [".pdf", ".doc", ".docx", ".xls", ".xlsx", ".jpg", ".jpeg", ".png"];
@@ -368,12 +395,15 @@ document.querySelector(".side-nav").addEventListener("click", (e) => {
 async function api(path, opts) {
   let res;
   try {
+    opts = opts || {};
+    opts.headers = { ...(opts.headers || {}), ...(authState.token ? { Authorization: `Bearer ${authState.token}` } : {}) };
     res = await fetch(API + path, opts);
   } catch {
     throw { network: true, message: "Tidak bisa terhubung ke server. Pastikan backend berjalan (npm run dev)." };
   }
   let body = null;
   try { body = await res.json(); } catch {}
+  if (res.status === 401 && authState.user) showLogin();
   if (!res.ok) throw { status: res.status, message: (body && body.message) || "Terjadi kesalahan", errors: (body && body.errors) || [] };
   return body;
 }
@@ -381,6 +411,68 @@ async function api(path, opts) {
 function setAlert(type, msg) { $("#alert").innerHTML = `<div class="alert ${type}">${esc(msg)}</div>`; }
 function clearAlert() { $("#alert").innerHTML = ""; }
 function setPill(cls, text) { const p = $("#apiStatus"); p.className = "pill " + cls; p.textContent = text; }
+
+function canEditProject(p) { return authState.user?.role === "ADMIN" || authState.user?.role === "PROJECT_MANAGER" && authState.user.projectManagerId === p.pmId || authState.user?.role === "BUSINESS_PARTNER" && authState.user.businessPartnerId === p.bpId; }
+function showLogin() {
+  authState = { token: null, user: null }; sessionStorage.removeItem("token");
+  $("#loginPage").hidden = false; $("#appLayout").hidden = true; $("#btnLogout").hidden = true; $("#btnChangePassword").hidden = true; $("#accountName").textContent = "";
+  Object.assign(state, { step: 0, jenis: null, form: newForm(), stages: newStages(), files: [], errors: {}, createdId: null, createdNama: "", done: false });
+  daily.blocks = [newBlock()]; daily.locked = false; daily.text = ""; daily.previewText = "";
+}
+function showApp(user) {
+  authState.user = user; $("#loginPage").hidden = true; $("#appLayout").hidden = false;
+  $("#accountName").textContent = `${user.nama} · ${({ ADMIN: "Admin", PROJECT_MANAGER: "PM", BUSINESS_PARTNER: "BP", VIEWER: "Viewer" })[user.role]}`;
+  $("#btnLogout").hidden = false;
+  $("#btnChangePassword").hidden = false;
+  $("[data-page=uploadPage]").hidden = user.role === "VIEWER";
+  $("[data-page=dailyPage]").hidden = user.role === "VIEWER";
+  $("[data-page=configPage]").hidden = user.role !== "ADMIN";
+}
+
+$("#loginForm").addEventListener("submit", async (e) => {
+  e.preventDefault(); $("#loginMessage").innerHTML = "";
+  try {
+    const result = await api("/auth/login", jsonOpts("POST", { email: $("#loginEmail").value, password: $("#loginPassword").value }));
+    authState.token = result.data.token; sessionStorage.setItem("token", authState.token); showApp(result.data.user);
+    if (result.data.user.role === "PROJECT_MANAGER") state.form.pmId = result.data.user.projectManagerId;
+    if (result.data.user.role === "BUSINESS_PARTNER") state.form.bpId = result.data.user.businessPartnerId;
+    await initApp();
+  } catch (err) { $("#loginMessage").innerHTML = `<div class="alert error">${esc(err.message)}</div>`; }
+});
+$("#btnShowActivation").onclick = () => { $("#loginForm").hidden = true; $("#btnShowActivation").hidden = true; $("#activationForm").hidden = false; };
+$("#btnBackLogin").onclick = () => { $("#activationForm").hidden = true; $("#loginForm").hidden = false; $("#btnShowActivation").hidden = false; };
+$("#activationForm").addEventListener("submit", async (e) => {
+  e.preventDefault(); $("#activationMessage").innerHTML = "";
+  const password = $("#activationPassword").value;
+  if (password !== $("#activationPasswordConfirm").value) { $("#activationMessage").innerHTML = `<div class="alert error">Password tidak sama.</div>`; return; }
+  try {
+    const result = await api("/auth/activate", jsonOpts("POST", { email: $("#activationEmail").value, token: $("#activationToken").value.trim(), password }));
+    $("#loginMessage").innerHTML = `<div class="alert ok">${esc(result.message)}</div>`;
+    $("#activationForm").reset(); $("#activationMessage").innerHTML = ""; $("#activationForm").hidden = true; $("#loginForm").hidden = false; $("#btnShowActivation").hidden = false;
+  } catch (err) { $("#activationMessage").innerHTML = `<div class="alert error">${esc(err.message)}</div>`; }
+});
+$("#btnLogout").onclick = showLogin;
+$("#btnChangePassword").onclick = () => { $("#changePasswordMessage").innerHTML = ""; $("#changePasswordDialog").showModal(); };
+$("#btnCancelPassword").onclick = () => $("#changePasswordDialog").close();
+$("#changePasswordForm").addEventListener("submit", async (e) => {
+  e.preventDefault(); $("#changePasswordMessage").innerHTML = "";
+  const newPassword = $("#newPassword").value;
+  if (newPassword !== $("#newPasswordConfirm").value) { $("#changePasswordMessage").innerHTML = `<div class="alert error">Password baru tidak sama.</div>`; return; }
+  try {
+    const result = await api("/auth/password", jsonOpts("PUT", { currentPassword: $("#currentPassword").value, newPassword }));
+    authState.token = result.data.token; sessionStorage.setItem("token", authState.token);
+    $("#changePasswordForm").reset(); $("#changePasswordDialog").close(); alert(result.message);
+  } catch (err) { $("#changePasswordMessage").innerHTML = `<div class="alert error">${esc(err.message)}</div>`; }
+});
+document.addEventListener("click", async (e) => {
+  const link = e.target.closest("a[data-download]"); if (!link) return;
+  e.preventDefault();
+  try {
+    const res = await fetch(API + link.getAttribute("href"), { headers: { Authorization: `Bearer ${authState.token}` } });
+    if (!res.ok) throw new Error("Dokumen tidak dapat diunduh");
+    const blob = await res.blob(), a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = link.dataset.filename || link.textContent; a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+  } catch (err) { alert(err.message); }
+});
 
 const nameOf = (list, id) => (list.find((x) => String(x.id) === String(id)) || {}).nama || "-";
 const options = (list, ph) => `<option value="">${ph}</option>` + list.map((x) => `<option value="${x.id}">${esc(x.nama)}</option>`).join("");
@@ -407,8 +499,8 @@ function stepInfo() {
     ${fld("kodeProject", "Kode Project", kode)}
     ${fld("nama", "Nama Project", `<input id="f-nama" data-f="nama">`, "full")}
     ${fld("deskripsi", "Deskripsi", `<textarea id="f-deskripsi" data-f="deskripsi"></textarea>`, "full")}
-    ${fld("pmId", "Project Manager", `<select id="f-pmId" data-f="pmId">${options(master.pm, "Pilih PM")}</select>`)}
-    ${fld("bpId", "Business Partner", `<select id="f-bpId" data-f="bpId">${options(master.bp, "Pilih BP")}</select>`)}
+    ${fld("pmId", "Project Manager", `<select id="f-pmId" data-f="pmId">${options(authState.user?.role === "PROJECT_MANAGER" ? master.pm.filter((x) => x.id === authState.user.projectManagerId) : master.pm, "Pilih PM")}</select>`)}
+    ${fld("bpId", "Business Partner", `<select id="f-bpId" data-f="bpId">${options(authState.user?.role === "BUSINESS_PARTNER" ? master.bp.filter((x) => x.id === authState.user.businessPartnerId) : master.bp, "Pilih BP")}</select>`)}
     ${fld("unitId", "Unit Pengusul", `<select id="f-unitId" data-f="unitId">${options(master.units, "Pilih unit")}</select>`)}
     ${fld("prioritas", "Prioritas", prio)}
     ${fld("ownerPic", "Owner / PIC", `<input id="f-ownerPic" data-f="ownerPic">`)}
@@ -650,7 +742,7 @@ panel.addEventListener("drop", (e) => { const d = e.target.closest("#drop"); if 
 
 function docsHtml(list) {
   if (!list.length) return `<span class="hint">Belum ada dokumen.</span>`;
-  return `<ul class="files">${list.map((d) => `<li><span class="nm"><a href="${API}/documents/${d.id}/download">${esc(d.namaFile)}</a> <small>(${fmtSize(d.ukuran)})</small></span><button type="button" class="small danger" data-deldoc="${d.id}">Hapus</button></li>`).join("")}</ul>`;
+  return `<ul class="files">${list.map((d) => `<li><span class="nm"><a data-download data-filename="${esc(d.namaFile)}" href="/documents/${d.id}/download">${esc(d.namaFile)}</a> <small>(${fmtSize(d.ukuran)})</small></span>${canEditProject(d.project || {}) ? `<button type="button" class="small danger" data-deldoc="${d.id}">Hapus</button>` : ""}</li>`).join("")}</ul>`;
 }
 
 // Tanggal dan jam dalam zona waktu browser, contoh: 23 Okt 2026, 14:35
@@ -810,7 +902,7 @@ function stageHistoryTable(list) {
 function renderProjectDetail(p) {
   const date = (value) => value ? esc(String(value).slice(0, 10)) : "-";
   const docs = p.documents.length
-    ? `<ul>${p.documents.map((d) => `<li><a href="${API}/documents/${d.id}/download">${esc(d.namaFile)}</a> <small>(${fmtSize(d.ukuran)})</small></li>`).join("")}</ul>`
+    ? `<ul>${p.documents.map((d) => `<li><a data-download data-filename="${esc(d.namaFile)}" href="/documents/${d.id}/download">${esc(d.namaFile)}</a> <small>(${fmtSize(d.ukuran)})</small></li>`).join("")}</ul>`
     : `<p class="hint">Belum ada dokumen.</p>`;
   const totalUpdates = p._count ? p._count.updates : p.updates.length;
   const updates = p.updates.length
@@ -850,9 +942,9 @@ function renderProjects(list, total) {
     <td>${esc(JENIS_LABEL[p.jenis] || p.jenis)}</td><td><span class="badge b-${esc(p.status)}">${esc(STATUS_LABEL[p.status] || p.status)}</span></td><td><span class="badge b-${esc(p.prioritas)}">${esc(PRIORITAS_LABEL[p.prioritas] || p.prioritas || "-")}</span></td>
     <td>${esc(p.pm ? p.pm.nama : "-")}</td><td>${esc(p.unitPengusul ? p.unitPengusul.nama : "-")}</td>
     <td><button type="button" class="small" data-docs="${p.id}">${p._count ? p._count.documents : 0} file</button></td>
-    <td><button type="button" class="small" data-edit="${p.id}">Edit</button>
+    <td>${canEditProject(p) ? `<button type="button" class="small" data-edit="${p.id}">Edit</button>` : ""}
     <button type="button" class="small" data-detail="${p.id}" aria-expanded="false">Lihat detail</button>
-    <button type="button" class="small danger" data-delp="${p.id}">Hapus</button></td></tr>`).join("")}</tbody></table>
+    ${authState.user?.role === "ADMIN" ? `<button type="button" class="small danger" data-delp="${p.id}">Hapus</button>` : ""}</td></tr>`).join("")}</tbody></table>
     <p class="hint">Menampilkan ${list.length} dari ${total} project.</p>`;
 }
 
@@ -919,6 +1011,8 @@ function renderEditForm(p) {
 async function openEditProject(id) {
   const r = await api(`/projects/${id}`);
   renderEditForm(r.data);
+  if (authState.user.role === "PROJECT_MANAGER") $("#editProjectForm [name=pmId]").disabled = true;
+  if (authState.user.role === "BUSINESS_PARTNER") $("#editProjectForm [name=bpId]").disabled = true;
   $("#editProjectForm").dataset.projectId = id;
   $("#editProjectDialog").showModal();
 }
@@ -1130,18 +1224,37 @@ const MASTER_TYPES = {
   bp: { label: "Business Partner", path: "/master/bp", singular: "BP" },
   units: { label: "Unit Pengusul", path: "/master/units", singular: "unit" },
 };
-const cfg = { type: "pm", rows: [], editingId: null };
+const cfg = { type: "pm", rows: [], users: [], editingId: null, activationToken: null };
 const jsonOpts = (method, body) => ({ method, headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
 const errText = (err) => (err.errors && err.errors.length ? err.errors.map((x) => x.message).join("; ") : err.message);
 
 function cfgMsg(type, msg) { $("#configMessage").innerHTML = msg ? `<div class="alert ${type}">${esc(msg)}</div>` : ""; }
+function updateAccountProfileFields() {
+  if (!$("#userRole")) return;
+  $("#userPmWrap").hidden = $("#userRole").value !== "PROJECT_MANAGER";
+  $("#userBpWrap").hidden = $("#userRole").value !== "BUSINESS_PARTNER";
+}
 
 function renderConfigTabs() {
   $("#configTabs").innerHTML = Object.entries(MASTER_TYPES).map(([k, t]) =>
-    `<button type="button" class="tab ${k === cfg.type ? "active" : ""}" data-cfgtab="${k}" role="tab" aria-selected="${k === cfg.type}">${esc(t.label)}</button>`).join("");
+    `<button type="button" class="tab ${k === cfg.type ? "active" : ""}" data-cfgtab="${k}" role="tab" aria-selected="${k === cfg.type}">${esc(t.label)}</button>`).join("") +
+    `<button type="button" class="tab ${cfg.type === "accounts" ? "active" : ""}" data-cfgtab="accounts" role="tab" aria-selected="${cfg.type === "accounts"}">Akun Pengguna</button>`;
 }
 
 function renderConfigBody() {
+  if (cfg.type === "accounts") {
+    const rows = cfg.users.map((u) => `<tr><td>${esc(u.nama)}</td><td>${esc(u.email)}</td><td>${esc(({ ADMIN: "Admin", PROJECT_MANAGER: "PM", BUSINESS_PARTNER: "BP", VIEWER: "Viewer" })[u.role])}</td><td>${esc(u.projectManager?.nama || u.businessPartner?.nama || "-")}</td><td>${u.activated ? "Aktif" : "Menunggu aktivasi"}</td><td><button type="button" class="small" data-reissue-activation="${esc(u.id)}">${u.activated ? "Reset password" : "Terbitkan kode baru"}</button></td></tr>`).join("");
+    $("#configBody").innerHTML = `<form id="userAddForm" class="grid">
+      <div><label for="userName">Nama</label><input id="userName" required maxlength="100"></div>
+      <div><label for="userEmail">Email</label><input id="userEmail" type="email" required></div>
+      <div><label for="userRole">Role</label><select id="userRole"><option value="VIEWER">Viewer</option><option value="PROJECT_MANAGER">PM</option><option value="BUSINESS_PARTNER">BP</option><option value="ADMIN">Admin</option></select></div>
+      <div id="userPmWrap" hidden><label for="userPm">Profil PM</label><select id="userPm">${options(master.pm, "Pilih PM")}</select></div>
+      <div id="userBpWrap" hidden><label for="userBp">Profil BP</label><select id="userBp">${options(master.bp, "Pilih BP")}</select></div>
+      <div class="full"><button class="primary" type="submit">Buat akun &amp; kode aktivasi</button></div></form>
+      ${cfg.activationToken ? `<div class="alert warn" role="status">Salin dan bagikan kode ini kepada pengguna sekarang. Kode hanya berlaku 24 jam dan tidak ditampilkan lagi setelah halaman ditutup.<br><code>${esc(cfg.activationToken)}</code> <button type="button" class="small" data-copy-activation>Salin kode</button></div>` : ""}
+      ${rows ? `<div class="tablewrap" style="margin-top:16px"><table><thead><tr><th>Nama</th><th>Email</th><th>Role</th><th>Profil</th><th>Status</th><th>Aksi</th></tr></thead><tbody>${rows}</tbody></table></div>` : `<p class="empty">Belum ada akun.</p>`}`;
+    updateAccountProfileFields(); return;
+  }
   const t = MASTER_TYPES[cfg.type];
   const rows = cfg.rows.map((r) => {
     const used = r._count ? r._count.projects : 0;
@@ -1161,6 +1274,11 @@ function renderConfigBody() {
 }
 
 async function loadConfig() {
+  if (cfg.type === "accounts") {
+    try { const [users] = await Promise.all([api("/auth/users"), loadMaster()]); cfg.users = users.data; }
+    catch (e) { cfg.users = []; cfgMsg("error", e.message); }
+    renderConfigBody(); return;
+  }
   try { cfg.rows = (await api(MASTER_TYPES[cfg.type].path)).data; }
   catch (e) { cfg.rows = []; cfgMsg("error", e.message); }
   renderConfigBody();
@@ -1181,7 +1299,21 @@ $("#configTabs").addEventListener("click", (e) => {
   cfg.type = tab.dataset.cfgtab; cfg.editingId = null; cfgMsg("ok", "");
   renderConfigTabs(); loadConfig();
 });
+$("#configBody").addEventListener("change", (e) => { if (e.target.id === "userRole") updateAccountProfileFields(); });
 $("#configBody").addEventListener("submit", async (e) => {
+  if (e.target.id === "userAddForm") {
+    e.preventDefault();
+    try {
+      const role = $("#userRole").value;
+      const result = await api("/auth/users", jsonOpts("POST", {
+        nama: $("#userName").value, email: $("#userEmail").value, role,
+        ...(role === "PROJECT_MANAGER" ? { projectManagerId: $("#userPm").value } : {}),
+        ...(role === "BUSINESS_PARTNER" ? { businessPartnerId: $("#userBp").value } : {}),
+      }));
+      cfg.activationToken = result.data.activationToken; cfgMsg("ok", "Akun dibuat. Kode aktivasi hanya ditampilkan sekarang."); await loadConfig();
+    } catch (err) { cfgMsg("error", errText(err)); }
+    return;
+  }
   if (e.target.id !== "cfgAddForm") return;
   e.preventDefault();
   const t = MASTER_TYPES[cfg.type], input = $("#cfgNewName"), nama = input.value.trim();
@@ -1190,6 +1322,19 @@ $("#configBody").addEventListener("submit", async (e) => {
     await api(t.path, jsonOpts("POST", { nama }));
     cfgMsg("ok", `${t.singular} "${nama}" berhasil ditambahkan.`);
     await refreshAfterMasterChange();
+  } catch (err) { cfgMsg("error", errText(err)); }
+});
+$("#configBody").addEventListener("click", async (e) => {
+  if (e.target.closest("[data-copy-activation]")) {
+    if (await copyToClipboard(cfg.activationToken)) cfgMsg("ok", "Kode aktivasi disalin.");
+    return;
+  }
+  const button = e.target.closest("[data-reissue-activation]");
+  if (!button) return;
+  if (!confirm("Terbitkan kode baru? Untuk akun aktif, password lama akan langsung dinonaktifkan.")) return;
+  try {
+    const result = await api(`/auth/users/${encodeURIComponent(button.dataset.reissueActivation)}/activation`, { method: "POST" });
+    cfg.activationToken = result.data.activationToken; cfgMsg("ok", result.message); await loadConfig();
   } catch (err) { cfgMsg("error", errText(err)); }
 });
 $("#configBody").addEventListener("click", async (e) => {
@@ -1242,7 +1387,7 @@ function dailyBlockHtml(i) {
   const p = projectOf(b.projectId);
   const taken = new Set(daily.blocks.filter((_, j) => j !== i).map((x) => String(x.projectId)).filter(Boolean));
   const dis = daily.locked ? " disabled" : "";
-  const projOpts = `<option value="">Pilih project</option>` + daily.projects.map((x) =>
+  const projOpts = `<option value="">Pilih project</option>` + daily.projects.filter(canEditProject).map((x) =>
     `<option value="${x.id}"${taken.has(String(x.id)) ? " disabled" : ""}>${esc(x.nama)}${x.kodeProject ? ` (${esc(x.kodeProject)})` : ""}</option>`).join("");
   const statusOpts = master.enums.status.map((s) => `<option value="${s}">${esc(STATUS_LABEL[s] || s)}</option>`).join("");
   const ro = (label, val) => `<div><label>${label}</label><input class="ro" readonly tabindex="-1" aria-label="${label}" value="${esc(val || "-")}"></div>`;
@@ -1271,7 +1416,7 @@ function blockDocsHtml(i, b, p, dis) {
   const head = `<div style="font-weight:600;font-size:13px;margin-bottom:4px">Dokumen Pendukung</div>`;
   if (!p) return `<div class="full">${head}<p class="hint">Pilih project untuk melihat dan menambah dokumen.</p></div>`;
   const existing = b.docs.length
-    ? `<ul class="files">${b.docs.map((d) => `<li><span class="nm"><a href="${API}/documents/${d.id}/download">${esc(d.namaFile)}</a> <small>(${bytes(d.ukuran)})</small></span><button type="button" class="small danger" data-dfdel="${d.id}" data-i="${i}"${dis}>Hapus</button></li>`).join("")}</ul>`
+    ? `<ul class="files">${b.docs.map((d) => `<li><span class="nm"><a data-download data-filename="${esc(d.namaFile)}" href="/documents/${d.id}/download">${esc(d.namaFile)}</a> <small>(${bytes(d.ukuran)})</small></span><button type="button" class="small danger" data-dfdel="${d.id}" data-i="${i}"${dis}>Hapus</button></li>`).join("")}</ul>`
     : `<p class="hint">Belum ada dokumen.</p>`;
   const staged = b.files.length
     ? `<ul class="files">${b.files.map((f, j) => `<li><span class="nm">${esc(f.name)} <small>(${bytes(f.size)}) · akan ditambahkan</small></span><button type="button" class="small danger" data-dfrm="${i}:${j}"${dis}>Batal</button></li>`).join("")}</ul>`
@@ -1628,7 +1773,7 @@ async function loadMaster() {
   return master;
 }
 
-async function init() {
+async function initApp() {
   try {
     await loadMaster();
     setPill("ok", "Server terhubung");
@@ -1642,7 +1787,20 @@ async function init() {
   loadProjects();
   loadDashboard();
 }
-init();
+
+async function start() {
+  try { await api("/health"); setPill("ok", "Server terhubung"); }
+  catch { setPill("down", "Server tidak terjangkau"); }
+  if (!authState.token) return showLogin();
+  try {
+    const result = await api("/auth/me");
+    showApp(result.data);
+    if (result.data.role === "PROJECT_MANAGER") state.form.pmId = result.data.projectManagerId;
+    if (result.data.role === "BUSINESS_PARTNER") state.form.bpId = result.data.businessPartnerId;
+    await initApp();
+  } catch { showLogin(); }
+}
+start();
 </script>
 </body>
 </html>

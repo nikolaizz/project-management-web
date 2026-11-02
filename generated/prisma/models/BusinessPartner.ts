@@ -159,12 +159,14 @@ export type BusinessPartnerWhereInput = {
   id?: Prisma.StringFilter<"BusinessPartner"> | string
   nama?: Prisma.StringFilter<"BusinessPartner"> | string
   projects?: Prisma.ProjectListRelationFilter
+  user?: Prisma.XOR<Prisma.UserNullableScalarRelationFilter, Prisma.UserWhereInput> | null
 }
 
 export type BusinessPartnerOrderByWithRelationInput = {
   id?: Prisma.SortOrder
   nama?: Prisma.SortOrder
   projects?: Prisma.ProjectOrderByRelationAggregateInput
+  user?: Prisma.UserOrderByWithRelationInput
 }
 
 export type BusinessPartnerWhereUniqueInput = Prisma.AtLeast<{
@@ -174,6 +176,7 @@ export type BusinessPartnerWhereUniqueInput = Prisma.AtLeast<{
   OR?: Prisma.BusinessPartnerWhereInput[]
   NOT?: Prisma.BusinessPartnerWhereInput | Prisma.BusinessPartnerWhereInput[]
   projects?: Prisma.ProjectListRelationFilter
+  user?: Prisma.XOR<Prisma.UserNullableScalarRelationFilter, Prisma.UserWhereInput> | null
 }, "id" | "nama">
 
 export type BusinessPartnerOrderByWithAggregationInput = {
@@ -196,24 +199,28 @@ export type BusinessPartnerCreateInput = {
   id: string
   nama: string
   projects?: Prisma.ProjectCreateNestedManyWithoutBpInput
+  user?: Prisma.UserCreateNestedOneWithoutBusinessPartnerInput
 }
 
 export type BusinessPartnerUncheckedCreateInput = {
   id: string
   nama: string
   projects?: Prisma.ProjectUncheckedCreateNestedManyWithoutBpInput
+  user?: Prisma.UserUncheckedCreateNestedOneWithoutBusinessPartnerInput
 }
 
 export type BusinessPartnerUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   nama?: Prisma.StringFieldUpdateOperationsInput | string
   projects?: Prisma.ProjectUpdateManyWithoutBpNestedInput
+  user?: Prisma.UserUpdateOneWithoutBusinessPartnerNestedInput
 }
 
 export type BusinessPartnerUncheckedUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   nama?: Prisma.StringFieldUpdateOperationsInput | string
   projects?: Prisma.ProjectUncheckedUpdateManyWithoutBpNestedInput
+  user?: Prisma.UserUncheckedUpdateOneWithoutBusinessPartnerNestedInput
 }
 
 export type BusinessPartnerCreateManyInput = {
@@ -246,9 +253,30 @@ export type BusinessPartnerMinOrderByAggregateInput = {
   nama?: Prisma.SortOrder
 }
 
+export type BusinessPartnerNullableScalarRelationFilter = {
+  is?: Prisma.BusinessPartnerWhereInput | null
+  isNot?: Prisma.BusinessPartnerWhereInput | null
+}
+
 export type BusinessPartnerScalarRelationFilter = {
   is?: Prisma.BusinessPartnerWhereInput
   isNot?: Prisma.BusinessPartnerWhereInput
+}
+
+export type BusinessPartnerCreateNestedOneWithoutUserInput = {
+  create?: Prisma.XOR<Prisma.BusinessPartnerCreateWithoutUserInput, Prisma.BusinessPartnerUncheckedCreateWithoutUserInput>
+  connectOrCreate?: Prisma.BusinessPartnerCreateOrConnectWithoutUserInput
+  connect?: Prisma.BusinessPartnerWhereUniqueInput
+}
+
+export type BusinessPartnerUpdateOneWithoutUserNestedInput = {
+  create?: Prisma.XOR<Prisma.BusinessPartnerCreateWithoutUserInput, Prisma.BusinessPartnerUncheckedCreateWithoutUserInput>
+  connectOrCreate?: Prisma.BusinessPartnerCreateOrConnectWithoutUserInput
+  upsert?: Prisma.BusinessPartnerUpsertWithoutUserInput
+  disconnect?: Prisma.BusinessPartnerWhereInput | boolean
+  delete?: Prisma.BusinessPartnerWhereInput | boolean
+  connect?: Prisma.BusinessPartnerWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.BusinessPartnerUpdateToOneWithWhereWithoutUserInput, Prisma.BusinessPartnerUpdateWithoutUserInput>, Prisma.BusinessPartnerUncheckedUpdateWithoutUserInput>
 }
 
 export type BusinessPartnerCreateNestedOneWithoutProjectsInput = {
@@ -265,14 +293,56 @@ export type BusinessPartnerUpdateOneRequiredWithoutProjectsNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.BusinessPartnerUpdateToOneWithWhereWithoutProjectsInput, Prisma.BusinessPartnerUpdateWithoutProjectsInput>, Prisma.BusinessPartnerUncheckedUpdateWithoutProjectsInput>
 }
 
+export type BusinessPartnerCreateWithoutUserInput = {
+  id: string
+  nama: string
+  projects?: Prisma.ProjectCreateNestedManyWithoutBpInput
+}
+
+export type BusinessPartnerUncheckedCreateWithoutUserInput = {
+  id: string
+  nama: string
+  projects?: Prisma.ProjectUncheckedCreateNestedManyWithoutBpInput
+}
+
+export type BusinessPartnerCreateOrConnectWithoutUserInput = {
+  where: Prisma.BusinessPartnerWhereUniqueInput
+  create: Prisma.XOR<Prisma.BusinessPartnerCreateWithoutUserInput, Prisma.BusinessPartnerUncheckedCreateWithoutUserInput>
+}
+
+export type BusinessPartnerUpsertWithoutUserInput = {
+  update: Prisma.XOR<Prisma.BusinessPartnerUpdateWithoutUserInput, Prisma.BusinessPartnerUncheckedUpdateWithoutUserInput>
+  create: Prisma.XOR<Prisma.BusinessPartnerCreateWithoutUserInput, Prisma.BusinessPartnerUncheckedCreateWithoutUserInput>
+  where?: Prisma.BusinessPartnerWhereInput
+}
+
+export type BusinessPartnerUpdateToOneWithWhereWithoutUserInput = {
+  where?: Prisma.BusinessPartnerWhereInput
+  data: Prisma.XOR<Prisma.BusinessPartnerUpdateWithoutUserInput, Prisma.BusinessPartnerUncheckedUpdateWithoutUserInput>
+}
+
+export type BusinessPartnerUpdateWithoutUserInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  nama?: Prisma.StringFieldUpdateOperationsInput | string
+  projects?: Prisma.ProjectUpdateManyWithoutBpNestedInput
+}
+
+export type BusinessPartnerUncheckedUpdateWithoutUserInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  nama?: Prisma.StringFieldUpdateOperationsInput | string
+  projects?: Prisma.ProjectUncheckedUpdateManyWithoutBpNestedInput
+}
+
 export type BusinessPartnerCreateWithoutProjectsInput = {
   id: string
   nama: string
+  user?: Prisma.UserCreateNestedOneWithoutBusinessPartnerInput
 }
 
 export type BusinessPartnerUncheckedCreateWithoutProjectsInput = {
   id: string
   nama: string
+  user?: Prisma.UserUncheckedCreateNestedOneWithoutBusinessPartnerInput
 }
 
 export type BusinessPartnerCreateOrConnectWithoutProjectsInput = {
@@ -294,11 +364,13 @@ export type BusinessPartnerUpdateToOneWithWhereWithoutProjectsInput = {
 export type BusinessPartnerUpdateWithoutProjectsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   nama?: Prisma.StringFieldUpdateOperationsInput | string
+  user?: Prisma.UserUpdateOneWithoutBusinessPartnerNestedInput
 }
 
 export type BusinessPartnerUncheckedUpdateWithoutProjectsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   nama?: Prisma.StringFieldUpdateOperationsInput | string
+  user?: Prisma.UserUncheckedUpdateOneWithoutBusinessPartnerNestedInput
 }
 
 
@@ -336,6 +408,7 @@ export type BusinessPartnerSelect<ExtArgs extends runtime.Types.Extensions.Inter
   id?: boolean
   nama?: boolean
   projects?: boolean | Prisma.BusinessPartner$projectsArgs<ExtArgs>
+  user?: boolean | Prisma.BusinessPartner$userArgs<ExtArgs>
   _count?: boolean | Prisma.BusinessPartnerCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["businessPartner"]>
 
@@ -357,6 +430,7 @@ export type BusinessPartnerSelectScalar = {
 export type BusinessPartnerOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "nama", ExtArgs["result"]["businessPartner"]>
 export type BusinessPartnerInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   projects?: boolean | Prisma.BusinessPartner$projectsArgs<ExtArgs>
+  user?: boolean | Prisma.BusinessPartner$userArgs<ExtArgs>
   _count?: boolean | Prisma.BusinessPartnerCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type BusinessPartnerIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
@@ -366,6 +440,7 @@ export type $BusinessPartnerPayload<ExtArgs extends runtime.Types.Extensions.Int
   name: "BusinessPartner"
   objects: {
     projects: Prisma.$ProjectPayload<ExtArgs>[]
+    user: Prisma.$UserPayload<ExtArgs> | null
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -765,6 +840,7 @@ readonly fields: BusinessPartnerFieldRefs;
 export interface Prisma__BusinessPartnerClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
   projects<T extends Prisma.BusinessPartner$projectsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.BusinessPartner$projectsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ProjectPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  user<T extends Prisma.BusinessPartner$userArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.BusinessPartner$userArgs<ExtArgs>>): Prisma.Prisma__UserClient<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1210,6 +1286,25 @@ export type BusinessPartner$projectsArgs<ExtArgs extends runtime.Types.Extension
   take?: number
   skip?: number
   distinct?: Prisma.ProjectScalarFieldEnum | Prisma.ProjectScalarFieldEnum[]
+}
+
+/**
+ * BusinessPartner.user
+ */
+export type BusinessPartner$userArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the User
+   */
+  select?: Prisma.UserSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the User
+   */
+  omit?: Prisma.UserOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.UserInclude<ExtArgs> | null
+  where?: Prisma.UserWhereInput
 }
 
 /**

@@ -173,6 +173,9 @@ export async function createProject(req, res, next) {
   try {
     // Body sudah diperiksa dan dibersihkan oleh middleware validate sebelum masuk ke sini.
     const d = req.body; // sudah divalidasi oleh middleware validate()
+    if (req.user.role === "PROJECT_MANAGER" && d.pmId !== req.user.projectManagerId || req.user.role === "BUSINESS_PARTNER" && d.bpId !== req.user.businessPartnerId) {
+      return res.status(403).json({ success: false, message: "Project hanya dapat dibuat dengan profil PM/BP akun Anda" });
+    }
 
     // Cek kode unik supaya pesan errornya ramah
     if (d.kodeProject) {
