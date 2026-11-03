@@ -547,8 +547,8 @@ function stepReview() {
     return `<tr><td>${TAHAP_LABEL[t]}</td><td>${esc(x.tanggalRencana || "-")}</td><td>${esc(STATUS_TAHAP_LABEL[x.status] || x.status)}</td><td>${esc(x.catatan.trim() || "-")}</td></tr>`;
   }).join("");
   return `<h2>Review Data</h2><dl class="rev">${rows.map(([k, v]) => `<dt>${k}</dt><dd>${esc(v)}</dd>`).join("")}</dl>
-    <h3 style="margin:20px 0 8px;font-size:15px">Tahapan</h3>
-    <div class="tablewrap"><table><thead><tr><th>Tahapan</th><th>Tanggal Rencana</th><th>Status</th><th>Catatan</th></tr></thead><tbody>${stageRows}</tbody></table></div>`;
+    <h3 style="margin:20px 0 8px;font-size:15px">Tahapan Komite</h3>
+    <div class="tablewrap"><table><thead><tr><th>Tahapan Komite</th><th>Tanggal Rencana</th><th>Status</th><th>Catatan</th></tr></thead><tbody>${stageRows}</tbody></table></div>`;
 }
 
 function successHtml() {
@@ -931,7 +931,7 @@ function renderProjectDetail(p) {
     <dt>Target go live</dt><dd>${date(p.targetGoLive)}</dd>
     <dt>Dibuat</dt><dd>${fmtDateTime(p.createdAt)}</dd>
     <dt>Terakhir diperbarui</dt><dd>${fmtDateTime(p.updatedAt)}</dd>
-  </dl><h3>Tahapan</h3>${stages}<h3>Riwayat Perubahan Tahapan</h3>${stageHistoryView}<h3>Dokumen</h3>${docs}<h3>Riwayat Update</h3>${updates}</div>`;
+  </dl><h3>Tahapan Komite</h3>${stages}<h3>Riwayat Perubahan Tahapan Komite</h3>${stageHistoryView}<h3>Dokumen</h3>${docs}<h3>Riwayat Update</h3>${updates}</div>`;
 }
 
 function renderProjects(list, total) {
