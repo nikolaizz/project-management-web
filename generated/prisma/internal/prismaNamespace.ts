@@ -1181,6 +1181,7 @@ export const ProjectScalarFieldEnum = {
   pmId: 'pmId',
   bpId: 'bpId',
   unitId: 'unitId',
+  unitKerjaDeveloper: 'unitKerjaDeveloper',
   ownerPic: 'ownerPic',
   tanggalProject: 'tanggalProject',
   targetGoLive: 'targetGoLive',
@@ -1358,6 +1359,20 @@ export type EnumJenisProjectFieldRefInput<$PrismaModel> = FieldRefInputType<$Pri
  * Reference to a field of type 'JenisProject[]'
  */
 export type ListEnumJenisProjectFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'JenisProject[]'>
+    
+
+
+/**
+ * Reference to a field of type 'UnitKerjaDeveloper[]'
+ */
+export type ListEnumUnitKerjaDeveloperFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'UnitKerjaDeveloper[]'>
+    
+
+
+/**
+ * Reference to a field of type 'UnitKerjaDeveloper'
+ */
+export type EnumUnitKerjaDeveloperFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'UnitKerjaDeveloper'>
     
 
 

@@ -58,6 +58,13 @@ enum Prioritas {
   HIGH
 }
 
+enum UnitKerjaDeveloper {
+  ADV
+  RDL
+  WDL
+  DMA
+}
+
 // Data referensi untuk mengisi dropdown dan relasinya ke project.
 
 model ProjectManager {
@@ -116,6 +123,7 @@ model Project {
   bp            BusinessPartner @relation(fields: [bpId], references: [id])
   unitId        Int
   unitPengusul  Unit            @relation(fields: [unitId], references: [id])
+  unitKerjaDeveloper UnitKerjaDeveloper[] @default([])
   ownerPic      String
   tanggalProject DateTime       @db.Date
   targetGoLive  DateTime?       @db.Date

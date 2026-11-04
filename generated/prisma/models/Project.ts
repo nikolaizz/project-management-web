@@ -84,6 +84,7 @@ export type ProjectCountAggregateOutputType = {
   pmId: number
   bpId: number
   unitId: number
+  unitKerjaDeveloper: number
   ownerPic: number
   tanggalProject: number
   targetGoLive: number
@@ -153,6 +154,7 @@ export type ProjectCountAggregateInputType = {
   pmId?: true
   bpId?: true
   unitId?: true
+  unitKerjaDeveloper?: true
   ownerPic?: true
   tanggalProject?: true
   targetGoLive?: true
@@ -259,6 +261,7 @@ export type ProjectGroupByOutputType = {
   pmId: string
   bpId: string
   unitId: number
+  unitKerjaDeveloper: $Enums.UnitKerjaDeveloper[]
   ownerPic: string
   tanggalProject: Date
   targetGoLive: Date | null
@@ -301,6 +304,7 @@ export type ProjectWhereInput = {
   pmId?: Prisma.StringFilter<"Project"> | string
   bpId?: Prisma.StringFilter<"Project"> | string
   unitId?: Prisma.IntFilter<"Project"> | number
+  unitKerjaDeveloper?: Prisma.EnumUnitKerjaDeveloperNullableListFilter<"Project">
   ownerPic?: Prisma.StringFilter<"Project"> | string
   tanggalProject?: Prisma.DateTimeFilter<"Project"> | Date | string
   targetGoLive?: Prisma.DateTimeNullableFilter<"Project"> | Date | string | null
@@ -327,6 +331,7 @@ export type ProjectOrderByWithRelationInput = {
   pmId?: Prisma.SortOrder
   bpId?: Prisma.SortOrder
   unitId?: Prisma.SortOrder
+  unitKerjaDeveloper?: Prisma.SortOrder
   ownerPic?: Prisma.SortOrder
   tanggalProject?: Prisma.SortOrder
   targetGoLive?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -356,6 +361,7 @@ export type ProjectWhereUniqueInput = Prisma.AtLeast<{
   pmId?: Prisma.StringFilter<"Project"> | string
   bpId?: Prisma.StringFilter<"Project"> | string
   unitId?: Prisma.IntFilter<"Project"> | number
+  unitKerjaDeveloper?: Prisma.EnumUnitKerjaDeveloperNullableListFilter<"Project">
   ownerPic?: Prisma.StringFilter<"Project"> | string
   tanggalProject?: Prisma.DateTimeFilter<"Project"> | Date | string
   targetGoLive?: Prisma.DateTimeNullableFilter<"Project"> | Date | string | null
@@ -382,6 +388,7 @@ export type ProjectOrderByWithAggregationInput = {
   pmId?: Prisma.SortOrder
   bpId?: Prisma.SortOrder
   unitId?: Prisma.SortOrder
+  unitKerjaDeveloper?: Prisma.SortOrder
   ownerPic?: Prisma.SortOrder
   tanggalProject?: Prisma.SortOrder
   targetGoLive?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -409,6 +416,7 @@ export type ProjectScalarWhereWithAggregatesInput = {
   pmId?: Prisma.StringWithAggregatesFilter<"Project"> | string
   bpId?: Prisma.StringWithAggregatesFilter<"Project"> | string
   unitId?: Prisma.IntWithAggregatesFilter<"Project"> | number
+  unitKerjaDeveloper?: Prisma.EnumUnitKerjaDeveloperNullableListFilter<"Project">
   ownerPic?: Prisma.StringWithAggregatesFilter<"Project"> | string
   tanggalProject?: Prisma.DateTimeWithAggregatesFilter<"Project"> | Date | string
   targetGoLive?: Prisma.DateTimeNullableWithAggregatesFilter<"Project"> | Date | string | null
@@ -424,6 +432,7 @@ export type ProjectCreateInput = {
   kodeProject?: string | null
   nama: string
   deskripsi: string
+  unitKerjaDeveloper?: Prisma.ProjectCreateunitKerjaDeveloperInput | $Enums.UnitKerjaDeveloper[]
   ownerPic: string
   tanggalProject: Date | string
   targetGoLive?: Date | string | null
@@ -450,6 +459,7 @@ export type ProjectUncheckedCreateInput = {
   pmId: string
   bpId: string
   unitId: number
+  unitKerjaDeveloper?: Prisma.ProjectCreateunitKerjaDeveloperInput | $Enums.UnitKerjaDeveloper[]
   ownerPic: string
   tanggalProject: Date | string
   targetGoLive?: Date | string | null
@@ -469,6 +479,7 @@ export type ProjectUpdateInput = {
   kodeProject?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   nama?: Prisma.StringFieldUpdateOperationsInput | string
   deskripsi?: Prisma.StringFieldUpdateOperationsInput | string
+  unitKerjaDeveloper?: Prisma.ProjectUpdateunitKerjaDeveloperInput | $Enums.UnitKerjaDeveloper[]
   ownerPic?: Prisma.StringFieldUpdateOperationsInput | string
   tanggalProject?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   targetGoLive?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -495,6 +506,7 @@ export type ProjectUncheckedUpdateInput = {
   pmId?: Prisma.StringFieldUpdateOperationsInput | string
   bpId?: Prisma.StringFieldUpdateOperationsInput | string
   unitId?: Prisma.IntFieldUpdateOperationsInput | number
+  unitKerjaDeveloper?: Prisma.ProjectUpdateunitKerjaDeveloperInput | $Enums.UnitKerjaDeveloper[]
   ownerPic?: Prisma.StringFieldUpdateOperationsInput | string
   tanggalProject?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   targetGoLive?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -518,6 +530,7 @@ export type ProjectCreateManyInput = {
   pmId: string
   bpId: string
   unitId: number
+  unitKerjaDeveloper?: Prisma.ProjectCreateunitKerjaDeveloperInput | $Enums.UnitKerjaDeveloper[]
   ownerPic: string
   tanggalProject: Date | string
   targetGoLive?: Date | string | null
@@ -533,6 +546,7 @@ export type ProjectUpdateManyMutationInput = {
   kodeProject?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   nama?: Prisma.StringFieldUpdateOperationsInput | string
   deskripsi?: Prisma.StringFieldUpdateOperationsInput | string
+  unitKerjaDeveloper?: Prisma.ProjectUpdateunitKerjaDeveloperInput | $Enums.UnitKerjaDeveloper[]
   ownerPic?: Prisma.StringFieldUpdateOperationsInput | string
   tanggalProject?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   targetGoLive?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -552,6 +566,7 @@ export type ProjectUncheckedUpdateManyInput = {
   pmId?: Prisma.StringFieldUpdateOperationsInput | string
   bpId?: Prisma.StringFieldUpdateOperationsInput | string
   unitId?: Prisma.IntFieldUpdateOperationsInput | number
+  unitKerjaDeveloper?: Prisma.ProjectUpdateunitKerjaDeveloperInput | $Enums.UnitKerjaDeveloper[]
   ownerPic?: Prisma.StringFieldUpdateOperationsInput | string
   tanggalProject?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   targetGoLive?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -571,6 +586,14 @@ export type ProjectOrderByRelationAggregateInput = {
   _count?: Prisma.SortOrder
 }
 
+export type EnumUnitKerjaDeveloperNullableListFilter<$PrismaModel = never> = {
+  equals?: $Enums.UnitKerjaDeveloper[] | Prisma.ListEnumUnitKerjaDeveloperFieldRefInput<$PrismaModel> | null
+  has?: $Enums.UnitKerjaDeveloper | Prisma.EnumUnitKerjaDeveloperFieldRefInput<$PrismaModel> | null
+  hasEvery?: $Enums.UnitKerjaDeveloper[] | Prisma.ListEnumUnitKerjaDeveloperFieldRefInput<$PrismaModel>
+  hasSome?: $Enums.UnitKerjaDeveloper[] | Prisma.ListEnumUnitKerjaDeveloperFieldRefInput<$PrismaModel>
+  isEmpty?: boolean
+}
+
 export type ProjectCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
   kategori?: Prisma.SortOrder
@@ -581,6 +604,7 @@ export type ProjectCountOrderByAggregateInput = {
   pmId?: Prisma.SortOrder
   bpId?: Prisma.SortOrder
   unitId?: Prisma.SortOrder
+  unitKerjaDeveloper?: Prisma.SortOrder
   ownerPic?: Prisma.SortOrder
   tanggalProject?: Prisma.SortOrder
   targetGoLive?: Prisma.SortOrder
@@ -769,12 +793,21 @@ export type ProjectUncheckedUpdateManyWithoutUnitPengusulNestedInput = {
   deleteMany?: Prisma.ProjectScalarWhereInput | Prisma.ProjectScalarWhereInput[]
 }
 
+export type ProjectCreateunitKerjaDeveloperInput = {
+  set: $Enums.UnitKerjaDeveloper[]
+}
+
 export type EnumKategoriProjectFieldUpdateOperationsInput = {
   set?: $Enums.KategoriProject
 }
 
 export type EnumJenisProjectFieldUpdateOperationsInput = {
   set?: $Enums.JenisProject
+}
+
+export type ProjectUpdateunitKerjaDeveloperInput = {
+  set?: $Enums.UnitKerjaDeveloper[]
+  push?: $Enums.UnitKerjaDeveloper | $Enums.UnitKerjaDeveloper[]
 }
 
 export type EnumProjectStatusFieldUpdateOperationsInput = {
@@ -847,6 +880,7 @@ export type ProjectCreateWithoutPmInput = {
   kodeProject?: string | null
   nama: string
   deskripsi: string
+  unitKerjaDeveloper?: Prisma.ProjectCreateunitKerjaDeveloperInput | $Enums.UnitKerjaDeveloper[]
   ownerPic: string
   tanggalProject: Date | string
   targetGoLive?: Date | string | null
@@ -871,6 +905,7 @@ export type ProjectUncheckedCreateWithoutPmInput = {
   deskripsi: string
   bpId: string
   unitId: number
+  unitKerjaDeveloper?: Prisma.ProjectCreateunitKerjaDeveloperInput | $Enums.UnitKerjaDeveloper[]
   ownerPic: string
   tanggalProject: Date | string
   targetGoLive?: Date | string | null
@@ -923,6 +958,7 @@ export type ProjectScalarWhereInput = {
   pmId?: Prisma.StringFilter<"Project"> | string
   bpId?: Prisma.StringFilter<"Project"> | string
   unitId?: Prisma.IntFilter<"Project"> | number
+  unitKerjaDeveloper?: Prisma.EnumUnitKerjaDeveloperNullableListFilter<"Project">
   ownerPic?: Prisma.StringFilter<"Project"> | string
   tanggalProject?: Prisma.DateTimeFilter<"Project"> | Date | string
   targetGoLive?: Prisma.DateTimeNullableFilter<"Project"> | Date | string | null
@@ -938,6 +974,7 @@ export type ProjectCreateWithoutBpInput = {
   kodeProject?: string | null
   nama: string
   deskripsi: string
+  unitKerjaDeveloper?: Prisma.ProjectCreateunitKerjaDeveloperInput | $Enums.UnitKerjaDeveloper[]
   ownerPic: string
   tanggalProject: Date | string
   targetGoLive?: Date | string | null
@@ -962,6 +999,7 @@ export type ProjectUncheckedCreateWithoutBpInput = {
   deskripsi: string
   pmId: string
   unitId: number
+  unitKerjaDeveloper?: Prisma.ProjectCreateunitKerjaDeveloperInput | $Enums.UnitKerjaDeveloper[]
   ownerPic: string
   tanggalProject: Date | string
   targetGoLive?: Date | string | null
@@ -1007,6 +1045,7 @@ export type ProjectCreateWithoutUnitPengusulInput = {
   kodeProject?: string | null
   nama: string
   deskripsi: string
+  unitKerjaDeveloper?: Prisma.ProjectCreateunitKerjaDeveloperInput | $Enums.UnitKerjaDeveloper[]
   ownerPic: string
   tanggalProject: Date | string
   targetGoLive?: Date | string | null
@@ -1031,6 +1070,7 @@ export type ProjectUncheckedCreateWithoutUnitPengusulInput = {
   deskripsi: string
   pmId: string
   bpId: string
+  unitKerjaDeveloper?: Prisma.ProjectCreateunitKerjaDeveloperInput | $Enums.UnitKerjaDeveloper[]
   ownerPic: string
   tanggalProject: Date | string
   targetGoLive?: Date | string | null
@@ -1076,6 +1116,7 @@ export type ProjectCreateWithoutDocumentsInput = {
   kodeProject?: string | null
   nama: string
   deskripsi: string
+  unitKerjaDeveloper?: Prisma.ProjectCreateunitKerjaDeveloperInput | $Enums.UnitKerjaDeveloper[]
   ownerPic: string
   tanggalProject: Date | string
   targetGoLive?: Date | string | null
@@ -1101,6 +1142,7 @@ export type ProjectUncheckedCreateWithoutDocumentsInput = {
   pmId: string
   bpId: string
   unitId: number
+  unitKerjaDeveloper?: Prisma.ProjectCreateunitKerjaDeveloperInput | $Enums.UnitKerjaDeveloper[]
   ownerPic: string
   tanggalProject: Date | string
   targetGoLive?: Date | string | null
@@ -1135,6 +1177,7 @@ export type ProjectUpdateWithoutDocumentsInput = {
   kodeProject?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   nama?: Prisma.StringFieldUpdateOperationsInput | string
   deskripsi?: Prisma.StringFieldUpdateOperationsInput | string
+  unitKerjaDeveloper?: Prisma.ProjectUpdateunitKerjaDeveloperInput | $Enums.UnitKerjaDeveloper[]
   ownerPic?: Prisma.StringFieldUpdateOperationsInput | string
   tanggalProject?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   targetGoLive?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1160,6 +1203,7 @@ export type ProjectUncheckedUpdateWithoutDocumentsInput = {
   pmId?: Prisma.StringFieldUpdateOperationsInput | string
   bpId?: Prisma.StringFieldUpdateOperationsInput | string
   unitId?: Prisma.IntFieldUpdateOperationsInput | number
+  unitKerjaDeveloper?: Prisma.ProjectUpdateunitKerjaDeveloperInput | $Enums.UnitKerjaDeveloper[]
   ownerPic?: Prisma.StringFieldUpdateOperationsInput | string
   tanggalProject?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   targetGoLive?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1178,6 +1222,7 @@ export type ProjectCreateWithoutUpdatesInput = {
   kodeProject?: string | null
   nama: string
   deskripsi: string
+  unitKerjaDeveloper?: Prisma.ProjectCreateunitKerjaDeveloperInput | $Enums.UnitKerjaDeveloper[]
   ownerPic: string
   tanggalProject: Date | string
   targetGoLive?: Date | string | null
@@ -1203,6 +1248,7 @@ export type ProjectUncheckedCreateWithoutUpdatesInput = {
   pmId: string
   bpId: string
   unitId: number
+  unitKerjaDeveloper?: Prisma.ProjectCreateunitKerjaDeveloperInput | $Enums.UnitKerjaDeveloper[]
   ownerPic: string
   tanggalProject: Date | string
   targetGoLive?: Date | string | null
@@ -1237,6 +1283,7 @@ export type ProjectUpdateWithoutUpdatesInput = {
   kodeProject?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   nama?: Prisma.StringFieldUpdateOperationsInput | string
   deskripsi?: Prisma.StringFieldUpdateOperationsInput | string
+  unitKerjaDeveloper?: Prisma.ProjectUpdateunitKerjaDeveloperInput | $Enums.UnitKerjaDeveloper[]
   ownerPic?: Prisma.StringFieldUpdateOperationsInput | string
   tanggalProject?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   targetGoLive?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1262,6 +1309,7 @@ export type ProjectUncheckedUpdateWithoutUpdatesInput = {
   pmId?: Prisma.StringFieldUpdateOperationsInput | string
   bpId?: Prisma.StringFieldUpdateOperationsInput | string
   unitId?: Prisma.IntFieldUpdateOperationsInput | number
+  unitKerjaDeveloper?: Prisma.ProjectUpdateunitKerjaDeveloperInput | $Enums.UnitKerjaDeveloper[]
   ownerPic?: Prisma.StringFieldUpdateOperationsInput | string
   tanggalProject?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   targetGoLive?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1280,6 +1328,7 @@ export type ProjectCreateWithoutStagesInput = {
   kodeProject?: string | null
   nama: string
   deskripsi: string
+  unitKerjaDeveloper?: Prisma.ProjectCreateunitKerjaDeveloperInput | $Enums.UnitKerjaDeveloper[]
   ownerPic: string
   tanggalProject: Date | string
   targetGoLive?: Date | string | null
@@ -1305,6 +1354,7 @@ export type ProjectUncheckedCreateWithoutStagesInput = {
   pmId: string
   bpId: string
   unitId: number
+  unitKerjaDeveloper?: Prisma.ProjectCreateunitKerjaDeveloperInput | $Enums.UnitKerjaDeveloper[]
   ownerPic: string
   tanggalProject: Date | string
   targetGoLive?: Date | string | null
@@ -1339,6 +1389,7 @@ export type ProjectUpdateWithoutStagesInput = {
   kodeProject?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   nama?: Prisma.StringFieldUpdateOperationsInput | string
   deskripsi?: Prisma.StringFieldUpdateOperationsInput | string
+  unitKerjaDeveloper?: Prisma.ProjectUpdateunitKerjaDeveloperInput | $Enums.UnitKerjaDeveloper[]
   ownerPic?: Prisma.StringFieldUpdateOperationsInput | string
   tanggalProject?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   targetGoLive?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1364,6 +1415,7 @@ export type ProjectUncheckedUpdateWithoutStagesInput = {
   pmId?: Prisma.StringFieldUpdateOperationsInput | string
   bpId?: Prisma.StringFieldUpdateOperationsInput | string
   unitId?: Prisma.IntFieldUpdateOperationsInput | number
+  unitKerjaDeveloper?: Prisma.ProjectUpdateunitKerjaDeveloperInput | $Enums.UnitKerjaDeveloper[]
   ownerPic?: Prisma.StringFieldUpdateOperationsInput | string
   tanggalProject?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   targetGoLive?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1382,6 +1434,7 @@ export type ProjectCreateWithoutStageHistoryInput = {
   kodeProject?: string | null
   nama: string
   deskripsi: string
+  unitKerjaDeveloper?: Prisma.ProjectCreateunitKerjaDeveloperInput | $Enums.UnitKerjaDeveloper[]
   ownerPic: string
   tanggalProject: Date | string
   targetGoLive?: Date | string | null
@@ -1407,6 +1460,7 @@ export type ProjectUncheckedCreateWithoutStageHistoryInput = {
   pmId: string
   bpId: string
   unitId: number
+  unitKerjaDeveloper?: Prisma.ProjectCreateunitKerjaDeveloperInput | $Enums.UnitKerjaDeveloper[]
   ownerPic: string
   tanggalProject: Date | string
   targetGoLive?: Date | string | null
@@ -1441,6 +1495,7 @@ export type ProjectUpdateWithoutStageHistoryInput = {
   kodeProject?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   nama?: Prisma.StringFieldUpdateOperationsInput | string
   deskripsi?: Prisma.StringFieldUpdateOperationsInput | string
+  unitKerjaDeveloper?: Prisma.ProjectUpdateunitKerjaDeveloperInput | $Enums.UnitKerjaDeveloper[]
   ownerPic?: Prisma.StringFieldUpdateOperationsInput | string
   tanggalProject?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   targetGoLive?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1466,6 +1521,7 @@ export type ProjectUncheckedUpdateWithoutStageHistoryInput = {
   pmId?: Prisma.StringFieldUpdateOperationsInput | string
   bpId?: Prisma.StringFieldUpdateOperationsInput | string
   unitId?: Prisma.IntFieldUpdateOperationsInput | number
+  unitKerjaDeveloper?: Prisma.ProjectUpdateunitKerjaDeveloperInput | $Enums.UnitKerjaDeveloper[]
   ownerPic?: Prisma.StringFieldUpdateOperationsInput | string
   tanggalProject?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   targetGoLive?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1487,6 +1543,7 @@ export type ProjectCreateManyPmInput = {
   deskripsi: string
   bpId: string
   unitId: number
+  unitKerjaDeveloper?: Prisma.ProjectCreateunitKerjaDeveloperInput | $Enums.UnitKerjaDeveloper[]
   ownerPic: string
   tanggalProject: Date | string
   targetGoLive?: Date | string | null
@@ -1502,6 +1559,7 @@ export type ProjectUpdateWithoutPmInput = {
   kodeProject?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   nama?: Prisma.StringFieldUpdateOperationsInput | string
   deskripsi?: Prisma.StringFieldUpdateOperationsInput | string
+  unitKerjaDeveloper?: Prisma.ProjectUpdateunitKerjaDeveloperInput | $Enums.UnitKerjaDeveloper[]
   ownerPic?: Prisma.StringFieldUpdateOperationsInput | string
   tanggalProject?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   targetGoLive?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1526,6 +1584,7 @@ export type ProjectUncheckedUpdateWithoutPmInput = {
   deskripsi?: Prisma.StringFieldUpdateOperationsInput | string
   bpId?: Prisma.StringFieldUpdateOperationsInput | string
   unitId?: Prisma.IntFieldUpdateOperationsInput | number
+  unitKerjaDeveloper?: Prisma.ProjectUpdateunitKerjaDeveloperInput | $Enums.UnitKerjaDeveloper[]
   ownerPic?: Prisma.StringFieldUpdateOperationsInput | string
   tanggalProject?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   targetGoLive?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1548,6 +1607,7 @@ export type ProjectUncheckedUpdateManyWithoutPmInput = {
   deskripsi?: Prisma.StringFieldUpdateOperationsInput | string
   bpId?: Prisma.StringFieldUpdateOperationsInput | string
   unitId?: Prisma.IntFieldUpdateOperationsInput | number
+  unitKerjaDeveloper?: Prisma.ProjectUpdateunitKerjaDeveloperInput | $Enums.UnitKerjaDeveloper[]
   ownerPic?: Prisma.StringFieldUpdateOperationsInput | string
   tanggalProject?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   targetGoLive?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1566,6 +1626,7 @@ export type ProjectCreateManyBpInput = {
   deskripsi: string
   pmId: string
   unitId: number
+  unitKerjaDeveloper?: Prisma.ProjectCreateunitKerjaDeveloperInput | $Enums.UnitKerjaDeveloper[]
   ownerPic: string
   tanggalProject: Date | string
   targetGoLive?: Date | string | null
@@ -1581,6 +1642,7 @@ export type ProjectUpdateWithoutBpInput = {
   kodeProject?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   nama?: Prisma.StringFieldUpdateOperationsInput | string
   deskripsi?: Prisma.StringFieldUpdateOperationsInput | string
+  unitKerjaDeveloper?: Prisma.ProjectUpdateunitKerjaDeveloperInput | $Enums.UnitKerjaDeveloper[]
   ownerPic?: Prisma.StringFieldUpdateOperationsInput | string
   tanggalProject?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   targetGoLive?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1605,6 +1667,7 @@ export type ProjectUncheckedUpdateWithoutBpInput = {
   deskripsi?: Prisma.StringFieldUpdateOperationsInput | string
   pmId?: Prisma.StringFieldUpdateOperationsInput | string
   unitId?: Prisma.IntFieldUpdateOperationsInput | number
+  unitKerjaDeveloper?: Prisma.ProjectUpdateunitKerjaDeveloperInput | $Enums.UnitKerjaDeveloper[]
   ownerPic?: Prisma.StringFieldUpdateOperationsInput | string
   tanggalProject?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   targetGoLive?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1627,6 +1690,7 @@ export type ProjectUncheckedUpdateManyWithoutBpInput = {
   deskripsi?: Prisma.StringFieldUpdateOperationsInput | string
   pmId?: Prisma.StringFieldUpdateOperationsInput | string
   unitId?: Prisma.IntFieldUpdateOperationsInput | number
+  unitKerjaDeveloper?: Prisma.ProjectUpdateunitKerjaDeveloperInput | $Enums.UnitKerjaDeveloper[]
   ownerPic?: Prisma.StringFieldUpdateOperationsInput | string
   tanggalProject?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   targetGoLive?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1645,6 +1709,7 @@ export type ProjectCreateManyUnitPengusulInput = {
   deskripsi: string
   pmId: string
   bpId: string
+  unitKerjaDeveloper?: Prisma.ProjectCreateunitKerjaDeveloperInput | $Enums.UnitKerjaDeveloper[]
   ownerPic: string
   tanggalProject: Date | string
   targetGoLive?: Date | string | null
@@ -1660,6 +1725,7 @@ export type ProjectUpdateWithoutUnitPengusulInput = {
   kodeProject?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   nama?: Prisma.StringFieldUpdateOperationsInput | string
   deskripsi?: Prisma.StringFieldUpdateOperationsInput | string
+  unitKerjaDeveloper?: Prisma.ProjectUpdateunitKerjaDeveloperInput | $Enums.UnitKerjaDeveloper[]
   ownerPic?: Prisma.StringFieldUpdateOperationsInput | string
   tanggalProject?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   targetGoLive?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1684,6 +1750,7 @@ export type ProjectUncheckedUpdateWithoutUnitPengusulInput = {
   deskripsi?: Prisma.StringFieldUpdateOperationsInput | string
   pmId?: Prisma.StringFieldUpdateOperationsInput | string
   bpId?: Prisma.StringFieldUpdateOperationsInput | string
+  unitKerjaDeveloper?: Prisma.ProjectUpdateunitKerjaDeveloperInput | $Enums.UnitKerjaDeveloper[]
   ownerPic?: Prisma.StringFieldUpdateOperationsInput | string
   tanggalProject?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   targetGoLive?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1706,6 +1773,7 @@ export type ProjectUncheckedUpdateManyWithoutUnitPengusulInput = {
   deskripsi?: Prisma.StringFieldUpdateOperationsInput | string
   pmId?: Prisma.StringFieldUpdateOperationsInput | string
   bpId?: Prisma.StringFieldUpdateOperationsInput | string
+  unitKerjaDeveloper?: Prisma.ProjectUpdateunitKerjaDeveloperInput | $Enums.UnitKerjaDeveloper[]
   ownerPic?: Prisma.StringFieldUpdateOperationsInput | string
   tanggalProject?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   targetGoLive?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1783,6 +1851,7 @@ export type ProjectSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   pmId?: boolean
   bpId?: boolean
   unitId?: boolean
+  unitKerjaDeveloper?: boolean
   ownerPic?: boolean
   tanggalProject?: boolean
   targetGoLive?: boolean
@@ -1810,6 +1879,7 @@ export type ProjectSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Exten
   pmId?: boolean
   bpId?: boolean
   unitId?: boolean
+  unitKerjaDeveloper?: boolean
   ownerPic?: boolean
   tanggalProject?: boolean
   targetGoLive?: boolean
@@ -1832,6 +1902,7 @@ export type ProjectSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Exten
   pmId?: boolean
   bpId?: boolean
   unitId?: boolean
+  unitKerjaDeveloper?: boolean
   ownerPic?: boolean
   tanggalProject?: boolean
   targetGoLive?: boolean
@@ -1854,6 +1925,7 @@ export type ProjectSelectScalar = {
   pmId?: boolean
   bpId?: boolean
   unitId?: boolean
+  unitKerjaDeveloper?: boolean
   ownerPic?: boolean
   tanggalProject?: boolean
   targetGoLive?: boolean
@@ -1863,7 +1935,7 @@ export type ProjectSelectScalar = {
   updatedAt?: boolean
 }
 
-export type ProjectOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "kategori" | "jenis" | "kodeProject" | "nama" | "deskripsi" | "pmId" | "bpId" | "unitId" | "ownerPic" | "tanggalProject" | "targetGoLive" | "status" | "prioritas" | "createdAt" | "updatedAt", ExtArgs["result"]["project"]>
+export type ProjectOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "kategori" | "jenis" | "kodeProject" | "nama" | "deskripsi" | "pmId" | "bpId" | "unitId" | "unitKerjaDeveloper" | "ownerPic" | "tanggalProject" | "targetGoLive" | "status" | "prioritas" | "createdAt" | "updatedAt", ExtArgs["result"]["project"]>
 export type ProjectInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   pm?: boolean | Prisma.ProjectManagerDefaultArgs<ExtArgs>
   bp?: boolean | Prisma.BusinessPartnerDefaultArgs<ExtArgs>
@@ -1906,6 +1978,7 @@ export type $ProjectPayload<ExtArgs extends runtime.Types.Extensions.InternalArg
     pmId: string
     bpId: string
     unitId: number
+    unitKerjaDeveloper: $Enums.UnitKerjaDeveloper[]
     ownerPic: string
     tanggalProject: Date
     targetGoLive: Date | null
@@ -2352,6 +2425,7 @@ export interface ProjectFieldRefs {
   readonly pmId: Prisma.FieldRef<"Project", 'String'>
   readonly bpId: Prisma.FieldRef<"Project", 'String'>
   readonly unitId: Prisma.FieldRef<"Project", 'Int'>
+  readonly unitKerjaDeveloper: Prisma.FieldRef<"Project", 'UnitKerjaDeveloper[]'>
   readonly ownerPic: Prisma.FieldRef<"Project", 'String'>
   readonly tanggalProject: Prisma.FieldRef<"Project", 'DateTime'>
   readonly targetGoLive: Prisma.FieldRef<"Project", 'DateTime'>

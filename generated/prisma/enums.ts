@@ -75,3 +75,13 @@ export const Prioritas = {
 } as const
 
 export type Prioritas = (typeof Prioritas)[keyof typeof Prioritas]
+
+
+export const UnitKerjaDeveloper = {
+  ADV: 'ADV',
+  RDL: 'RDL',
+  WDL: 'WDL',
+  DMA: 'DMA'
+} as const
+
+export type UnitKerjaDeveloper = (typeof UnitKerjaDeveloper)[keyof typeof UnitKerjaDeveloper]

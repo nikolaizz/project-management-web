@@ -116,6 +116,16 @@ tr.project-detail table.history td,tr.project-detail table.history th{background
 .cfg-add{margin-bottom:14px}
 .check{display:flex;align-items:center;gap:8px;font-weight:400;margin-top:14px}
 .check input{width:auto}
+.unit-picker-wrap{min-width:0}
+.unit-picker{min-width:0;margin:0;padding:10px 12px 12px;border:1px solid #8d9ab2;border-radius:8px}
+.unit-picker legend{padding:0 4px;font-weight:600;font-size:13px}
+.unit-picker-options{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+.unit-choice{display:flex;align-items:center;gap:9px;min-height:42px;margin:0;padding:8px 10px;border:1px solid #8d9ab2;border-radius:7px;background:#fff;cursor:pointer;font-size:14px;font-weight:500}
+.unit-choice:hover{border-color:var(--blue)}
+.unit-choice.selected{border-color:var(--blue);background:var(--blue-soft);color:var(--navy)}
+.unit-choice input{flex:0 0 16px;width:16px;height:16px;margin:0;padding:0;accent-color:var(--blue);cursor:pointer}
+.unit-picker.invalid{border-color:var(--bad)}
+@media(max-width:620px){.unit-picker-options{grid-template-columns:repeat(2,minmax(0,1fr))}}
 #deleteProjectDialog{width:min(520px,calc(100% - 28px))}
 button.danger-solid{background:var(--bad);border-color:var(--bad);color:#fff}
 .daily-layout{display:grid;grid-template-columns:minmax(0,3fr) minmax(0,2fr);gap:20px;align-items:start}
@@ -355,6 +365,7 @@ const TAHAP_LABEL = { PRA_KOMITE: "Pra Komite", KOMITE_TI_B: "Komite TI B", KOMI
 const TAHAP_ORDER = Object.keys(TAHAP_LABEL);
 const STATUS_TAHAP_LABEL = { PLANNED: "Planned", ON_PROGRESS: "On Progress", SELESAI: "Selesai" };
 const STATUS_TAHAPAN = Object.keys(STATUS_TAHAP_LABEL);
+const UNIT_KERJA_DEVELOPER = ["ADV", "RDL", "WDL", "DMA"];
 function newStages() {
   const o = {};
   TAHAP_ORDER.forEach((t) => { o[t] = { tanggalRencana: "", status: "PLANNED", catatan: "" }; });
@@ -367,7 +378,7 @@ const fmtSize = (n) => (n >= 1048576 ? (n / 1048576).toFixed(1) + " MB" : Math.m
 const today = () => new Date(Date.now() - new Date().getTimezoneOffset() * 60000).toISOString().slice(0, 10);
 
 function newForm() {
-  return { kategori: "", kodeProject: "", nama: "", deskripsi: "", pmId: "", bpId: "", unitId: "", prioritas: "MEDIUM", ownerPic: "", tanggalProject: today(), targetGoLive: "", status: "INISIASI" };
+  return { kategori: "", kodeProject: "", nama: "", deskripsi: "", pmId: "", bpId: "", unitId: "", unitKerjaDeveloper: [], prioritas: "MEDIUM", ownerPic: "", tanggalProject: today(), targetGoLive: "", status: "INISIASI" };
 }
 const FIELDS = Object.keys(newForm());
 
@@ -480,6 +491,13 @@ function fld(name, label, control, cls = "") {
   return `<div class="${cls}"><label for="f-${name}">${label}</label>${control}<div class="err" data-err="${name}"></div></div>`;
 }
 
+function unitKerjaPicker(prefix, selected = []) {
+  return `<div class="full unit-picker-wrap"><fieldset class="unit-picker" data-unitkerja-group="${prefix}" aria-describedby="${prefix}UnitKerjaHint ${prefix}UnitKerjaError">
+    <legend>Unit Kerja/Developer</legend><div class="unit-picker-options">${UNIT_KERJA_DEVELOPER.map((unit) => `<label class="unit-choice${selected.includes(unit) ? " selected" : ""}"><input type="checkbox" name="unitKerjaDeveloper" value="${unit}" data-unitkerja-choice${selected.includes(unit) ? " checked" : ""}><span>${unit}</span></label>`).join("")}</div>
+    <small id="${prefix}UnitKerjaHint" class="hint">Pilih satu atau lebih.</small>
+  </fieldset><div id="${prefix}UnitKerjaError" class="err" data-err="unitKerjaDeveloper" aria-live="polite"></div></div>`;
+}
+
 function stepJenis() {
   const c = (v, title, desc) => `<button type="button" class="choice ${state.jenis === v ? "on" : ""}" data-jenis="${v}"><strong>${title}</strong><span>${desc}</span></button>`;
   return `<h2>Pilih Jenis Project</h2><div class="choices">
@@ -502,6 +520,7 @@ function stepInfo() {
     ${fld("pmId", "Project Manager", `<select id="f-pmId" data-f="pmId">${options(authState.user?.role === "PROJECT_MANAGER" ? master.pm.filter((x) => x.id === authState.user.projectManagerId) : master.pm, "Pilih PM")}</select>`)}
     ${fld("bpId", "Business Partner", `<select id="f-bpId" data-f="bpId">${options(authState.user?.role === "BUSINESS_PARTNER" ? master.bp.filter((x) => x.id === authState.user.businessPartnerId) : master.bp, "Pilih BP")}</select>`)}
     ${fld("unitId", "Unit Pengusul", `<select id="f-unitId" data-f="unitId">${options(master.units, "Pilih unit")}</select>`)}
+    ${unitKerjaPicker("create", state.form.unitKerjaDeveloper)}
     ${fld("prioritas", "Prioritas", prio)}
     ${fld("ownerPic", "Owner / PIC", `<input id="f-ownerPic" data-f="ownerPic">`)}
     ${fld("tanggalProject", "Tanggal Project", `<input id="f-tanggalProject" data-f="tanggalProject" type="date">`)}
@@ -536,7 +555,7 @@ function stepReview() {
   const rows = [
     ["Jenis", JENIS_LABEL[state.jenis]], ["Kategori", KATEGORI_LABEL[f.kategori] || f.kategori],
     ["Kode Project", f.kodeProject.trim() || "-"], ["Nama", f.nama], ["Deskripsi", f.deskripsi],
-    ["PM", nameOf(master.pm, f.pmId)], ["BP", nameOf(master.bp, f.bpId)], ["Unit Pengusul", nameOf(master.units, f.unitId)],
+    ["PM", nameOf(master.pm, f.pmId)], ["BP", nameOf(master.bp, f.bpId)], ["Unit Pengusul", nameOf(master.units, f.unitId)], ["Unit Kerja/Developer", f.unitKerjaDeveloper.join(", ") || "-"],
     ["Owner / PIC", f.ownerPic], ["Tanggal Project", f.tanggalProject], ["Target Go Live", f.targetGoLive || "-"],
     ["Status Awal", STATUS_LABEL[f.status] || f.status],
     ["Prioritas", PRIORITAS_LABEL[f.prioritas] || f.prioritas],
@@ -576,12 +595,15 @@ function render() {
   renderSteps();
   const p = $("#panel");
   p.innerHTML = state.done ? successHtml() : [stepJenis, stepInfo, stepDocs, stepReview][state.step]();
-  p.querySelectorAll("[data-f]").forEach((el) => { el.value = state.form[el.dataset.f]; });
+  p.querySelectorAll("[data-f]").forEach((el) => {
+    if (el.multiple) [...el.options].forEach((option) => { option.selected = state.form[el.dataset.f].includes(option.value); });
+    else el.value = state.form[el.dataset.f];
+  });
   p.querySelectorAll("[data-stage]").forEach((el) => { el.value = state.stages[el.dataset.stage][el.dataset.sf]; });
   p.querySelectorAll("[data-err]").forEach((el) => {
     const m = state.errors[el.dataset.err];
     el.textContent = m || "";
-    const inp = p.querySelector(`[data-f="${el.dataset.err}"],[data-ekey="${el.dataset.err}"]`);
+    const inp = p.querySelector(`[data-f="${el.dataset.err}"],[data-ekey="${el.dataset.err}"]`) || (el.dataset.err === "unitKerjaDeveloper" ? p.querySelector('[data-unitkerja-group="create"]') : null);
     if (inp) inp.classList.toggle("invalid", !!m);
   });
   updateNav();
@@ -596,6 +618,7 @@ function validateInfo() {
   if (!f.pmId) e.pmId = "Pilih PM";
   if (!f.bpId) e.bpId = "Pilih BP";
   if (!f.unitId) e.unitId = "Pilih unit pengusul";
+  if (!f.unitKerjaDeveloper.length) e.unitKerjaDeveloper = "Pilih minimal satu Unit Kerja/Developer";
   if (!f.ownerPic.trim()) e.ownerPic = "Owner / PIC wajib diisi";
   if (!f.tanggalProject) e.tanggalProject = "Tanggal project wajib diisi";
   state.errors = e;
@@ -606,7 +629,7 @@ function payload() {
   const f = state.form;
   return {
     kategori: f.kategori, jenis: state.jenis, kodeProject: f.kodeProject.trim(), nama: f.nama.trim(),
-    deskripsi: f.deskripsi.trim(), pmId: f.pmId, bpId: f.bpId, unitId: f.unitId, ownerPic: f.ownerPic.trim(),
+    deskripsi: f.deskripsi.trim(), pmId: f.pmId, bpId: f.bpId, unitId: f.unitId, unitKerjaDeveloper: f.unitKerjaDeveloper, ownerPic: f.ownerPic.trim(),
     tanggalProject: f.tanggalProject, targetGoLive: f.targetGoLive || null, status: f.status, prioritas: f.prioritas,
     stages: TAHAP_ORDER.map((t) => {
       const x = state.stages[t];
@@ -718,7 +741,7 @@ panel.addEventListener("input", (e) => {
   }
   const n = e.target.dataset.f;
   if (!n) return;
-  state.form[n] = e.target.value;
+  state.form[n] = e.target.multiple ? [...e.target.selectedOptions].map((option) => option.value) : e.target.value;
   if (state.errors[n]) {
     delete state.errors[n];
     e.target.classList.remove("invalid");
@@ -734,6 +757,17 @@ panel.addEventListener("click", (e) => {
   if (e.target.closest("#btnAgain")) resetAll();
 });
 panel.addEventListener("change", (e) => {
+  if (e.target.matches("[data-unitkerja-choice]")) {
+    const group = e.target.closest("[data-unitkerja-group]");
+    state.form.unitKerjaDeveloper = [...group.querySelectorAll("[data-unitkerja-choice]:checked")].map((input) => input.value);
+    e.target.closest(".unit-choice").classList.toggle("selected", e.target.checked);
+    if (state.errors.unitKerjaDeveloper) {
+      delete state.errors.unitKerjaDeveloper;
+      const out = panel.querySelector('[data-err="unitKerjaDeveloper"]'); if (out) out.textContent = "";
+      group.classList.remove("invalid");
+    }
+    return;
+  }
   if (e.target.id === "fileInput") { addFiles([...e.target.files]); e.target.value = ""; }
 });
 panel.addEventListener("dragover", (e) => { const d = e.target.closest("#drop"); if (d) { e.preventDefault(); d.classList.add("over"); } });
@@ -926,6 +960,7 @@ function renderProjectDetail(p) {
     <dt>Deskripsi</dt><dd>${esc(p.deskripsi)}</dd>
     <dt>Business partner</dt><dd>${esc(p.bp ? p.bp.nama : "-")}</dd>
     <dt>Unit pengusul</dt><dd>${esc(p.unitPengusul ? p.unitPengusul.nama : "-")}</dd>
+    <dt>Unit Kerja/Developer</dt><dd>${esc((p.unitKerjaDeveloper || []).join(", ") || "-")}</dd>
     <dt>Owner / PIC</dt><dd>${esc(p.ownerPic)}</dd>
     <dt>Tanggal project</dt><dd>${date(p.tanggalProject)}</dd>
     <dt>Target go live</dt><dd>${date(p.targetGoLive)}</dd>
@@ -937,10 +972,10 @@ function renderProjectDetail(p) {
 function renderProjects(list, total) {
   const box = $("#projects");
   if (!list.length) { box.innerHTML = `<p class="empty">Belum ada project.</p>`; return; }
-  box.innerHTML = `<table><thead><tr><th>Kode</th><th>Nama</th><th>Kategori</th><th>Jenis</th><th>Status</th><th>Prioritas</th><th>PM</th><th>Unit Pengusul</th><th>Dokumen</th><th>Aksi</th></tr></thead><tbody>${list.map((p) => `<tr>
+  box.innerHTML = `<table><thead><tr><th>Kode</th><th>Nama</th><th>Kategori</th><th>Jenis</th><th>Status</th><th>Prioritas</th><th>PM</th><th>Unit Pengusul</th><th>Unit Kerja/Developer</th><th>Dokumen</th><th>Aksi</th></tr></thead><tbody>${list.map((p) => `<tr>
     <td>${esc(p.kodeProject || "-")}</td><td>${esc(p.nama)}</td><td>${esc(KATEGORI_LABEL[p.kategori] || p.kategori)}</td>
     <td>${esc(JENIS_LABEL[p.jenis] || p.jenis)}</td><td><span class="badge b-${esc(p.status)}">${esc(STATUS_LABEL[p.status] || p.status)}</span></td><td><span class="badge b-${esc(p.prioritas)}">${esc(PRIORITAS_LABEL[p.prioritas] || p.prioritas || "-")}</span></td>
-    <td>${esc(p.pm ? p.pm.nama : "-")}</td><td>${esc(p.unitPengusul ? p.unitPengusul.nama : "-")}</td>
+    <td>${esc(p.pm ? p.pm.nama : "-")}</td><td>${esc(p.unitPengusul ? p.unitPengusul.nama : "-")}</td><td>${esc((p.unitKerjaDeveloper || []).join(", ") || "-")}</td>
     <td><button type="button" class="small" data-docs="${p.id}">${p._count ? p._count.documents : 0} file</button></td>
     <td>${canEditProject(p) ? `<button type="button" class="small" data-edit="${p.id}">Edit</button>` : ""}
     <button type="button" class="small" data-detail="${p.id}" aria-expanded="false">Lihat detail</button>
@@ -996,6 +1031,7 @@ function renderEditForm(p) {
       <div class="full"><label for="edit-nama">Nama project</label><input id="edit-nama" name="nama" value="${esc(p.nama)}" required></div>
       <div class="full"><label for="edit-deskripsi">Deskripsi</label><textarea id="edit-deskripsi" name="deskripsi" required>${esc(p.deskripsi)}</textarea></div>
       ${editMasterSelect("unitId", "Unit pengusul", master.units, p.unitId)}
+      ${unitKerjaPicker("edit", p.unitKerjaDeveloper || [])}
       <div><label for="edit-ownerPic">Owner / PIC</label><input id="edit-ownerPic" name="ownerPic" value="${esc(p.ownerPic)}" required></div>
       <div><label for="edit-tanggalProject">Tanggal project</label><input id="edit-tanggalProject" name="tanggalProject" type="date" value="${date(p.tanggalProject)}" required></div>
       <div><label for="edit-targetGoLive">Target go live</label><input id="edit-targetGoLive" name="targetGoLive" type="date" value="${date(p.targetGoLive)}"></div>
@@ -1049,6 +1085,14 @@ $("#btnRefresh").onclick = loadProjects;
 $("#editProjectDialog").addEventListener("click", (e) => {
   if (e.target.closest("[data-close-edit]")) $("#editProjectDialog").close();
 });
+$("#editProjectDialog").addEventListener("change", (e) => {
+  if (!e.target.matches("[data-unitkerja-choice]")) return;
+  e.target.closest(".unit-choice").classList.toggle("selected", e.target.checked);
+  const group = e.target.closest("[data-unitkerja-group]"), message = $("#editUnitKerjaError");
+  if ([...group.querySelectorAll("[data-unitkerja-choice]:checked")].length) {
+    group.classList.remove("invalid"); message.textContent = "";
+  }
+});
 $("#editProjectDialog").addEventListener("submit", async (e) => {
   if (e.target.id !== "editProjectForm") return;
   e.preventDefault();
@@ -1062,13 +1106,21 @@ $("#editProjectDialog").addEventListener("submit", async (e) => {
     kodeProject: String(data.get("kodeProject")).trim() || null,
     nama: String(data.get("nama")).trim(),
     deskripsi: String(data.get("deskripsi")).trim(),
-    pmId: data.get("pmId"),
-    bpId: data.get("bpId"),
+    ...(data.has("pmId") ? { pmId: data.get("pmId") } : {}),
+    ...(data.has("bpId") ? { bpId: data.get("bpId") } : {}),
     unitId: Number(data.get("unitId")),
+    unitKerjaDeveloper: data.getAll("unitKerjaDeveloper"),
     ownerPic: String(data.get("ownerPic")).trim(),
     tanggalProject: data.get("tanggalProject"),
     targetGoLive: data.get("targetGoLive") || null,
   };
+  if (!payload.unitKerjaDeveloper.length) {
+    const group = form.querySelector('[data-unitkerja-group="edit"]');
+    group.classList.add("invalid");
+    $("#editUnitKerjaError").textContent = "Pilih minimal satu Unit Kerja/Developer";
+    group.querySelector("input").focus();
+    return;
+  }
   // Hanya tahapan yang berubah yang dikirim
   const changes = [];
   TAHAP_ORDER.forEach((t) => {
@@ -1146,7 +1198,7 @@ $("#projects").addEventListener("click", async (e) => {
       const r = await api(`/projects/${detail.dataset.detail}`);
       const tr = document.createElement("tr");
       tr.className = "project-detail";
-      tr.innerHTML = `<td colspan="10">${renderProjectDetail(r.data)}</td>`;
+      tr.innerHTML = `<td colspan="11">${renderProjectDetail(r.data)}</td>`;
       row.after(tr);
       detail.setAttribute("aria-expanded", "true");
       detail.textContent = "Tutup detail";
@@ -1158,7 +1210,7 @@ $("#projects").addEventListener("click", async (e) => {
       if (next && next.classList.contains("docs")) { next.remove(); return; }
       const r = await api(`/projects/${d.dataset.docs}/documents`);
       const tr = document.createElement("tr");
-      tr.className = "docs"; tr.innerHTML = `<td colspan="10">${docsHtml(r.data)}</td>`;
+      tr.className = "docs"; tr.innerHTML = `<td colspan="11">${docsHtml(r.data)}</td>`;
       row.after(tr);
       return;
     }

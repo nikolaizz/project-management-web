@@ -129,6 +129,7 @@ export const ProjectScalarFieldEnum = {
   pmId: 'pmId',
   bpId: 'bpId',
   unitId: 'unitId',
+  unitKerjaDeveloper: 'unitKerjaDeveloper',
   ownerPic: 'ownerPic',
   tanggalProject: 'tanggalProject',
   targetGoLive: 'targetGoLive',

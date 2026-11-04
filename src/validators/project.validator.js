@@ -9,6 +9,9 @@ const id = (label) =>
 
 const stringId = (label) =>
   z.string().trim().min(1, `${label} wajib dipilih`);
+const unitKerjaDeveloper = z.array(z.enum(["ADV", "RDL", "WDL", "DMA"]))
+  .min(1, "Pilih minimal satu Unit Kerja/Developer")
+  .refine((items) => new Set(items).size === items.length, "Unit Kerja/Developer tidak boleh duplikat");
 
 // Field yang dipakai bersama oleh create dan update
 const projectFields = {
@@ -20,6 +23,7 @@ const projectFields = {
   pmId: stringId("PM"),
   bpId: stringId("BP"),
   unitId: id("Unit pengusul"),
+  unitKerjaDeveloper,
   ownerPic: z.string().trim().min(1, "Owner / PIC wajib diisi"),
   tanggalProject: z.iso.date("Tanggal project harus berformat YYYY-MM-DD"),
   targetGoLive: z.iso.date("Target go live harus berformat YYYY-MM-DD").nullish(),

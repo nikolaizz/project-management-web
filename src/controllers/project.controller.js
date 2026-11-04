@@ -201,6 +201,7 @@ export async function createProject(req, res, next) {
         pmId: d.pmId,
         bpId: d.bpId,
         unitId: d.unitId,
+        unitKerjaDeveloper: d.unitKerjaDeveloper,
         ownerPic: d.ownerPic,
         tanggalProject: new Date(d.tanggalProject),
         targetGoLive: d.targetGoLive ? new Date(d.targetGoLive) : null,
@@ -261,7 +262,7 @@ export async function updateProject(req, res, next) {
 
     // Hanya ubah field yang memang dikirim
     const data = {};
-    for (const key of ["kategori", "jenis", "nama", "deskripsi", "pmId", "bpId", "unitId", "ownerPic", "prioritas"]) {
+    for (const key of ["kategori", "jenis", "nama", "deskripsi", "pmId", "bpId", "unitId", "unitKerjaDeveloper", "ownerPic", "prioritas"]) {
       if (key in d) data[key] = d[key];
     }
     if ("kodeProject" in d) data.kodeProject = kode;
