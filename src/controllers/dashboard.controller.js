@@ -321,6 +321,7 @@ export async function createAiSummary(req, res) {
           "Balas dengan JSON valid saja.", },
           { role: "user", content: JSON.stringify(input) },
         ],
+        reasoning_effort: "none",
       }),
     });
     if (!response.ok) throw new Error(`Model API returned ${response.status}`);
