@@ -6,26 +6,37 @@ import { todayWIB } from "../lib/dates.js";
 const DAY_MS = 24 * 60 * 60 * 1000;
 const aiSummaryKey = "portfolio";
 const aiSummaryProjectInclude = {
-  pm: true,
-  bp: true,
-  unitPengusul: true,
-  stages: { orderBy: { tahap: "asc" } },
+  pm: { select: { nama: true } },
+  stages: {
+    orderBy: { tahap: "asc" },
+    select: { tahap: true, status: true, tanggalRencana: true },
+  },
   updates: {
     orderBy: [{ tanggalInput: "asc" }, { id: "asc" }],
-    include: { modifiedBy: { select: { id: true, nama: true, role: true } } },
+    select: { status: true, tanggalInput: true, aktivitas: true, kendala: true, nextAction: true },
   },
   stageHistory: {
     orderBy: [{ changedAt: "asc" }, { id: "asc" }],
-    include: { modifiedBy: { select: { id: true, nama: true, role: true } } },
-  },
-  documents: {
-    orderBy: [{ uploadedAt: "asc" }, { id: "asc" }],
-    select: { id: true, projectId: true, namaFile: true, ukuran: true, tipe: true, uploadedAt: true },
+    select: { tahap: true, status: true, changedAt: true },
   },
 };
 
 async function getAiSummaryProjects() {
-  return prisma.project.findMany({ orderBy: { id: "asc" }, include: aiSummaryProjectInclude });
+  return prisma.project.findMany({
+    orderBy: { id: "asc" },
+    select: {
+      id: true,
+      nama: true,
+      status: true,
+      prioritas: true,
+      targetGoLive: true,
+      createdAt: true,
+      pm: aiSummaryProjectInclude.pm,
+      stages: aiSummaryProjectInclude.stages,
+      updates: aiSummaryProjectInclude.updates,
+      stageHistory: aiSummaryProjectInclude.stageHistory,
+    },
+  });
 }
 
 function hashAiSummaryProjects(projects) {
@@ -40,6 +51,53 @@ function dayOffset(date, today) {
 
 function safeText(value, maxLength = 500) {
   return typeof value === "string" ? value.trim().slice(0, maxLength) : "";
+}
+
+function buildModelProjects(projects, now, today, weeklyBlockers) {
+  const blockerProjectIds = new Set(weeklyBlockers.map((blocker) => blocker.projectId));
+  return projects.flatMap((project) => {
+    if (["DRAFT", "SELESAI"].includes(project.status)) return [];
+
+    const latestUpdate = project.updates.at(-1) ?? null;
+    const lastProgressAt = latestUpdate?.tanggalInput ?? null;
+    const daysWithoutUpdate = Math.floor(Math.max(0, now.getTime() - new Date(lastProgressAt ?? project.createdAt).getTime()) / DAY_MS);
+    const stages = project.stages.map((stage) => {
+      const daysOverdue = stage.status !== "SELESAI" && stage.tanggalRencana
+        ? Math.max(0, dayOffset(stage.tanggalRencana, today) * -1)
+        : 0;
+      return { tahap: stage.tahap, status: stage.status, tanggalRencana: stage.tanggalRencana, daysOverdue };
+    });
+    // shortcut: the attention horizon is 30 days, adjust if dashboard policy changes.
+    const upcomingStage = stages.some((stage) => stage.tanggalRencana && dayOffset(stage.tanggalRencana, today) >= 0 && dayOffset(stage.tanggalRencana, today) <= 30);
+    const upcomingTarget = project.targetGoLive && dayOffset(project.targetGoLive, today) >= 0 && dayOffset(project.targetGoLive, today) <= 30;
+    const candidate = project.prioritas === "HIGH"
+      || ["PENDING", "ON_HOLD"].includes(project.status)
+      || !lastProgressAt
+      || daysWithoutUpdate >= 1
+      || stages.some((stage) => stage.daysOverdue > 0)
+      || upcomingStage
+      || upcomingTarget
+      || blockerProjectIds.has(project.id);
+    if (!candidate) return [];
+
+    return [{
+      id: project.id,
+      nama: project.nama,
+      status: project.status,
+      prioritas: project.prioritas,
+      pm: project.pm?.nama ?? null,
+      targetGoLive: project.targetGoLive,
+      lastProgressAt,
+      daysWithoutUpdate,
+      latestUpdate: latestUpdate ? {
+        status: latestUpdate.status,
+        aktivitas: safeText(latestUpdate.aktivitas, 300),
+        kendala: safeText(latestUpdate.kendala, 300),
+        nextAction: safeText(latestUpdate.nextAction, 300),
+      } : null,
+      stages,
+    }];
+  });
 }
 
 function getPeriodChanges(projects, periodStart) {
@@ -189,25 +247,37 @@ export async function createAiSummary(req, res) {
     const projectDetails = new Map(projects.map((project) => [project.id, project]));
     const weeklyBlockers = projects.flatMap((project) => project.updates
       .filter((update) => new Date(update.tanggalInput) >= periodStart && update.kendala?.trim())
-      .map((update) => ({ updateId: update.id, projectId: project.id, projectName: project.nama, reportedAt: update.tanggalInput, description: update.kendala })));
+      .map((update) => ({ projectId: project.id, projectName: project.nama, reportedAt: update.tanggalInput, description: safeText(update.kendala, 500) })));
     const changesThisPeriod = getPeriodChanges(projects, periodStart);
+    const modelProjects = buildModelProjects(projects, now, today, weeklyBlockers);
+    const stageAdvances = new Set(changesThisPeriod.committeeStageAdvances.map((change) => change.projectId)).size;
 
     const input = {
-  meta: { asOf: now.toISOString(), timezone: "Asia/Jakarta", period: { start: periodStartDate, end: today } },
-  portfolio: { totalProjects, statusCounts, priorityCounts, highPriorityOnHold: highHoldCount, committeeStageCounts: stageCounts },
-  projects, // disarankan: tambahkan field daysOverdue per tahap (lihat catatan di bawah)
-  weeklyBlockers,
-  changesThisPeriod,
-  labels: {
-    status: { ON_PROGRESS: "On Progress", PENDING: "Pending", ON_HOLD: "On Hold", SELESAI: "Selesai", DRAFT: "Draft" },
-    stage: { PRA_KOMITE: "Pra-Komite", KOMITE_TI_A: "Komite TI A", KOMITE_TI_B: "Komite TI B" },
-    priority: { HIGH: "High", MEDIUM: "Medium", LOW: "Low" },
-  },
-  constraints: [
+      meta: { asOf: now.toISOString(), timezone: "Asia/Jakarta", period: { start: periodStartDate, end: today } },
+      portfolio: {
+        totalProjects,
+        statusCounts,
+        priorityCounts,
+        highPriorityOnHold: highHoldCount,
+        committeeStageCounts: stageCounts,
+        staleActiveProjectCount: modelProjects.filter((project) => project.daysWithoutUpdate >= 1).length,
+      },
+      projects: modelProjects,
+      weeklyBlockers: weeklyBlockers.map(({ projectId, projectName, reportedAt, description }) => ({ projectId, projectName, reportedAt, description })),
+      changesThisPeriod: {
+        completedProjectCount: changesThisPeriod.completedProjectIds.length,
+        committeeStageAdvanceCount: stageAdvances,
+      },
+      labels: {
+        status: { ON_PROGRESS: "On Progress", PENDING: "Pending", ON_HOLD: "On Hold", SELESAI: "Selesai", DRAFT: "Draft" },
+        stage: { PRA_KOMITE: "Pra-Komite", KOMITE_TI_A: "Komite TI A", KOMITE_TI_B: "Komite TI B" },
+        priority: { HIGH: "High", MEDIUM: "Medium", LOW: "Low" },
+      },
+      constraints: [
     // Akurasi
     "Gunakan hanya data yang tersedia; jangan mengarang fakta, angka, sebab, atau rekomendasi.",
     "Untuk project DRAFT atau SELESAI, jangan masukkan ke daftar project yang belum diupdate.",
-    "Gunakan changesThisPeriod untuk jumlah project selesai dan perubahan tahapan; jangan menghitung dari status akhir saja.",
+    "Gunakan changesThisPeriod untuk jumlah project selesai dan kemajuan tahapan; jangan menghitung dari status akhir saja.",
 
     // Struktur: satu project hanya muncul sekali
     "Setiap project hanya boleh muncul SATU kali di seluruh output. Gabungkan masalah dan tindakan dalam satu item attention (insight + action); jangan ulangi di bagian lain.",
@@ -230,8 +300,8 @@ export async function createAiSummary(req, res) {
 
     // Format
     "Keluarkan JSON saja dengan bentuk { condition: string, attention: [{ projectId: number, insight: string, action: string }], review: [string], blockerPattern: string, dataQualityNote: string }.",
-  ],
-};
+      ],
+    };
 
     const endpoint = new URL("chat/completions", `${process.env.LLM_BASE_URL.replace(/\/+$/, "")}/`);
     if (endpoint.protocol !== "https:") throw new Error("AI endpoint must use HTTPS");
@@ -247,7 +317,7 @@ export async function createAiSummary(req, res) {
           { role: "system", content: "Kamu analis portofolio project. Buat AI Summary dashboard dalam bahasa Indonesia yang SINGKAT, spesifik, dan bisa ditindaklanjuti. " +
           "Pembaca adalah manajer yang hanya punya waktu beberapa detik: utamakan hal yang perlu tindakan, bukan membacakan ulang data. " +
           "Bagian yang tidak punya temuan harus dikosongkan, bukan diisi kalimat 'tidak ada'. " +
-          "Data mencakup seluruh project, update, tahapan, riwayat, dan metadata dokumen; gunakan semuanya sebagai bahan analisis, tapi hanya tampilkan yang paling penting. " +
+          "Data proyek dalam projects hanya berisi kandidat perhatian dan update terakhir; gunakan agregat portofolio serta catatan kendala dan perubahan periode yang disediakan. " +
           "Balas dengan JSON valid saja.", },
           { role: "user", content: JSON.stringify(input) },
         ],
@@ -285,7 +355,7 @@ export async function createAiSummary(req, res) {
       period: { start: periodStartDate, end: today },
       blockerUpdateCount: weeklyBlockers.length,
       completedProjectCount: changesThisPeriod.completedProjectIds.length,
-      stageChangeProjectCount: new Set(changesThisPeriod.committeeStageAdvances.map((change) => change.projectId)).size,
+      stageChangeProjectCount: stageAdvances,
     };
     const generatedAt = new Date();
     const isStale = hashAiSummaryProjects(await getAiSummaryProjects()) !== dataHash;
