@@ -405,7 +405,8 @@ export const ModelName = {
   Document: 'Document',
   ProjectUpdate: 'ProjectUpdate',
   ProjectStage: 'ProjectStage',
-  ProjectStageHistory: 'ProjectStageHistory'
+  ProjectStageHistory: 'ProjectStageHistory',
+  DashboardAiSummary: 'DashboardAiSummary'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -421,7 +422,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "projectManager" | "businessPartner" | "unit" | "user" | "project" | "document" | "projectUpdate" | "projectStage" | "projectStageHistory"
+    modelProps: "projectManager" | "businessPartner" | "unit" | "user" | "project" | "document" | "projectUpdate" | "projectStage" | "projectStageHistory" | "dashboardAiSummary"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -1091,6 +1092,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    DashboardAiSummary: {
+      payload: Prisma.$DashboardAiSummaryPayload<ExtArgs>
+      fields: Prisma.DashboardAiSummaryFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.DashboardAiSummaryFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DashboardAiSummaryPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.DashboardAiSummaryFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DashboardAiSummaryPayload>
+        }
+        findFirst: {
+          args: Prisma.DashboardAiSummaryFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DashboardAiSummaryPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.DashboardAiSummaryFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DashboardAiSummaryPayload>
+        }
+        findMany: {
+          args: Prisma.DashboardAiSummaryFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DashboardAiSummaryPayload>[]
+        }
+        create: {
+          args: Prisma.DashboardAiSummaryCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DashboardAiSummaryPayload>
+        }
+        createMany: {
+          args: Prisma.DashboardAiSummaryCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.DashboardAiSummaryCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DashboardAiSummaryPayload>[]
+        }
+        delete: {
+          args: Prisma.DashboardAiSummaryDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DashboardAiSummaryPayload>
+        }
+        update: {
+          args: Prisma.DashboardAiSummaryUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DashboardAiSummaryPayload>
+        }
+        deleteMany: {
+          args: Prisma.DashboardAiSummaryDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.DashboardAiSummaryUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.DashboardAiSummaryUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DashboardAiSummaryPayload>[]
+        }
+        upsert: {
+          args: Prisma.DashboardAiSummaryUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DashboardAiSummaryPayload>
+        }
+        aggregate: {
+          args: Prisma.DashboardAiSummaryAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateDashboardAiSummary>
+        }
+        groupBy: {
+          args: Prisma.DashboardAiSummaryGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.DashboardAiSummaryGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.DashboardAiSummaryCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.DashboardAiSummaryCountAggregateOutputType> | number
+        }
+      }
+    }
   }
 } & {
   other: {
@@ -1248,12 +1323,30 @@ export const ProjectStageHistoryScalarFieldEnum = {
 export type ProjectStageHistoryScalarFieldEnum = (typeof ProjectStageHistoryScalarFieldEnum)[keyof typeof ProjectStageHistoryScalarFieldEnum]
 
 
+export const DashboardAiSummaryScalarFieldEnum = {
+  key: 'key',
+  result: 'result',
+  dataHash: 'dataHash',
+  dataAsOf: 'dataAsOf',
+  generatedAt: 'generatedAt'
+} as const
+
+export type DashboardAiSummaryScalarFieldEnum = (typeof DashboardAiSummaryScalarFieldEnum)[keyof typeof DashboardAiSummaryScalarFieldEnum]
+
+
 export const SortOrder = {
   asc: 'asc',
   desc: 'desc'
 } as const
 
 export type SortOrder = (typeof SortOrder)[keyof typeof SortOrder]
+
+
+export const JsonNullValueInput = {
+  JsonNull: JsonNull
+} as const
+
+export type JsonNullValueInput = (typeof JsonNullValueInput)[keyof typeof JsonNullValueInput]
 
 
 export const QueryMode = {
@@ -1270,6 +1363,15 @@ export const NullsOrder = {
 } as const
 
 export type NullsOrder = (typeof NullsOrder)[keyof typeof NullsOrder]
+
+
+export const JsonNullValueFilter = {
+  DbNull: DbNull,
+  JsonNull: JsonNull,
+  AnyNull: AnyNull
+} as const
+
+export type JsonNullValueFilter = (typeof JsonNullValueFilter)[keyof typeof JsonNullValueFilter]
 
 
 
@@ -1429,6 +1531,20 @@ export type EnumStatusTahapanFieldRefInput<$PrismaModel> = FieldRefInputType<$Pr
  * Reference to a field of type 'StatusTahapan[]'
  */
 export type ListEnumStatusTahapanFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'StatusTahapan[]'>
+    
+
+
+/**
+ * Reference to a field of type 'Json'
+ */
+export type JsonFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Json'>
+    
+
+
+/**
+ * Reference to a field of type 'QueryMode'
+ */
+export type EnumQueryModeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'QueryMode'>
     
 
 
@@ -1605,6 +1721,7 @@ export type GlobalOmitConfig = {
   projectUpdate?: Prisma.ProjectUpdateOmit
   projectStage?: Prisma.ProjectStageOmit
   projectStageHistory?: Prisma.ProjectStageHistoryOmit
+  dashboardAiSummary?: Prisma.DashboardAiSummaryOmit
 }
 
 /* Types for Logging */

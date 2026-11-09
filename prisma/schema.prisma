@@ -196,3 +196,11 @@ model ProjectStageHistory {
 
   @@index([projectId, changedAt])
 }
+
+model DashboardAiSummary {
+  key         String   @id
+  result      Json
+  dataHash    String
+  dataAsOf    DateTime
+  generatedAt DateTime @default(now())
+}

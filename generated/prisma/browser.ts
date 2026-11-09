@@ -62,3 +62,8 @@ export type ProjectStage = Prisma.ProjectStageModel
  * 
  */
 export type ProjectStageHistory = Prisma.ProjectStageHistoryModel
+/**
+ * Model DashboardAiSummary
+ * 
+ */
+export type DashboardAiSummary = Prisma.DashboardAiSummaryModel
