@@ -176,6 +176,13 @@ button.wa-copy{background:#1f8a4c;border-color:#1f8a4c;color:#fff}
 .dashboard-pagination{display:flex;align-items:center;justify-content:flex-end;gap:8px;margin-top:12px}
 .dashboard-pagination span{margin-right:auto;color:var(--muted);font-size:12.5px}
 .stale-age{display:block;color:var(--muted);font-size:12px}
+.ai-summary-meta{margin:0 0 12px;color:var(--muted);font-size:13px}
+.ai-summary-head{gap:10px;flex-wrap:wrap}
+.ai-summary-result h3{font-size:14px;margin:14px 0 6px}
+.ai-summary-overview{line-height:1.6}
+.ai-summary-attention{margin:12px 0 0;padding-left:22px;display:grid;gap:12px}
+.ai-summary-attention li{padding-left:2px}
+.ai-summary-recommendations{margin:0;padding-left:22px;display:grid;gap:6px}
 .login-wrap{max-width:420px;margin:10vh auto;padding:24px}
 @media(max-width:1150px){.dashboard-charts{grid-template-columns:repeat(2,minmax(0,1fr))}.dashboard-panel:last-child{grid-column:1/-1}}
 @media(max-width:850px){.dashboard-summary{grid-template-columns:repeat(3,minmax(0,1fr))}.dashboard-filters{grid-template-columns:repeat(2,minmax(0,1fr))}}
@@ -247,6 +254,15 @@ button.wa-copy{background:#1f8a4c;border-color:#1f8a4c;color:#fff}
             <section class="dashboard-panel" aria-labelledby="priorityTitle"><h2 id="priorityTitle">5 Project Prioritas Tertinggi</h2><div id="dashboardPriorities"><p class="empty">Memuat project...</p></div></section>
           </div>
         </div>
+
+        <section class="card" aria-labelledby="aiSummaryTitle">
+          <div class="head ai-summary-head">
+            <div><h2 id="aiSummaryTitle">AI Summary</h2><p class="hint">Saat diminta, DeepSeek menerima status, prioritas, umur update, dan jarak jadwal dengan kode project samaran. Nama, kode project asli, PIC, deskripsi, catatan komite, dan teks kendala tidak dikirim.</p></div>
+            <button type="button" id="btnAiSummary">Buat AI Summary</button>
+          </div>
+          <div id="aiSummaryStatus" role="status" aria-live="polite"></div>
+          <div id="aiSummaryResult" class="ai-summary-result"><p class="empty">Summary belum dibuat. Tekan tombol untuk membuatnya.</p></div>
+        </section>
 
         <section class="card" aria-labelledby="dashboardFilterTitle">
           <h2 id="dashboardFilterTitle">Filter &amp; Pencarian Project</h2>
@@ -916,6 +932,48 @@ async function loadDashboard() {
   await loadDashboardProjects();
 }
 
+function renderAiSummary(data) {
+  const statusLabel = { DRAFT: "Draft", INISIASI: "Inisiasi", ON_PROGRESS: "On Progress", PENDING: "Pending", ON_HOLD: "On Hold", SELESAI: "Selesai" };
+  const distribution = Object.entries(data.statusCounts).filter(([, count]) => count > 0).map(([status, count]) => `${count} ${statusLabel[status] || status}`).join(", ");
+  const priorityLabel = { HIGH: "High", MEDIUM: "Medium", LOW: "Low" };
+  const date = (value, options) => new Date(`${value}T12:00:00+07:00`).toLocaleDateString("id-ID", { ...options, timeZone: "Asia/Jakarta" });
+  const startDate = new Date(`${data.period.start}T12:00:00+07:00`), endDate = new Date(`${data.period.end}T12:00:00+07:00`);
+  const periodLabel = startDate.getMonth() === endDate.getMonth() && startDate.getFullYear() === endDate.getFullYear()
+    ? `${date(data.period.start, { day: "numeric" })}–${date(data.period.end, { day: "numeric", month: "short", year: "numeric" })}`
+    : `${date(data.period.start, { day: "numeric", month: "short", year: "numeric" })}–${date(data.period.end, { day: "numeric", month: "short", year: "numeric" })}`;
+  const attention = data.attention.length
+    ? `<ol class="ai-summary-attention">${data.attention.map((item) => `<li><strong>${esc(item.nama)} (${priorityLabel[item.prioritas] || esc(item.prioritas)}, ${esc(statusLabel[item.status] || item.status)}):</strong> ${esc(item.insight)}</li>`).join("")}</ol>`
+    : `<p class="empty">Tidak ada project yang ditandai untuk perhatian khusus.</p>`;
+  const recommendations = data.attention.length
+    ? `<ol class="ai-summary-recommendations">${data.attention.map((item) => `<li>${esc(item.recommendation)}</li>`).join("")}</ol>`
+    : `<p class="empty">Belum ada rekomendasi khusus.</p>`;
+  const createdAt = new Date(data.asOf).toLocaleString("id-ID", { dateStyle: "medium", timeStyle: "short", timeZone: "Asia/Jakarta" });
+  const blockerPattern = data.blockerUpdateCount
+    ? `${data.blockerUpdateCount} update mencatat kendala. Teks kendala tidak dikirim ke AI, sehingga polanya belum dapat disimpulkan.`
+    : "Tidak ada kendala yang tercatat pada update periode ini.";
+  const progress = `${data.completedProjectCount} project tercatat berstatus Selesai pada update periode ini; riwayat tahapan berubah pada ${data.stageChangeProjectCount} project. Perubahan tahapan belum tentu berarti maju ke tahap berikutnya.`;
+  $("#aiSummaryResult").innerHTML = `<p><strong>Ringkasan portofolio · ${esc(periodLabel)} · ${data.totalProjects} project</strong></p><p><strong>Kondisi umum:</strong> ${esc(data.condition)} ${data.highPriorityOnHold ? `${data.highPriorityOnHold} project prioritas High berstatus On Hold.` : "Tidak ada project prioritas High berstatus On Hold."} (${esc(distribution)}.)</p><h3>Perlu perhatian</h3>${attention}<h3>Pola kendala</h3><p>${esc(blockerPattern)}</p><h3>Perkembangan</h3><p>${esc(progress)}</p><h3>Rekomendasi</h3>${recommendations}<p class="ai-summary-meta">Dibuat otomatis dari data sampai ${esc(createdAt)} WIB. Periksa kembali sebelum digunakan.</p>`;
+}
+
+async function generateAiSummary() {
+  const button = $("#btnAiSummary"), status = $("#aiSummaryStatus"), result = $("#aiSummaryResult");
+  button.disabled = true;
+  button.textContent = "Sedang membuat...";
+  status.textContent = "Meminta AI menyusun ringkasan project...";
+  result.innerHTML = `<p class="empty">Meminta AI menyusun ringkasan project...</p>`;
+  try {
+    const response = await api("/dashboard/ai-summary", { method: "POST" });
+    renderAiSummary(response.data);
+    status.textContent = "Summary selesai dibuat.";
+  } catch (err) {
+    status.innerHTML = `<div class="alert error" role="alert">${esc(err.message || "Summary gagal dibuat. Coba lagi nanti.")}</div>`;
+    result.innerHTML = `<p class="empty">Summary tidak tersedia. Data dashboard tetap dapat digunakan.</p>`;
+  } finally {
+    button.disabled = false;
+    button.textContent = "Buat ulang summary";
+  }
+}
+
 // Tabel riwayat update: dipakai di Lihat Detail dan di menu Update progress (satu sumber data)
 function updatesTable(list) {
   return `<table class="history"><thead><tr><th>Tanggal &amp; jam</th><th>Status</th><th>Aktivitas / Progress</th><th>Kendala</th><th>Next Action</th><th>Updated by</th></tr></thead><tbody>${list.map((u) => `<tr>
@@ -1061,6 +1119,7 @@ async function loadProjects() {
 }
 
 $("#btnDashboardRefresh").onclick = loadDashboard;
+$("#btnAiSummary").onclick = generateAiSummary;
 $("#dashboardFilterForm").addEventListener("submit", (e) => {
   e.preventDefault();
   dashboardState.page = 1;
