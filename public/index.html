@@ -179,6 +179,17 @@ button.wa-copy{background:#1f8a4c;border-color:#1f8a4c;color:#fff}
 .dashboard-table table{min-width:760px}
 .dashboard-pagination{display:flex;align-items:center;justify-content:flex-end;gap:8px;margin-top:12px}
 .dashboard-pagination span{margin-right:auto;color:var(--muted);font-size:12.5px}
+.dashboard-chat-messages{display:grid;gap:10px;max-height:360px;overflow:auto;padding:12px;border:1px solid var(--line);border-radius:8px;background:#fff}
+.dashboard-chat-message{max-width:min(100%,900px);padding:10px 12px;border:1px solid var(--line);border-radius:8px;white-space:pre-wrap;overflow-wrap:anywhere}
+.dashboard-chat-message p{margin:0}
+.dashboard-chat-message.user{margin-left:auto;background:var(--blue-soft)}
+.dashboard-chat-message.assistant{background:#f7f9fd}
+.dashboard-chat-sources{margin-top:8px}
+.dashboard-chat-sources ul{margin:4px 0 0;padding-left:20px;display:grid;gap:8px}
+.dashboard-chat-suggestions{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0}
+.dashboard-chat-controls{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:12px;margin-top:8px}
+.dashboard-chat-controls small{color:var(--muted)}
+.dashboard-chat-form textarea{min-height:76px}
 .stale-age{display:block;color:var(--muted);font-size:12px}
 .ai-summary-meta{margin:0 0 12px;color:var(--muted);font-size:13px}
 .ai-summary-head{gap:10px;flex-wrap:wrap}
@@ -266,6 +277,25 @@ button.wa-copy{background:#1f8a4c;border-color:#1f8a4c;color:#fff}
           </div>
           <div id="aiSummaryStatus" role="status" aria-live="polite"></div>
           <div id="aiSummaryResult" class="ai-summary-result"><p class="empty">Summary belum dibuat. Tekan tombol untuk membuatnya.</p></div>
+        </section>
+
+        <section class="card" aria-labelledby="dashboardChatTitle">
+          <h2 id="dashboardChatTitle">Tanya Dashboard</h2>
+          <p class="hint">Tanyakan status, tahap komite, prioritas, PM/BP, developer, update terakhir, atau project yang belum diupdate. Percakapan hanya tersimpan selama halaman ini terbuka.</p>
+          <div id="dashboardChatMessages" class="dashboard-chat-messages" role="log" aria-label="Percakapan chatbot dashboard" aria-live="polite" aria-relevant="additions text"><div class="dashboard-chat-message assistant"><p>Apa yang ingin Anda ketahui tentang data project?</p></div></div>
+          <div class="dashboard-chat-suggestions" aria-label="Contoh pertanyaan">
+            <button type="button" data-chat-question="Ada berapa project yang sedang On Progress?">Jumlah On Progress</button>
+            <button type="button" data-chat-question="Project apa yang saat ini berada di Komite TI B?">Project di Komite TI B</button>
+            <button type="button" data-chat-question="Project mana yang prioritas High dan belum selesai?">Prioritas High belum selesai</button>
+            <button type="button" data-chat-question="Apa update terakhir Cloud Migration?">Update Cloud Migration</button>
+            <button type="button" data-chat-question="Project mana yang belum diupdate?">Project belum diupdate</button>
+          </div>
+          <form id="dashboardChatForm" class="dashboard-chat-form">
+            <label for="dashboardChatInput">Pertanyaan</label>
+            <textarea id="dashboardChatInput" name="message" maxlength="500" required aria-describedby="dashboardChatHelp dashboardChatCount"></textarea>
+            <div class="dashboard-chat-controls"><small id="dashboardChatHelp">Enter untuk kirim, Shift+Enter untuk baris baru.</small><small id="dashboardChatCount">0/500</small><button id="dashboardChatSubmit" type="submit" class="primary">Kirim</button></div>
+            <div id="dashboardChatStatus" role="status" aria-live="polite"></div>
+          </form>
         </section>
 
         <section class="card" aria-labelledby="dashboardFilterTitle">
@@ -409,6 +439,7 @@ const FIELDS = Object.keys(newForm());
 let master = { pm: [], bp: [], units: [], enums: { kategori: [], status: [] } };
 let busy = false;
 const dashboardState = { page: 1, limit: 10 };
+const dashboardChatState = { pending: false };
 let hasSavedAiSummary = false;
 const state = { step: 0, jenis: null, form: newForm(), stages: newStages(), files: [], errors: {}, createdId: null, createdNama: "", done: false };
 
@@ -946,6 +977,53 @@ async function loadDashboard() {
   await loadDashboardProjects();
 }
 
+function dashboardChatMessageMarkup(role, answer, sources = [], truncated = false) {
+  const sourceList = sources.length ? `<div class="dashboard-chat-sources"><strong>Sumber:</strong><ul>${sources.map((source) => {
+    const stage = source.currentStage === "SELESAI" ? "Selesai" : TAHAP_LABEL[source.currentStage] || source.currentStage;
+    const lastUpdate = source.lastProgressAt
+      ? new Date(source.lastProgressAt).toLocaleString("id-ID", { dateStyle: "medium", timeStyle: "short", timeZone: "Asia/Jakarta" })
+      : "Belum pernah";
+    const activity = source.latestUpdate?.aktivitas ? ` — ${source.latestUpdate.aktivitas}` : "";
+    return `<li><strong>${esc(source.nama)}</strong> (${esc(source.kodeProject || "Tanpa kode")}) · ${esc(STATUS_LABEL[source.status] || source.status)} · tahap ${esc(stage)} · prioritas ${esc(PRIORITAS_LABEL[source.prioritas] || source.prioritas)} · PM ${esc(source.pm || "-")} · BP ${esc(source.bp || "-")} · developer ${esc((source.unitKerjaDeveloper || []).join(", ") || "-")} · update terakhir ${esc(lastUpdate)} · ${esc(source.hoursWithoutUpdate)} jam tanpa update${esc(activity)}</li>`;
+  }).join("")}</ul>${truncated ? `<p class="hint">Sumber menampilkan 20 project pertama.</p>` : ""}</div>` : "";
+  return `<article class="dashboard-chat-message ${role}"><p>${esc(answer)}</p>${sourceList}</article>`;
+}
+
+function appendDashboardChatMessage(role, answer, sources = [], truncated = false) {
+  const messages = $("#dashboardChatMessages");
+  messages.insertAdjacentHTML("beforeend", dashboardChatMessageMarkup(role, answer, sources, truncated));
+  messages.scrollTop = messages.scrollHeight;
+}
+
+function setDashboardChatPending(pending) {
+  dashboardChatState.pending = pending;
+  $("#dashboardChatSubmit").disabled = pending;
+  $("#dashboardChatInput").disabled = pending;
+  document.querySelectorAll("[data-chat-question]").forEach((button) => { button.disabled = pending; });
+  $("#dashboardChatStatus").textContent = pending ? "Sedang mencari data project..." : "";
+}
+
+async function sendDashboardChat(rawMessage, clearInput = false) {
+  const message = String(rawMessage || "").trim();
+  if (dashboardChatState.pending || !message) return;
+  setDashboardChatPending(true);
+  appendDashboardChatMessage("user", message);
+  if (clearInput) {
+    $("#dashboardChatInput").value = "";
+    $("#dashboardChatCount").textContent = "0/500";
+  }
+  try {
+    const result = await api("/dashboard/chat", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ message }) });
+    if (typeof result.data?.answer !== "string" || !Array.isArray(result.data.sources)) throw new Error("invalid response");
+    appendDashboardChatMessage("assistant", result.data.answer, result.data.sources || [], result.data.truncated);
+  } catch (err) {
+    const message = err?.status || err?.network ? err.message : "Chatbot gagal memproses pertanyaan. Coba lagi nanti.";
+    appendDashboardChatMessage("assistant", message);
+  } finally {
+    setDashboardChatPending(false);
+  }
+}
+
 function renderAiSummary(data) {
   const statusLabel = { DRAFT: "Draft", INISIASI: "Inisiasi", ON_PROGRESS: "On Progress", PENDING: "Pending", ON_HOLD: "On Hold", SELESAI: "Selesai" };
   const distribution = Object.entries(data.statusCounts).filter(([, count]) => count > 0).map(([status, count]) => `${count} ${statusLabel[status] || status}`).join(", ");
@@ -1161,6 +1239,23 @@ async function loadProjects() {
 
 $("#btnDashboardRefresh").onclick = loadDashboard;
 $("#btnAiSummary").onclick = generateAiSummary;
+$("#dashboardChatForm").addEventListener("submit", (e) => {
+  e.preventDefault();
+  sendDashboardChat($("#dashboardChatInput").value, true);
+});
+$("#dashboardChatInput").addEventListener("input", (e) => {
+  $("#dashboardChatCount").textContent = `${e.target.value.length}/500`;
+});
+$("#dashboardChatInput").addEventListener("keydown", (e) => {
+  if (e.key === "Enter" && !e.shiftKey && !e.isComposing) {
+    e.preventDefault();
+    e.currentTarget.form.requestSubmit();
+  }
+});
+$(".dashboard-chat-suggestions").addEventListener("click", (e) => {
+  const button = e.target.closest("[data-chat-question]");
+  if (button && !button.disabled) sendDashboardChat(button.dataset.chatQuestion);
+});
 $("#dashboardFilterForm").addEventListener("submit", (e) => {
   e.preventDefault();
   dashboardState.page = 1;

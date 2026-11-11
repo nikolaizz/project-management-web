@@ -2,6 +2,7 @@ import { createHash } from "node:crypto";
 import prisma from "../lib/prisma.js";
 import { STATUS, TAHAP, STATUS_TAHAPAN } from "../constants/enums.js";
 import { todayWIB } from "../lib/dates.js";
+import { hoursWithoutProgress, sortStaleProjects, staleProjectWhere } from "../lib/staleProjects.js";
 
 const DAY_MS = 24 * 60 * 60 * 1000;
 const aiSummaryKey = "portfolio";
@@ -136,7 +137,7 @@ function getPeriodChanges(projects, periodStart) {
 export async function getDashboard(req, res, next) {
   try {
     const now = new Date();
-    const cutoff = new Date(now.getTime() - 24 * 60 * 60 * 1000);
+    const cutoff = new Date(now.getTime() - DAY_MS);
     const [totalProjects, statusGroups, stageGroups, priorities, staleProjects] = await Promise.all([
       prisma.project.count(),
       prisma.project.groupBy({ by: ["status"], _count: { _all: true } }),
@@ -147,11 +148,7 @@ export async function getDashboard(req, res, next) {
         select: { id: true, nama: true, kodeProject: true, prioritas: true, status: true, stages: { select: { tahap: true, status: true } } },
       }),
       prisma.project.findMany({
-        where: {
-          status: { notIn: ["DRAFT", "SELESAI"] },
-          createdAt: { lt: cutoff },
-          updates: { none: { tanggalInput: { gte: cutoff } } },
-        },
+        where: staleProjectWhere(cutoff),
         select: {
           id: true,
           nama: true,
@@ -172,11 +169,7 @@ export async function getDashboard(req, res, next) {
       Object.fromEntries(STATUS_TAHAPAN.map((status) => [status, 0])),
     ]));
     for (const group of stageGroups) stageCounts[group.tahap][group.status] = group._count._all;
-    staleProjects.sort((a, b) => {
-      const lastA = a.updates[0]?.tanggalInput ?? a.createdAt;
-      const lastB = b.updates[0]?.tanggalInput ?? b.createdAt;
-      return new Date(lastA) - new Date(lastB);
-    });
+    sortStaleProjects(staleProjects);
 
     res.json({
       success: true,
@@ -187,8 +180,7 @@ export async function getDashboard(req, res, next) {
         priorities,
         staleProjects: staleProjects.map((project) => {
           const lastProgressAt = project.updates[0]?.tanggalInput ?? null;
-          const lastActivity = lastProgressAt ?? project.createdAt;
-          return { ...project, lastProgressAt, hoursWithoutUpdate: Math.floor((now.getTime() - lastActivity.getTime()) / 3600000) };
+          return { ...project, lastProgressAt, hoursWithoutUpdate: hoursWithoutProgress(project, now) };
         }),
       },
     });

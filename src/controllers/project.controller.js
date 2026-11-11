@@ -1,7 +1,7 @@
 import prisma from "../lib/prisma.js";
 import { STATUS, KATEGORI, PRIORITAS, TAHAP, UNIT_KERJA_DEVELOPER } from "../constants/enums.js";
 import { removeFiles } from "../lib/files.js";
-import { buildStages } from "../lib/stages.js";
+import { buildStages, currentStageFilter } from "../lib/stages.js";
 
 // Relasi data master yang ikut dikirim bersama project, tanpa mengambil kolom lain.
 const projectInclude = {
@@ -10,17 +10,6 @@ const projectInclude = {
   unitPengusul: { select: { id: true, nama: true } },
   stages: { orderBy: { tahap: "asc" } },
 };
-
-function currentStageFilter(tahap) {
-  if (tahap === "SELESAI") {
-    return TAHAP.map((stage) => ({ stages: { some: { tahap: stage, status: "SELESAI" } } }));
-  }
-  const index = TAHAP.indexOf(tahap);
-  return [
-    ...TAHAP.slice(0, index).map((stage) => ({ stages: { some: { tahap: stage, status: "SELESAI" } } })),
-    { stages: { none: { tahap, status: "SELESAI" } } },
-  ];
-}
 
 // ---------- GET /projects ----------
 export async function getProjects(req, res, next) {

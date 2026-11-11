@@ -13,3 +13,19 @@ export function buildStages(input = []) {
     };
   });
 }
+
+export function currentStageFilter(tahap) {
+  if (tahap === "SELESAI") {
+    return TAHAP.map((stage) => ({ stages: { some: { tahap: stage, status: "SELESAI" } } }));
+  }
+  const index = TAHAP.indexOf(tahap);
+  return [
+    ...TAHAP.slice(0, index).map((stage) => ({ stages: { some: { tahap: stage, status: "SELESAI" } } })),
+    { stages: { none: { tahap, status: "SELESAI" } } },
+  ];
+}
+
+export function getCurrentStage(stages = []) {
+  const completed = new Set(stages.filter((stage) => stage.status === "SELESAI").map((stage) => stage.tahap));
+  return TAHAP.find((tahap) => !completed.has(tahap)) ?? "SELESAI";
+}
