@@ -1,5 +1,5 @@
 import prisma from "../lib/prisma.js";
-import { STATUS, KATEGORI, PRIORITAS, TAHAP } from "../constants/enums.js";
+import { STATUS, KATEGORI, PRIORITAS, TAHAP, UNIT_KERJA_DEVELOPER } from "../constants/enums.js";
 import { removeFiles } from "../lib/files.js";
 import { buildStages } from "../lib/stages.js";
 
@@ -28,7 +28,7 @@ export async function getProjects(req, res, next) {
     // Ambil filter dan pagination dari query URL; batasi jumlah hasil maksimal 100.
     const page = Math.max(parseInt(req.query.page) || 1, 1);
     const limit = Math.min(parseInt(req.query.limit) || 10, 100);
-    const { search, status, kategori, unitId, prioritas, tahap, tahun } = req.query;
+    const { search, status, kategori, unitId, prioritas, tahap, tahun, pmId, bpId, unitKerjaDeveloper } = req.query;
 
     // Tolak filter yang tidak termasuk pilihan resmi sebelum menjalankan query database.
     if (status && !STATUS.includes(status)) {
@@ -53,6 +53,15 @@ export async function getProjects(req, res, next) {
     if (tahap && ![...TAHAP, "SELESAI"].includes(tahap)) {
       return res.status(400).json({ success: false, message: "Tahapan komite tidak valid" });
     }
+    if (pmId && typeof pmId !== "string") {
+      return res.status(400).json({ success: false, message: "Project Manager tidak valid" });
+    }
+    if (bpId && typeof bpId !== "string") {
+      return res.status(400).json({ success: false, message: "Business Partner tidak valid" });
+    }
+    if (unitKerjaDeveloper && !UNIT_KERJA_DEVELOPER.includes(unitKerjaDeveloper)) {
+      return res.status(400).json({ success: false, message: "Unit Kerja/Developer tidak valid" });
+    }
     if (tahun && (!/^\d{4}$/.test(tahun) || Number(tahun) < 1900)) {
       return res.status(400).json({ success: false, message: "Tahun harus berformat YYYY" });
     }
@@ -62,6 +71,9 @@ export async function getProjects(req, res, next) {
     if (status) where.status = status;
     if (kategori) where.kategori = kategori;
     if (prioritas) where.prioritas = prioritas; // BARU: filter prioritas
+    if (pmId) where.pmId = pmId;
+    if (bpId) where.bpId = bpId;
+    if (unitKerjaDeveloper) where.unitKerjaDeveloper = { has: unitKerjaDeveloper };
     if (unitId) where.unitId = parseInt(unitId);
     if (tahun) {
       const year = Number(tahun);

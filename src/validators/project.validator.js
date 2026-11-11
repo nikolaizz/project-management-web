@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { KATEGORI, JENIS, STATUS, TAHAP, STATUS_TAHAPAN, PRIORITAS} from "../constants/enums.js";
+import { KATEGORI, JENIS, STATUS, TAHAP, STATUS_TAHAPAN, PRIORITAS, UNIT_KERJA_DEVELOPER } from "../constants/enums.js";
 
 const id = (label) =>
   z.coerce
@@ -9,7 +9,7 @@ const id = (label) =>
 
 const stringId = (label) =>
   z.string().trim().min(1, `${label} wajib dipilih`);
-const unitKerjaDeveloper = z.array(z.enum(["ADV", "RDL", "WDL", "DMA"]))
+const unitKerjaDeveloper = z.array(z.enum(UNIT_KERJA_DEVELOPER))
   .min(1, "Pilih minimal satu Unit Kerja/Developer")
   .refine((items) => new Set(items).size === items.length, "Unit Kerja/Developer tidak boleh duplikat");
 

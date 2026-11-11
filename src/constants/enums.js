@@ -13,3 +13,4 @@ export const STATUS = [
 export const TAHAP = ["PRA_KOMITE", "KOMITE_TI_B", "KOMITE_TI_A"];
 export const STATUS_TAHAPAN = ["PLANNED", "ON_PROGRESS", "SELESAI"];
 export const PRIORITAS = ["LOW", "MEDIUM", "HIGH"];
+export const UNIT_KERJA_DEVELOPER = ["ADV", "RDL", "WDL", "DMA"];

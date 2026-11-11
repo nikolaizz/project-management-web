@@ -87,10 +87,12 @@ table{width:100%;border-collapse:collapse;font-size:13.5px}
 th,td{text-align:left;padding:8px 10px;border-bottom:1px solid var(--line);vertical-align:top}
 th{color:var(--muted);font-weight:600;white-space:nowrap}
 .badge{display:inline-block;padding:2px 9px;border-radius:999px;font-size:12px;font-weight:600;white-space:nowrap}
-.b-ON_PROGRESS{background:#e1ecff;color:#17479e}
-.b-SELESAI{background:var(--ok-bg);color:var(--ok)}
-.b-PENDING,.b-ON_HOLD{background:var(--warn-bg);color:var(--warn)}
-.b-INISIASI,.b-DRAFT{background:#e9ebf2;color:#444c63}
+.b-DRAFT{background:#778198;color:#000}
+.b-INISIASI{background:#a2aabe;color:#000}
+.b-ON_PROGRESS{background:#1b5fd6;color:#fff}
+.b-PENDING{background:#d18b00;color:#000}
+.b-ON_HOLD{background:#c43d32;color:#fff}
+.b-SELESAI{background:#157347;color:#fff}
 tr.docs td{background:#f7f9fd}
 tr.project-detail td{background:#f7f9fd}
 .project-detail dl{display:grid;grid-template-columns:150px minmax(0,1fr);gap:6px 14px;margin:0}
@@ -149,6 +151,8 @@ button.wa-copy{background:#1f8a4c;border-color:#1f8a4c;color:#fff}
 .dashboard-summary{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:12px}
 .dashboard-kpi{border:1px solid var(--line);border-radius:10px;padding:14px;min-width:0}
 .dashboard-kpi span{display:block;color:var(--muted);font-size:13px}
+.dashboard-kpi .dashboard-kpi-label{display:flex;align-items:center;gap:8px}
+.dashboard-kpi .dashboard-kpi-label .legend-dot{display:inline-block}
 .dashboard-kpi strong{display:block;font-size:25px;line-height:1.25;margin-top:5px}
 .dashboard-charts{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.2fr) minmax(0,1fr);gap:12px}
 .dashboard-panel{border:1px solid var(--line);border-radius:10px;padding:14px;min-width:0}
@@ -270,7 +274,11 @@ button.wa-copy{background:#1f8a4c;border-color:#1f8a4c;color:#fff}
             <div><label for="dashboardSearch">Nama atau kode project</label><input id="dashboardSearch" name="search" type="search" placeholder="Cari project"></div>
             <div><label for="dashboardStatus">Status Project</label><select id="dashboardStatus" name="status"></select></div>
             <div><label for="dashboardStage">Tahapan Komite</label><select id="dashboardStage" name="tahap"></select></div>
+            <div><label for="dashboardPm">Project Manager</label><select id="dashboardPm" name="pmId"></select></div>
+            <div><label for="dashboardBp">Business Partner</label><select id="dashboardBp" name="bpId"></select></div>
+            <div><label for="dashboardPriority">Prioritas</label><select id="dashboardPriority" name="prioritas"></select></div>
             <div><label for="dashboardUnit">Unit Pengusul</label><select id="dashboardUnit" name="unitId"></select></div>
+            <div><label for="dashboardDeveloper">Unit Kerja/Developer</label><select id="dashboardDeveloper" name="unitKerjaDeveloper"></select></div>
             <div><label for="dashboardYear">Tahun Project</label><input id="dashboardYear" name="tahun" type="number" min="1900" max="9999" inputmode="numeric" placeholder="Semua tahun"></div>
             <div class="dashboard-filter-actions"><button type="button" id="btnDashboardClear">Hapus filter</button><button type="submit" class="primary">Cari project</button></div>
           </form>
@@ -818,25 +826,29 @@ const currentCommitteeStage = (project) => {
 function dashboardFiltersInit() {
   $("#dashboardStatus").innerHTML = `<option value="">Semua status</option>${Object.entries(STATUS_LABEL).map(([value, label]) => `<option value="${value}">${esc(label)}</option>`).join("")}`;
   $("#dashboardStage").innerHTML = `<option value="">Semua tahapan</option>${TAHAP_ORDER.map((value) => `<option value="${value}">${esc(TAHAP_LABEL[value])}</option>`).join("")}<option value="SELESAI">Selesai</option>`;
-  dashboardUnitsRefresh();
+  $("#dashboardPriority").innerHTML = `<option value="">Semua prioritas</option>${Object.entries(PRIORITAS_LABEL).map(([value, label]) => `<option value="${value}">${esc(label)}</option>`).join("")}`;
+  $("#dashboardDeveloper").innerHTML = `<option value="">Semua unit kerja</option>${UNIT_KERJA_DEVELOPER.map((unit) => `<option value="${unit}">${unit}</option>`).join("")}`;
+  dashboardMastersRefresh();
 }
 
-function dashboardUnitsRefresh() {
-  const select = $("#dashboardUnit"), selected = select.value;
-  select.innerHTML = `<option value="">Semua unit</option>${master.units.map((unit) => `<option value="${unit.id}">${esc(unit.nama)}</option>`).join("")}`;
-  select.value = selected;
+function dashboardMastersRefresh() {
+  for (const [selector, name, rows] of [["#dashboardPm", "PM", master.pm], ["#dashboardBp", "BP", master.bp], ["#dashboardUnit", "unit", master.units]]) {
+    const select = $(selector), selected = select.value;
+    select.innerHTML = `<option value="">Semua ${name}</option>${rows.map((row) => `<option value="${esc(row.id)}">${esc(row.nama)}</option>`).join("")}`;
+    select.value = selected;
+  }
 }
 
 function renderDashboard(data) {
   const counts = data.statusCounts;
   const cards = [
-    ["Total Project", data.totalProjects, null],
-    ["On Progress", counts.ON_PROGRESS, data.totalProjects],
-    ["Selesai", counts.SELESAI, data.totalProjects],
-    ["Pending", counts.PENDING, data.totalProjects],
-    ["On Hold", counts.ON_HOLD, data.totalProjects],
+    ["Total Project", data.totalProjects, null, null],
+    ["On Progress", counts.ON_PROGRESS, data.totalProjects, "ON_PROGRESS"],
+    ["Pending", counts.PENDING, data.totalProjects, "PENDING"],
+    ["On Hold", counts.ON_HOLD, data.totalProjects, "ON_HOLD"],
+    ["Selesai", counts.SELESAI, data.totalProjects, "SELESAI"],
   ];
-  $("#dashboardSummary").innerHTML = cards.map(([label, count, total]) => `<div class="dashboard-kpi"><span>${label}</span><strong>${count}</strong>${total === null ? "" : `<span>${total ? Math.round(count / total * 100) : 0}% dari total</span>`}</div>`).join("");
+  $("#dashboardSummary").innerHTML = cards.map(([label, count, total, status]) => `<div class="dashboard-kpi"><span class="dashboard-kpi-label">${status ? `<span class="legend-dot" style="background:${DASHBOARD_STATUS_COLORS[status]}" aria-hidden="true"></span>` : ""}${label}</span><strong>${count}</strong>${total === null ? "" : `<span>${total ? Math.round(count / total * 100) : 0}% dari total</span>`}</div>`).join("");
 
   const statusTotal = Object.values(counts).reduce((sum, count) => sum + count, 0);
   let position = 0;
@@ -899,7 +911,7 @@ async function loadDashboardProjects() {
   box.innerHTML = `<p class="empty">Memuat project...</p>`;
   const params = new URLSearchParams({ page: dashboardState.page, limit: dashboardState.limit });
   const form = new FormData($("#dashboardFilterForm"));
-  for (const key of ["search", "status", "tahap", "unitId", "tahun"]) {
+  for (const key of ["search", "status", "tahap", "pmId", "bpId", "prioritas", "unitId", "unitKerjaDeveloper", "tahun"]) {
     const value = String(form.get(key) || "").trim();
     if (value) params.set(key, value);
   }
@@ -912,7 +924,7 @@ async function loadDashboardProjects() {
 }
 
 async function loadDashboard() {
-  dashboardUnitsRefresh();
+  dashboardMastersRefresh();
   $("#dashboardMessage").innerHTML = "";
   $("#dashboardSummary").innerHTML = `<p class="empty">Memuat ringkasan...</p>`;
   $("#dashboardStatusChart").innerHTML = `<p class="empty">Memuat grafik...</p>`;
@@ -1059,10 +1071,10 @@ function renderProjectDetail(p) {
 function renderProjects(list, total) {
   const box = $("#projects");
   if (!list.length) { box.innerHTML = `<p class="empty">Belum ada project.</p>`; return; }
-  box.innerHTML = `<table><thead><tr><th>Kode</th><th>Nama</th><th>Kategori</th><th>Jenis</th><th>Status</th><th>Prioritas</th><th>PM</th><th>Unit Pengusul</th><th>Unit Kerja/Developer</th><th>Dokumen</th><th>Aksi</th></tr></thead><tbody>${list.map((p) => `<tr>
+  box.innerHTML = `<table><thead><tr><th>Kode</th><th>Nama</th><th>Kategori</th><th>Status</th><th>Prioritas</th><th>PM</th><th>BP</th><th>Unit Pengusul</th><th>Unit Kerja/Developer</th><th>Dokumen</th><th>Aksi</th></tr></thead><tbody>${list.map((p) => `<tr>
     <td>${esc(p.kodeProject || "-")}</td><td>${esc(p.nama)}</td><td>${esc(KATEGORI_LABEL[p.kategori] || p.kategori)}</td>
-    <td>${esc(JENIS_LABEL[p.jenis] || p.jenis)}</td><td><span class="badge b-${esc(p.status)}">${esc(STATUS_LABEL[p.status] || p.status)}</span></td><td><span class="badge b-${esc(p.prioritas)}">${esc(PRIORITAS_LABEL[p.prioritas] || p.prioritas || "-")}</span></td>
-    <td>${esc(p.pm ? p.pm.nama : "-")}</td><td>${esc(p.unitPengusul ? p.unitPengusul.nama : "-")}</td><td>${esc((p.unitKerjaDeveloper || []).join(", ") || "-")}</td>
+    <td><span class="badge b-${esc(p.status)}">${esc(STATUS_LABEL[p.status] || p.status)}</span></td><td><span class="badge b-${esc(p.prioritas)}">${esc(PRIORITAS_LABEL[p.prioritas] || p.prioritas || "-")}</span></td>
+    <td>${esc(p.pm ? p.pm.nama : "-")}</td><td>${esc(p.bp ? p.bp.nama : "-")}</td><td>${esc(p.unitPengusul ? p.unitPengusul.nama : "-")}</td><td>${esc((p.unitKerjaDeveloper || []).join(", ") || "-")}</td>
     <td><button type="button" class="small" data-docs="${p.id}">${p._count ? p._count.documents : 0} file</button></td>
     <td>${canEditProject(p) ? `<button type="button" class="small" data-edit="${p.id}">Edit</button>` : ""}
     <button type="button" class="small" data-detail="${p.id}" aria-expanded="false">Lihat detail</button>
