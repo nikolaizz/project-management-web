@@ -10,6 +10,7 @@
     "db:migrate": "prisma migrate dev",
     "db:generate": "prisma generate",
     "db:seed": "prisma db seed",
+    "db:seed:demo": "tsx scripts/seed-demo.js",
     "db:studio": "prisma studio",
     "db:create-admin": "tsx scripts/create-admin.js"
   },
